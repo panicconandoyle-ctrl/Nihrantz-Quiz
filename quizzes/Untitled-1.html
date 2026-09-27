@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical Assessment - Immunology Ch. 4</title>
+  <style>
+    /* Global Reset & Clinical Chart Paper Background */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #ffffff;
+      /* Subtle light grey horizontal chart ruling */
+      background-image: linear-gradient(to bottom, #f0f3f6 1px, transparent 1px);
+      background-size: 100% 28px;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px;
+    }
+
+    /* Clipboard / Tablet Container */
+    .clipboard-container {
+      width: 100%;
+      max-width: 820px;
+      background: #ffffff;
+      border: 1px solid #0056b3;
+      border-top: 8px solid #0056b3; /* Medical clipboard accent */
+      border-radius: 2px;
+      box-shadow: 0 4px 18px rgba(0, 86, 179, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Clinical Header */
+    .clinical-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e1e8ed;
+      background: #fcfdfe;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .clinical-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #0056b3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .clinical-header .doc-id {
+      font-size: 12px;
+      color: #555555;
+      font-weight: normal;
+    }
+
+    /* Action bar / Patient List button */
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Content Area */
+    .card-body {
+      padding: 28px 24px;
+      min-height: 420px;
+    }
+
+    /* Progress & Tracking */
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background-color: #e9ecef;
+      margin-bottom: 20px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #0056b3;
+      transition: width 0.25s ease;
+    }
+
+    .meta-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #0056b3;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    /* Question Formatting */
+    .question-prompt {
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: bold;
+      color: #111111;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #d5dee5;
+    }
+
+    /* Options List */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.4;
+      background-color: #ffffff;
+      color: #222222;
+      border: 1px solid #c2d4e7;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: #eaf2fb;
+      border-color: #0056b3;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Option Text & Validation Badges */
+    .opt-label {
+      flex: 1;
+    }
+
+    .validation-tag {
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 12px;
+      white-space: nowrap;
+    }
+
+    .tag-correct {
+      color: #0d8a3e; /* Bold Green */
+    }
+
+    .tag-incorrect {
+      color: #c91818; /* Bold Red */
+    }
+
+    .option-btn.selected-correct {
+      background-color: #edf7ee !important;
+      border-color: #0d8a3e !important;
+    }
+
+    .option-btn.selected-incorrect {
+      background-color: #fdf0f0 !important;
+      border-color: #c91818 !important;
+    }
+
+    /* Clinical Explanation Note */
+    .explanation-box {
+      margin-top: 14px;
+      padding: 14px;
+      background-color: #f7faff;
+      border-left: 3px solid #0056b3;
+      border-radius: 2px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #333333;
+      display: none;
+    }
+
+    .explanation-box strong {
+      color: #0056b3;
+      display: block;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Clinical Navigation Buttons */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #e1e8ed;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 2px;
+      border: 1px solid #0056b3;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background-color: #0056b3;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: #004085;
+      border-color: #004085;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: #0056b3;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #eaf2fb;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-color: #a0b6cd;
+      color: #7d96b0;
+    }
+
+    /* Patient List / Question Overview Drawer */
+    .patient-list-drawer {
+      border: 1px solid #0056b3;
+      background-color: #fcfdfe;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 2px;
+      display: none;
+    }
+
+    .drawer-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #0056b3;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .grid-item {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      /* Status 3: Unanswered Questions (White background) */
+      background-color: #ffffff;
+      border: 1px solid #c2d4e7;
+      color: #444444;
+    }
+
+    .grid-item:hover {
+      border-color: #0056b3;
+    }
+
+    /* Status 2: Answered Questions (Light blue background) */
+    .grid-item.answered {
+      background-color: #e0edfa;
+      border-color: #8bbce8;
+      color: #004085;
+    }
+
+    /* Status 1: Current Question (Blue border) */
+    .grid-item.current {
+      border: 2px solid #0056b3 !important;
+      font-weight: bold;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 11px;
+      color: #555555;
+      padding-top: 8px;
+      border-top: 1px dashed #d5dee5;
+    }
+
+    .legend-box {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 4px;
+      vertical-align: middle;
+      border-radius: 2px;
+    }
+
+    /* Result Screen (Clinical Report) */
+    .result-screen {
+      display: none;
+      padding: 30px 10px;
+      text-align: center;
+    }
+
+    .report-card {
+      border: 1px solid #c2d4e7;
+      background: #fafcfe;
+      border-radius: 2px;
+      padding: 30px 20px;
+      max-width: 480px;
+      margin: 0 auto 24px auto;
+    }
+
+    .report-title {
+      font-size: 14px;
+      color: #555555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .score-display {
+      font-size: 52px;
+      font-weight: bold;
+      color: #0056b3;
+      margin-bottom: 6px;
+    }
+
+    .score-subtext {
+      font-size: 14px;
+      color: #444444;
+      margin-bottom: 20px;
+    }
+
+    /* Clinical Footer & Social Branding (Fixed to container bottom) */
+    .clipboard-footer {
+      border-top: 1px solid #e1e8ed;
+      background: #fcfdfe;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+    }
+
+    .credit-text {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #0056b3;
+    }
+
+    .social-links-bar {
+      display: flex;
+      gap: 6px;
+    }
+
+    .social-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #0056b3;
+      background-color: #ffffff;
+      color: #0056b3;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .social-btn:hover {
+      background-color: #0056b3;
+      color: #ffffff;
+    }
+
+    @media (max-width: 580px) {
+      body {
+        padding: 12px;
+      }
+      .clipboard-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+  </style>
+<script src="/_aistudio-iframe.js?v=2c34bde1"></script></head>
+<body>
+
+<div class="clipboard-container">
+
+  <!-- Header -->
+  <header class="clinical-header">
+    <div>
+      <h1>Immunology Assessment</h1>
+      <span class="doc-id">CH4: Antigen Recognition in the Adaptive Immune System</span>
+    </div>
+    <div class="top-actions">
+      <button id="toggleListBtn" class="btn btn-secondary" onclick="togglePatientList()">View List</button>
+    </div>
+  </header>
+
+  <!-- Main Card Body -->
+  <main class="card-body">
+    
+    <!-- Progress Indicator -->
+    <div class="progress-bar-container">
+      <div id="quizProgressBar" class="progress-bar"></div>
+    </div>
+
+    <!-- Patient List Grid Drawer -->
+    <section id="patientListDrawer" class="patient-list-drawer">
+      <div class="drawer-title">Examination Index (Select Any Item to Navigate)</div>
+      <div id="gridContainer" class="grid-container"></div>
+      <div class="legend">
+        <span><span class="legend-box" style="border: 2px solid #0056b3; background: #fff;"></span> Current Question</span>
+        <span><span class="legend-box" style="background: #e0edfa; border: 1px solid #8bbce8;"></span> Answered</span>
+        <span><span class="legend-box" style="background: #ffffff; border: 1px solid #c2d4e7;"></span> Unanswered</span>
+      </div>
+    </section>
+
+    <!-- Quiz Question Interface -->
+    <div id="quizContainer">
+      <div class="meta-status">
+        <span id="questionCounter">Item 1 of 30</span>
+        <span id="answeredStatus">0 / 30 Recorded</span>
+      </div>
+
+      <div id="questionPrompt" class="question-prompt"></div>
+
+      <div id="optionsList" class="options-list"></div>
+
+      <div id="explanationBox" class="explanation-box">
+        <strong>Clinical Note / Explanation</strong>
+        <p id="explanationText"></p>
+      </div>
+
+      <!-- Navigation Freedom Controls -->
+      <div class="nav-bar">
+        <button id="prevBtn" class="btn btn-secondary" onclick="navigate(-1)">Previous</button>
+        <button id="nextBtn" class="btn btn-primary" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Final Result Report Screen -->
+    <div id="resultScreen" class="result-screen">
+      <div class="report-card">
+        <div class="report-title">Examination Report</div>
+        <div id="finalScore" class="score-display">0%</div>
+        <div id="scoreRatio" class="score-subtext">0 of 30 Completed Correctly</div>
+        <button class="btn btn-primary" onclick="restartQuiz()">Retake Examination</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Fixed Bottom Container: Branding & Social Links -->
+  <footer class="clipboard-footer">
+    <div class="credit-text">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links-bar">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // Complete 30 MCQs Database derived directly from chapter content
+  const quizData = [
+    {
+      q: "What is the primary structural difference between the B cell receptor (BCR) and the T cell receptor (TCR)?",
+      options: [
+        "The BCR is secreted; the TCR is membrane-bound only",
+        "The BCR recognizes native antigens; the TCR recognizes only peptide–MHC complexes",
+        "The TCR has constant regions that mediate effector functions",
+        "The BCR lacks variable domains"
+      ],
+      correct: 1,
+      explanation: "B cells recognize intact, native antigens (proteins, carbs, lipids) in their natural conformation. T cells only recognize short linear peptides presented by MHC molecules—never free antigen."
+    },
+    {
+      q: "Which component of the BCR complex transduces intracellular signals upon antigen binding?",
+      options: [
+        "Membrane immunoglobulin (mIg)",
+        "J chain",
+        "Igα/Igβ (CD79a/b)",
+        "Fc region"
+      ],
+      correct: 2,
+      explanation: "The mIg binds antigen but cannot signal due to short cytoplasmic tails. Igα and Igβ contain ITAM motifs that are phosphorylated upon BCR engagement, initiating downstream signaling via kinases like Syk."
+    },
+    {
+      q: "The complementarity-determining region (CDR) most responsible for antigen specificity is:",
+      options: [
+        "CDR1",
+        "CDR2",
+        "CDR3",
+        "Framework region"
+      ],
+      correct: 2,
+      explanation: "CDR3 is formed at the V-(D)-J junction during somatic recombination and exhibits the greatest sequence variability due to junctional diversity (N/P nucleotide addition). It directly contacts the antigen."
+    },
+    {
+      q: "Which of the following best describes the antigen recognized by a CD8⁺ T cell?",
+      options: [
+        "A polysaccharide from bacterial capsule",
+        "A lipid presented by CD1",
+        "An 8–10 amino acid peptide bound to MHC class I",
+        "A conformational epitope on a viral envelope protein"
+      ],
+      correct: 2,
+      explanation: "CD8⁺ cytotoxic T cells recognize short endogenous peptides (8–10 aa) presented by MHC class I on nucleated cells."
+    },
+    {
+      q: "Somatic recombination of immunoglobulin and T cell receptor genes occurs in which respective location(s)?",
+      options: [
+        "Thymus for both B and T cells",
+        "Bone marrow for B cells; thymus for T cells",
+        "Spleen for mature lymphocytes",
+        "Lymph nodes during immune responses"
+      ],
+      correct: 1,
+      explanation: "B cells undergo V(D)J recombination in the bone marrow. T cells rearrange TCR genes in the thymus. These are the primary generative lymphoid organs."
+    },
+    {
+      q: "Junctional diversity during V(D)J recombination is primarily generated by:",
+      options: [
+        "Alternative splicing of mRNA",
+        "Class switch recombination",
+        "Terminal deoxynucleotidyl transferase (TdT) adding random nucleotides",
+        "Somatic hypermutation"
+      ],
+      correct: 2,
+      explanation: "TdT adds non-templated (N) nucleotides at junctions. Combined with exonuclease trimming and P-nucleotide addition, this creates immense CDR3 diversity."
+    },
+    {
+      q: "Which enzyme complex initiates DNA cleavage during V(D)J recombination?",
+      options: [
+        "DNA polymerase",
+        "RAG-1/RAG-2",
+        "AID (Activation-Induced Cytidine Deaminase)",
+        "TdT"
+      ],
+      correct: 1,
+      explanation: "RAG-1 and RAG-2 form the V(D)J recombinase that recognizes recombination signal sequences (RSS) and introduces double-strand breaks between coding segments and RSS."
+    },
+    {
+      q: "Positive selection of T cells occurs in the thymus to ensure:",
+      options: [
+        "Elimination of self-reactive clones",
+        "Expression of functional TCRs that can bind self-MHC",
+        "Secretion of antibodies",
+        "Development of B-1 cells"
+      ],
+      correct: 1,
+      explanation: "Positive selection in the thymic cortex tests whether double-positive (DP) thymocytes can weakly bind self-peptide–self-MHC complexes, ensuring MHC restriction."
+    },
+    {
+      q: "Negative selection of B cells primarily occurs in the:",
+      options: [
+        "Thymus",
+        "Spleen",
+        "Bone marrow",
+        "Lymph node follicle"
+      ],
+      correct: 2,
+      explanation: "Immature B cells in the bone marrow undergo negative selection if their BCR binds strongly to multivalent self-antigens, leading to clonal deletion, receptor editing, or anergy."
+    },
+    {
+      q: "Which of the following is a key feature of the TCR complex?",
+      options: [
+        "It includes a J chain for polymerization",
+        "It signals through Igα/Igβ",
+        "It requires CD3 and co-receptors (CD4/CD8) for function",
+        "It can be secreted as an effector molecule"
+      ],
+      correct: 2,
+      explanation: "The functional TCR includes the αβ heterodimer (antigen recognition), CD3 (signaling via ITAMs), and CD4 or CD8 (co-receptor for MHC binding)."
+    },
+    {
+      q: "Naïve mature B cells co-express which two immunoglobulin isotypes on their surface?",
+      options: [
+        "IgG and IgA",
+        "IgM and IgD",
+        "IgE and IgM",
+        "IgA and IgD"
+      ],
+      correct: 1,
+      explanation: "Through alternative RNA splicing of the primary VHDHJH transcript, mature naïve B cells co-express IgM and IgD sharing identical antigen specificity."
+    },
+    {
+      q: "Which process ensures that each B cell expresses only one heavy chain allele?",
+      options: [
+        "Receptor editing",
+        "Somatic hypermutation",
+        "Allelic exclusion",
+        "Class switching"
+      ],
+      correct: 2,
+      explanation: "Allelic exclusion halts further heavy-chain rearrangement once a functional μ chain is synthesized, ensuring that each B cell clone possesses a single antigen specificity."
+    },
+    {
+      q: "The pre-BCR is composed of:",
+      options: [
+        "IgM + IgD",
+        "μ heavy chain + surrogate light chain (VpreB + λ5) + Igα/Igβ",
+        "TCR β chain + pre-Tα",
+        "CD20 + CD19"
+      ],
+      correct: 1,
+      explanation: "The pre-BCR consists of a newly synthesized μ heavy chain paired with a surrogate light chain (VpreB and λ5) and the signaling heterodimer Igα/Igβ."
+    },
+    {
+      q: "Which T cell subset expresses a γδ TCR?",
+      options: [
+        "Follicular helper T cells",
+        "Regulatory T cells",
+        "Intraepithelial lymphocytes (IELs)",
+        "Memory CD8⁺ T cells"
+      ],
+      correct: 2,
+      explanation: "γδ T cells are enriched in epithelial borders (e.g., gut, skin, respiratory mucosa) and can recognize non-peptide antigens without classical MHC restriction."
+    },
+    {
+      q: "What is the primary role of the CD3 complex in T cell activation?",
+      options: [
+        "It binds peptide–MHC complexes directly",
+        "It provides co-stimulation via CD28",
+        "It contains ITAMs that initiate intracellular signaling",
+        "It mediates antibody-dependent cellular cytotoxicity"
+      ],
+      correct: 2,
+      explanation: "The CD3 complex (γε, δε, ζζ) contains ITAMs that become phosphorylated by Lck, recruiting ZAP-70 kinase to initiate intracellular activation cascades."
+    },
+    {
+      q: "Which immunoglobulin isotype has the longest serum half-life?",
+      options: [
+        "IgM",
+        "IgA",
+        "IgE",
+        "IgG"
+      ],
+      correct: 3,
+      explanation: "IgG has a serum half-life of ~21 days due to FcRn (neonatal Fc receptor) recycling within endothelial cells, protecting it from lysosomal degradation."
+    },
+    {
+      q: "Monoclonal antibodies like rituximab are typically produced for clinical use using:",
+      options: [
+        "PCR amplification of serum Ig",
+        "Hybridoma technology or recombinant expression in CHO cells",
+        "Transgenic mice with human TCRs",
+        "Phage display of TCR libraries"
+      ],
+      correct: 1,
+      explanation: "mAbs were historically produced via hybridoma technology (B cell + myeloma fusion) and are modernly synthesized using recombinant expression systems like CHO cells."
+    },
+    {
+      q: "Which mechanism contributes MOST to the diversity of the adaptive immune receptor repertoire?",
+      options: [
+        "Combinatorial V-J pairing",
+        "Somatic hypermutation",
+        "Junctional diversity at CDR3",
+        "Class switching"
+      ],
+      correct: 2,
+      explanation: "Junctional diversity (TdT addition, exonuclease trimming, P-nucleotides) generates unprecedented sequence variation at CDR3, massively exceeding simple combinatorial joins."
+    },
+    {
+      q: "A genetic defect in RAG-1 or RAG-2 would most likely cause:",
+      options: [
+        "Selective IgA deficiency",
+        "Severe Combined Immunodeficiency (SCID)",
+        "Allergic asthma",
+        "Chronic granulomatous disease"
+      ],
+      correct: 1,
+      explanation: "RAG deficiency prevents initiation of V(D)J recombination, resulting in a complete absence of mature B and T lymphocytes (T⁻B⁻ SCID)."
+    },
+    {
+      q: "Which of the following is NOT recognized by antibodies in their native state?",
+      options: [
+        "Conformational epitopes on proteins",
+        "Linear peptide sequences",
+        "MHC-bound peptide complexes exclusively",
+        "Polysaccharides and lipids"
+      ],
+      correct: 2,
+      explanation: "Antibodies bind diverse native macromolecules directly. Only T cell receptors are specifically restricted to peptide fragments embedded within MHC grooves."
+    },
+    {
+      q: "During thymic development, lineage commitment to CD4⁺ or CD8⁺ is governed by:",
+      options: [
+        "Cytokine concentrations in thymic stroma",
+        "Whether the TCR recognizes MHC class II or class I during positive selection",
+        "Random post-translational modification",
+        "Direct engagement with circulating B cells"
+      ],
+      correct: 1,
+      explanation: "During positive selection, DP thymocytes recognizing self-peptide on MHC class II commit to CD4⁺ T cells, while those recognizing MHC class I become CD8⁺ T cells."
+    },
+    {
+      q: "Which B cell subset is primarily responsible for rapid, T-independent antibody responses to blood-borne encapsulated bacteria?",
+      options: [
+        "Follicular B cells",
+        "B-1 cells",
+        "Marginal zone B cells",
+        "Germinal center B cells"
+      ],
+      correct: 2,
+      explanation: "Marginal zone (MZ) B cells in the spleen rapidly mount T-independent IgM responses against blood-borne particulate and encapsulated bacterial pathogens."
+    },
+    {
+      q: "Effector functions of antibodies, such as opsonization and complement activation, are mediated by the:",
+      options: [
+        "Variable region (Fab)",
+        "CDR3 loop",
+        "Constant region (Fc)",
+        "J chain alone"
+      ],
+      correct: 2,
+      explanation: "The Fc (constant) region binds to leukocyte Fc receptors (mediating opsonization, ADCC) and C1q (activating the classical complement pathway)."
+    },
+    {
+      q: "Which biological process allows B cells to alter their antibody isotype while maintaining identical antigen specificity?",
+      options: [
+        "V(D)J recombination",
+        "Receptor editing",
+        "Class switch recombination",
+        "Negative selection"
+      ],
+      correct: 2,
+      explanation: "Class switch recombination replaces constant heavy chain gene segments (e.g., Cμ to Cγ) while leaving the rearranged VDJ segment unchanged."
+    },
+    {
+      q: "In classical hybridoma technology, HAT selective medium is utilized to:",
+      options: [
+        "Enhance B cell antibody secretion rate",
+        "Select for successfully fused hybridoma cells while killing unfused myeloma cells",
+        "Induce high-frequency class switching",
+        "Stimulate T-helper cell cytokine production"
+      ],
+      correct: 1,
+      explanation: "Myeloma partner cells are HGPRT-deficient and die in HAT medium. Unfused primary B cells have limited lifespan. Only hybridomas (possessing immortality and HGPRT) survive."
+    },
+    {
+      q: "Which statement accurately describes the intrinsic binding affinity of T cell receptors compared to antibodies?",
+      options: [
+        "TCRs exhibit higher affinity due to somatic hypermutation",
+        "TCR affinity progressively increases during secondary immune responses",
+        "TCRs possess lower intrinsic affinity and do not undergo affinity maturation",
+        "TCRs bind antigens with picomolar dissociation constants (Kd ≈ 10⁻¹² M)"
+      ],
+      correct: 2,
+      explanation: "TCRs have relatively low affinity (Kd ≈ 10⁻⁵ to 10⁻⁷ M) and do not undergo somatic hypermutation or affinity maturation in the periphery, safeguarding against autoimmunity."
+    },
+    {
+      q: "Receptor editing during B cell central tolerance involves:",
+      options: [
+        "Somatic hypermutation of heavy chain CDRs",
+        "Secondary V-J rearrangement at the light chain locus",
+        "Direct transcriptional switching from IgM to IgD",
+        "Upregulation of CD40 ligand"
+      ],
+      correct: 1,
+      explanation: "When an immature B cell strongly recognizes self-antigen in bone marrow, it can re-express RAG to rearrange an upstream V to downstream J light chain segment."
+    },
+    {
+      q: "Which polypeptide is a constituent of the surrogate light chain during the pre-B cell stage?",
+      options: [
+        "J chain",
+        "λ5",
+        "CD79a",
+        "β2-microglobulin"
+      ],
+      correct: 1,
+      explanation: "The surrogate light chain is a invariant heterodimer consisting of λ5 covalently linked to VpreB, pairing with the μ heavy chain to form the pre-BCR."
+    },
+    {
+      q: "Rituximab achieves targeted destruction of leukemic B cells by binding which surface marker?",
+      options: [
+        "CD19",
+        "CD20",
+        "CD40",
+        "Surface IgD"
+      ],
+      correct: 1,
+      explanation: "Rituximab is a chimeric monoclonal antibody targeting CD20, a surface molecule expressed on pre-B and mature B cells, but absent on hematopoietic stem cells and plasma cells."
+    },
+    {
+      q: "Why are T cell receptors precluded from undergoing peripheral somatic hypermutation?",
+      options: [
+        "They do not enter germinal centers and lack AID expression",
+        "T cells lack RAG enzymes during development",
+        "High-affinity random mutants could easily trigger destructive autoimmunity against self-MHC",
+        "Both A and C are correct"
+      ],
+      correct: 3,
+      explanation: "T cells do not transit germinal center reactions, lack AID, and must strictly preserve their calibrated affinity to self-MHC; somatic hypermutation would risk generating aggressive autoreactive T clones."
+    }
+  ];
+
+  // State Management
+  let currentIndex = 0;
+  // userAnswers stores: null if unanswered, or { selectedOptionIndex: number, isCorrect: boolean }
+  const userAnswers = new Array(quizData.length).fill(null);
+  let isPatientListOpen = false;
+
+  // DOM Elements
+  const questionCounterEl = document.getElementById("questionCounter");
+  const answeredStatusEl = document.getElementById("answeredStatus");
+  const progressBarEl = document.getElementById("quizProgressBar");
+  const promptEl = document.getElementById("questionPrompt");
+  const optionsListEl = document.getElementById("optionsList");
+  const explanationBoxEl = document.getElementById("explanationBox");
+  const explanationTextEl = document.getElementById("explanationText");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const patientListDrawer = document.getElementById("patientListDrawer");
+  const gridContainer = document.getElementById("gridContainer");
+  const toggleListBtn = document.getElementById("toggleListBtn");
+  const quizContainer = document.getElementById("quizContainer");
+  const resultScreen = document.getElementById("resultScreen");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    loadQuestion(0);
+    updateMetrics();
+  }
+
+  // Build the Question Overview Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    for (let i = 0; i < quizData.length; i++) {
+      const item = document.createElement("div");
+      item.id = `grid-item-${i}`;
+      item.className = "grid-item";
+      item.textContent = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    }
+  }
+
+  // Update Status Indicators in the Grid
+  function updateGridIndicators() {
+    for (let i = 0; i < quizData.length; i++) {
+      const item = document.getElementById(`grid-item-${i}`);
+      if (!item) continue;
+
+      // Base class
+      item.className = "grid-item";
+
+      // Answered status
+      if (userAnswers[i] !== null) {
+        item.classList.add("answered");
+      }
+
+      // Current active status
+      if (i === currentIndex) {
+        item.classList.add("current");
+      }
+    }
+  }
+
+  // Load a Question by Index
+  function loadQuestion(index) {
+    currentIndex = index;
+    const q = quizData[index];
+
+    questionCounterEl.textContent = `Item ${index + 1} of ${quizData.length}`;
+    promptEl.textContent = `${index + 1}. ${q.q}`;
+    optionsListEl.innerHTML = "";
+
+    const existingAnswer = userAnswers[index];
+
+    // Render Options
+    q.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "opt-label";
+      labelSpan.textContent = `${String.fromCharCode(65 + optIdx)}. ${optText}`;
+      btn.appendChild(labelSpan);
+
+      const tagSpan = document.createElement("span");
+      tagSpan.className = "validation-tag";
+      btn.appendChild(tagSpan);
+
+      // If already answered previously, restore visual state
+      if (existingAnswer !== null) {
+        btn.disabled = true;
+        if (optIdx === q.correct) {
+          tagSpan.textContent = "CORRECT";
+          tagSpan.classList.add("tag-correct");
+          if (existingAnswer.selected === optIdx) {
+            btn.classList.add("selected-correct");
+          }
+        } else if (existingAnswer.selected === optIdx) {
+          tagSpan.textContent = "INCORRECT";
+          tagSpan.classList.add("tag-incorrect");
+          btn.classList.add("selected-incorrect");
+        }
+      } else {
+        // Active click listener
+        btn.onclick = () => handleAnswerSelect(optIdx);
+      }
+
+      optionsListEl.appendChild(btn);
+    });
+
+    // Handle Explanation View
+    if (existingAnswer !== null) {
+      explanationTextEl.textContent = q.explanation;
+      explanationBoxEl.style.display = "block";
+    } else {
+      explanationBoxEl.style.display = "none";
+    }
+
+    // Navigation button states
+    prevBtn.disabled = (currentIndex === 0);
+    if (currentIndex === quizData.length - 1) {
+      nextBtn.textContent = "Finish Test";
+    } else {
+      nextBtn.textContent = "Next";
+    }
+
+    updateGridIndicators();
+    updateMetrics();
+  }
+
+  // Instant Feedback Handler
+  function handleAnswerSelect(selectedIdx) {
+    if (userAnswers[currentIndex] !== null) return; // Prevent re-selection
+
+    const q = quizData[currentIndex];
+    const isCorrect = (selectedIdx === q.correct);
+
+    // Save answer
+    userAnswers[currentIndex] = {
+      selected: selectedIdx,
+      isCorrect: isCorrect
+    };
+
+    // Update buttons in place with instant feedback
+    const buttons = optionsListEl.querySelectorAll(".option-btn");
+    buttons.forEach((btn, idx) => {
+      btn.disabled = true;
+      const tag = btn.querySelector(".validation-tag");
+
+      if (idx === q.correct) {
+        tag.textContent = "CORRECT";
+        tag.classList.add("tag-correct");
+        if (idx === selectedIdx) {
+          btn.classList.add("selected-correct");
+        }
+      } else if (idx === selectedIdx) {
+        tag.textContent = "INCORRECT";
+        tag.classList.add("tag-incorrect");
+        btn.classList.add("selected-incorrect");
+      }
+    });
+
+    // Show Explanation
+    explanationTextEl.textContent = q.explanation;
+    explanationBoxEl.style.display = "block";
+
+    updateGridIndicators();
+    updateMetrics();
+  }
+
+  // Navigation Logic
+  function navigate(delta) {
+    const targetIndex = currentIndex + delta;
+    if (targetIndex >= 0 && targetIndex < quizData.length) {
+      loadQuestion(targetIndex);
+    } else if (targetIndex >= quizData.length) {
+      // Completed, show result screen
+      showResults();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    if (resultScreen.style.display === "block") {
+      resultScreen.style.display = "none";
+      quizContainer.style.display = "block";
+    }
+    loadQuestion(index);
+    if (window.innerWidth < 640 && isPatientListOpen) {
+      togglePatientList(); // auto-close drawer on mobile
+    }
+  }
+
+  function togglePatientList() {
+    isPatientListOpen = !isPatientListOpen;
+    patientListDrawer.style.display = isPatientListOpen ? "block" : "none";
+    toggleListBtn.textContent = isPatientListOpen ? "Hide List" : "View List";
+  }
+
+  function updateMetrics() {
+    const answeredCount = userAnswers.filter(a => a !== null).length;
+    answeredStatusEl.textContent = `${answeredCount} / ${quizData.length} Recorded`;
+    const pct = ((answeredCount / quizData.length) * 100);
+    progressBarEl.style.width = `${pct}%`;
+  }
+
+  // Clinical Report Display
+  function showResults() {
+    quizContainer.style.display = "none";
+    resultScreen.style.display = "block";
+    patientListDrawer.style.display = "none";
+    isPatientListOpen = false;
+    toggleListBtn.textContent = "View List";
+
+    const totalCorrect = userAnswers.filter(a => a && a.isCorrect).length;
+    const finalPct = Math.round((totalCorrect / quizData.length) * 100);
+
+    document.getElementById("finalScore").textContent = `${finalPct}%`;
+    document.getElementById("scoreRatio").textContent = `${totalCorrect} of ${quizData.length} Items Validated Correct`;
+  }
+
+  function restartQuiz() {
+    for (let i = 0; i < userAnswers.length; i++) {
+      userAnswers[i] = null;
+    }
+    resultScreen.style.display = "none";
+    quizContainer.style.display = "block";
+    loadQuestion(0);
+    updateMetrics();
+    updateGridIndicators();
+  }
+
+  // Run on startup
+  window.onload = initQuiz;
+</script>
+
+</body>
+</html>
