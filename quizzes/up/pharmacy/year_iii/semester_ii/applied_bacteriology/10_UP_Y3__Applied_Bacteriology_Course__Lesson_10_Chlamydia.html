@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 10: Chlamydia Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 10: Chlamydia</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Why are Chlamydia species classified as obligatory intracellular pathogens?",
+        options: [
+          "They can only replicate in artificial nutrient broth containing sheep blood",
+          "They strictly require a living host cell to survive and replicate, failing to grow on artificial media",
+          "They require a high concentration of oxygen available only within red blood cells",
+          "They live solely as saprophytes in outdoor soil environments"
+        ],
+        correct: 1,
+        explanation: "Chlamydia species are obligatory intracellular pathogens because they lack autonomous metabolic capacity and must reside inside living eukaryotic host cells to reproduce. They cannot multiply on standard artificial agar or broth media."
+      },
+      {
+        q: "Which distinct form of Chlamydia represents the infectious, metabolically inert stage specialized for extracellular survival?",
+        options: [
+          "Reticulate Body (RB)",
+          "Initial Body (IB)",
+          "Elementary Body (EB)",
+          "Endosomal inclusion"
+        ],
+        correct: 2,
+        explanation: "The Elementary Body (EB) is small, compact, metabolically inactive ('survival mode'), and resistant to extracellular stress. Its primary role is adhering to host epithelial cells and mediating infection."
+      },
+      {
+        q: "What is the primary biological function of the Reticulate Body (Initial Body) in the Chlamydia life cycle?",
+        options: [
+          "Surviving outside the host and adhering to uninfected epithelial membranes",
+          "Metabolically replicating inside the host cell inclusion via transverse fission",
+          "Direct transmission via respiratory droplets without host cell invasion",
+          "Producing exotoxins that lyse red blood cells in the circulation"
+        ],
+        correct: 1,
+        explanation: "Reticulate Bodies (or Initial Bodies) are the metabolically active, non-infectious intracellular stage that multiplies within the endosomal inclusion vesicle by transverse fission."
+      },
+      {
+        q: "What structural component is notably absent from the cell wall of Chlamydia, distinguishing it from typical bacteria?",
+        options: [
+          "Lipopolysaccharide (LPS)",
+          "Outer membrane",
+          "Peptidoglycan",
+          "Phospholipid bilayer"
+        ],
+        correct: 2,
+        explanation: "Chlamydia possesses an outer membrane containing Lipopolysaccharide (LPS), but uniquely lacks a standard peptidoglycan layer in its cell wall, rendering beta-lactam antibiotics targeting peptidoglycan synthesis ineffective."
+      },
+      {
+        q: "What is the approximate total duration of the biphasic replication cycle of Chlamydia from initial attachment to host cell lysis?",
+        options: [
+          "2 to 4 hours",
+          "12 hours",
+          "48 hours",
+          "7 to 10 days"
+        ],
+        correct: 2,
+        explanation: "The complete replication cycle of Chlamydia—from Elementary Body attachment, endocytosis, transformation into Reticulate Bodies, division, recondensation into EBs, to host cell lysis—takes approximately 48 hours."
+      },
+      {
+        q: "Which host cell structure encapsulates the reproducing Chlamydia Reticulate Bodies during intracellular multiplication?",
+        options: [
+          "Mitochondrial matrix",
+          "Inclusion vesicle (endosome)",
+          "Golgi apparatus cisterna",
+          "Host cell nucleolus"
+        ],
+        correct: 1,
+        explanation: "Following endocytosis, the bacteria remain enclosed in a membrane-bound vacuole termed an inclusion vesicle or endosome, preventing lysosomal fusion and housing the replicating Reticulate Bodies."
+      },
+      {
+        q: "Which pathogenic species of Chlamydia is a recognized zoonosis primarily transmitted through contact with birds or dried avian droppings?",
+        options: [
+          "Chlamydia trachomatis",
+          "Chlamydia pneumoniae",
+          "Chlamydia psittaci",
+          "Chlamydia pecorum"
+        ],
+        correct: 2,
+        explanation: "Chlamydia psittaci naturally infects birds (parrots, parakeets, pigeons) and causes psittacosis ('parrot fever') in humans via inhalation of aerosolized droppings or feather dust."
+      },
+      {
+        q: "Which two biovars of Chlamydia trachomatis are specifically pathogenic to humans?",
+        options: [
+          "Biovar Psittaci and Biovar Pneumoniae",
+          "Biovar Trachoma and Biovar LGV (Lymphogranuloma Venereum)",
+          "Biovar MoPn and Biovar Pecorum",
+          "Biovar Ovis and Biovar Bovis"
+        ],
+        correct: 1,
+        explanation: "C. trachomatis is classified into three biovars: Biovar Trachoma (causing ocular trachoma and genital infections) and Biovar LGV (causing lymphogranuloma venereum) are human pathogens, while MoPn infects mice."
+      },
+      {
+        q: "Which cellular lining serves as the primary anatomical habitat and target for Chlamydia trachomatis infections in humans?",
+        options: [
+          "Keratinized stratified squamous epithelium of the dry skin",
+          "Columnar epithelial cells of mucous membranes (eyes, genital tract, respiratory tract)",
+          "Endothelial cells lining deep venous valves",
+          "Myocardial muscle fibers"
+        ],
+        correct: 1,
+        explanation: "C. trachomatis specifically infects non-ciliated columnar or transitional epithelial cells found on mucosal surfaces of the conjunctiva, urethra, cervix, and fallopian tubes."
+      },
+      {
+        q: "How does mechanical transmission of ocular trachoma frequently occur in endemic rural regions with poor sanitation?",
+        options: [
+          "Biting ticks transferring bacteria through blood meals",
+          "Flies carrying infected eye secretions from person to person",
+          "Mosquito vectors inoculating salivary gland fluids",
+          "Airborne fungal spores carrying bacteria on their surface"
+        ],
+        correct: 1,
+        explanation: "In endemic areas with overcrowding and limited water, eye-seeking flies (such as Musca sorbens) act as mechanical vectors, transporting C. trachomatis-laden discharge directly between children's eyes."
+      },
+      {
+        q: "Which condition represents the leading infectious cause of preventable blindness worldwide?",
+        options: [
+          "Onchocerciasis",
+          "Trachoma caused by C. trachomatis",
+          "Herpetic keratoconjunctivitis",
+          "Gonococcal ophthalmia neonatorum"
+        ],
+        correct: 1,
+        explanation: "Trachoma, caused by chronic, repeated conjunctival infection with C. trachomatis, is the world's leading infectious cause of blindness, affecting hundreds of millions and having blinded ~6 million people."
+      },
+      {
+        q: "What pathological sequence leads directly to corneal blindness in advanced chronic trachoma?",
+        options: [
+          "Retinal detachment triggered by bacterial neurotoxins",
+          "Conjunctival scarring leading to inward-turned eyelashes (trichiasis) that abrade the cornea",
+          "Lens opacification from systemic carbohydrate accumulation",
+          "Optic nerve necrosis caused by acute intraocular bacterial invasion"
+        ],
+        correct: 1,
+        explanation: "Chronic follicular inflammation produces conjunctival retractile scar tissue. This scarring distorts the eyelid margin, turning the eyelashes inward (trichiasis). The lashes continuously scratch the cornea, resulting in ulceration, scarring, and permanent blindness."
+      },
+      {
+        q: "In non-endemic, industrialized settings, how does chlamydial inclusion conjunctivitis commonly present in adults?",
+        options: [
+          "Bilateral blindness within 48 hours of onset",
+          "Usually unilateral follicular conjunctivitis acquired via autoinoculation of genital secretions",
+          "Painless loss of color vision without redness",
+          "Copious purulent discharge containing Gram-positive diplococci"
+        ],
+        correct: 1,
+        explanation: "In non-endemic areas, adult chlamydial inclusion conjunctivitis is typically unilateral and follicular, acquired when patients accidentally transfer infected genital secretions to their eyes via contaminated fingers."
+      },
+      {
+        q: "Chlamydia trachomatis is recognized as the leading etiologic agent of which condition in men?",
+        options: [
+          "Acute bacterial prostatitis caused by Gram-negative bacilli",
+          "Non-Gonococcal Urethritis (NGU)",
+          "Primary syphilitic chancre",
+          "Testicular torsion"
+        ],
+        correct: 1,
+        explanation: "C. trachomatis is the number one cause of Non-Gonococcal Urethritis (NGU) in men, producing symptoms such as dysuria and mucoid urethral discharge."
+      },
+      {
+        q: "What common complication can occur in untreated men approximately two weeks after an initial chlamydial urethral infection?",
+        options: [
+          "Glomerulonephritis",
+          "Epididymitis",
+          "Renal cell carcinoma",
+          "Fournier's gangrene"
+        ],
+        correct: 1,
+        explanation: "Ascending canalicular spread of C. trachomatis along the vas deferens leads to epididymitis (scrotal pain, unilateral tenderness, and swelling) approximately two weeks after the initial urethritis."
+      },
+      {
+        q: "Why is genital C. trachomatis infection particularly dangerous and difficult to control in female patients?",
+        options: [
+          "It rapidly causes hemorrhagic shock within 24 hours",
+          "A large proportion of female genital infections are completely asymptomatic (silent/unapparent)",
+          "It induces violent vomiting and immediate gastrointestinal perforation",
+          "It forms antibiotic-resistant spores that persist in soil"
+        ],
+        correct: 1,
+        explanation: "In women, chlamydial cervicitis is frequently asymptomatic ('silent infection') in up to 70–80% of cases. Lack of early symptoms prevents patients from seeking care while internal scarring silently progresses."
+      },
+      {
+        q: "What severe long-term reproductive complication can arise from ascending chlamydial salpingitis (Pelvic Inflammatory Disease)?",
+        options: [
+          "Tubal scarring leading to tubal-factor infertility and ectopic pregnancy",
+          "Cervical agenesis",
+          "Immediate ovarian fibroma development",
+          "Uterine leiomyosarcoma"
+        ],
+        correct: 0,
+        explanation: "Ascent into the fallopian tubes causes salpingitis/PID. The resulting chronic inflammation and retractile scarring obstruct the tubal lumen, causing involuntary infertility and raising the risk of fatal ectopic pregnancy."
+      },
+      {
+        q: "What is Fitz-Hugh-Curtis syndrome, a rare complication associated with ascending chlamydial pelvic inflammatory disease?",
+        options: [
+          "Reactive sacroiliitis accompanied by urethral strictures",
+          "Perihepatitis characterized by inflammation of the liver capsule and right upper quadrant pain",
+          "Acute bacterial endocarditis affecting the mitral valve",
+          "Splenic infarction resulting from bacterial embolization"
+        ],
+        correct: 1,
+        explanation: "Perihepatitis (Fitz-Hugh-Curtis syndrome) occurs when bacteria spread along the paracolic gutters into the subdiaphragmatic space, producing inflammation and 'violin-string' adhesions on the liver capsule."
+      },
+      {
+        q: "Which two main clinical conditions can develop in a neonate born vaginally to a mother with an active untreated C. trachomatis infection?",
+        options: [
+          "Neonatal meningitis and hydrocephalus",
+          "Inclusion conjunctivitis and interstitial pneumonia (staccato cough)",
+          "Acute congenital hepatitis and jaundice",
+          "Scalded skin syndrome and bullous impetigo"
+        ],
+        correct: 1,
+        explanation: "Neonates exposed during passage through the colonized birth canal are at high risk for developing neonatal conjunctivitis (ophthalmia neonatorum) and infantile chlamydial pneumonia (characterized by a classic staccato cough)."
+      },
+      {
+        q: "Which genetic marker is strongly associated with Reiter's syndrome (Reactive Arthritis) triggered by Chlamydia infection?",
+        options: [
+          "HLA-DR4",
+          "HLA-B27",
+          "BRCA1",
+          "APOE-epsilon4"
+        ],
+        correct: 1,
+        explanation: "Reiter's syndrome (reactive arthritis) demonstrates a well-established immunogenetic association with the HLA-B27 human leukocyte antigen."
+      },
+      {
+        q: "What clinical triad classically defines Reiter's syndrome (Fiessinger-Leroy-Reiter syndrome)?",
+        options: [
+          "Jaundice, fever, and right upper quadrant abdominal pain",
+          "Arthritis, conjunctivitis/uveitis, and urethritis",
+          "Hemolytic anemia, thrombocytopenia, and acute renal failure",
+          "Tremor, chorea, and emotional lability"
+        ],
+        correct: 1,
+        explanation: "Reiter's syndrome is classically remembered by the triad of arthritis, uveitis/conjunctivitis, and urethritis (summarized by the clinical mnemonic: 'can't see, can't pee, can't climb a tree')."
+      },
+      {
+        q: "What is the hallmark presentation of the secondary stage of Lymphogranuloma Venereum (LGV)?",
+        options: [
+          "A small, transient, painless genital ulcer",
+          "Painful, suppurative inguinal lymphadenopathy (femoral buboes) that can form fistulas",
+          "Ascending paralysis starting in the lower extremities",
+          "Macular rash covering the palms and soles"
+        ],
+        correct: 1,
+        explanation: "LGV progresses from a transient, painless primary genital papule/ulcer to the secondary stage marked by severe, painful enlargement and suppuration of inguinal lymph nodes (buboes), often with draining fistulous tracts."
+      },
+      {
+        q: "Why is Nucleic Acid Amplification Testing (NAAT) the gold standard and only recommended test for routine clinical screening of C. trachomatis?",
+        options: [
+          "It provides live bacterial colonies for disk diffusion susceptibility testing",
+          "It offers the highest sensitivity and specificity by detecting bacterial DNA/RNA, even in low-organism samples",
+          "It relies on measuring patient serum antibody titers within 15 minutes",
+          "It is an inexpensive direct light microscopy stain requiring no machinery"
+        ],
+        correct: 1,
+        explanation: "NAAT detects specific chlamydial DNA or RNA sequences. Its superior sensitivity and specificity outmatch cultures and antigen detection, making it the only globally recommended routine diagnostic method on urine or swab specimens."
+      },
+      {
+        q: "Which cell line is most classically utilized when isolating Chlamydia trachomatis via cell culture?",
+        options: [
+          "Vero monkey kidney cells",
+          "McCoy cells",
+          "Jurkat T-lymphocyte cells",
+          "Bacterial lawn of E. coli"
+        ],
+        correct: 1,
+        explanation: "Cell culture isolation relies on living cell monolayers, with cycloheximide-treated McCoy cells (alongside HeLa 229 and Hep-2 cells) being the standard laboratory cell line."
+      },
+      {
+        q: "When cell culture isolation of C. trachomatis is performed, what transport conditions are mandatory to prevent organism death?",
+        options: [
+          "Transport medium kept at room temperature (25°C) for up to 7 days",
+          "Special transport medium, refrigerated at 4°C, reaching the lab within 24 hours",
+          "Dried on filter paper stored at 37°C in an anaerobic jar",
+          "Suspended in pure 70% ethanol"
+        ],
+        correct: 1,
+        explanation: "Because elementary bodies rapidly lose infectivity at room temperature, specimens for viable culture must be collected in specific sucrose-phosphate transport broth, refrigerated at 4°C, and inoculated within 24 hours."
+      },
+      {
+        q: "Why are penicillins and cephalosporins ineffective against Chlamydia infections?",
+        options: [
+          "Chlamydia produces abundant beta-lactamase enzymes in the inclusion",
+          "Chlamydia lacks a peptidoglycan cell wall target, making cell-wall synthesis inhibitors ineffective",
+          "Beta-lactams cannot dissolve in human serum",
+          "Host cells actively convert penicillins into bacterial growth factors"
+        ],
+        correct: 1,
+        explanation: "Penicillins and cephalosporins work by inhibiting bacterial peptidoglycan cell wall cross-linking. Because Chlamydia does not synthesize a classical peptidoglycan wall, these antibiotics lack an effective biochemical target."
+      },
+      {
+        q: "Which antibiotic classes represent the primary first-line therapeutic agents for treating C. trachomatis infections?",
+        options: [
+          "Aminoglycosides and Carbapenems",
+          "Tetracyclines (e.g., Doxycycline) and Macrolides (e.g., Azithromycin)",
+          "First-generation Cephalosporins and Polymyxins",
+          "Glycopeptides (e.g., Vancomycin) and Oxazolidinones"
+        ],
+        correct: 1,
+        explanation: "Because Chlamydia is an intracellular organism lacking peptidoglycan, protein synthesis inhibitors with high intracellular penetration—specifically Tetracyclines (Doxycycline) and Macrolides (Azithromycin)—are the frontline drug classes."
+      },
+      {
+        q: "What is the primary mode of transmission of Chlamydia pneumoniae between humans?",
+        options: [
+          "Inhalation of infectious respiratory droplets spread by coughing and sneezing",
+          "Direct mucosal contact during sexual intercourse",
+          "Mechanical transmission via bird mites",
+          "Consumption of contaminated unpasteurized cow's milk"
+        ],
+        correct: 0,
+        explanation: "Chlamydia pneumoniae is an obligate human respiratory pathogen that spreads from person to person through respiratory droplet inhalation during coughing or close conversational contact."
+      },
+      {
+        q: "Which chronic cardiovascular condition has been epidemiologically and pathologically linked to Chlamydia pneumoniae?",
+        options: [
+          "Coarctation of the aorta",
+          "Atheromatous vascular disease (hardening of arteries and coronary plaque inflammation)",
+          "Patent ductus arteriosus",
+          "Mitral valve prolapse"
+        ],
+        correct: 1,
+        explanation: "C. pneumoniae has been detected in atheromatous plaques within arterial walls, where chronic vascular wall inflammation is thought to accelerate atherogenesis and increase cardiovascular event risks."
+      },
+      {
+        q: "In the taxonomic hierarchy, to which Order and Family does the genus Chlamydia belong?",
+        options: [
+          "Order Enterobacterales, Family Enterobacteriaceae",
+          "Order Chlamydiales, Family Chlamydiaceae",
+          "Order Bacillales, Family Staphylococcaceae",
+          "Order Pseudomonadales, Family Pseudomonadaceae"
+        ],
+        correct: 1,
+        explanation: "Chlamydia belongs to the Kingdom Bacteria, Phylum Chlamydiae, Class Chlamydiae, Order Chlamydiales, and Family Chlamydiaceae."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
