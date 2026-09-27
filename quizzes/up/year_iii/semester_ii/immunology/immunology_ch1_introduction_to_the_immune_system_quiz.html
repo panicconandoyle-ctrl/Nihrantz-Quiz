@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01. UP_Immunology_CH1: Introduction to the Immune System_BUNRETH Nihrantz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px 40px;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Header & Progress */
+    .header-card {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .quiz-subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .list-toggle-btn {
+      background-color: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d5dcff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .list-toggle-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-bg {
+      background-color: #e6e9f2;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-fill {
+      background-color: #4255ff;
+      height: 100%;
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    /* Question Drawer / Modal Grid */
+    .grid-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .grid-modal.open {
+      display: block;
+    }
+
+    .grid-modal-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 12px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #d5dcff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      background-color: #eef1ff;
+      border-color: #4255ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      color: #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-item.answered {
+      background-color: #eef1ff;
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    /* Study Card */
+    .card {
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .q-number-tag {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #646f90;
+      font-weight: 700;
+    }
+
+    .q-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.45;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 14.5px;
+      color: #2e3856;
+      transition: all 0.15s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fbfcff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: #f6f7fb;
+      color: #646f90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      border: 1px solid #e6e9f2;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .feedback-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: none;
+      text-transform: uppercase;
+    }
+
+    /* Option Feedback States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .feedback-pill {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .feedback-pill {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Rationale Card */
+    .rationale-box {
+      display: none;
+      background: #fcfdfe;
+      border: 1px solid #e6e9f2;
+      border-left: 5px solid #4255ff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 4px;
+    }
+
+    .rationale-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-content {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.5;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      border-color: #d5dcff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      color: #ffffff;
+      border: 1px solid #4255ff;
+      margin-left: auto;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+    }
+
+    /* Results Card */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      padding: 40px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .score-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 10px auto;
+    }
+
+    .score-percent {
+      font-size: 32px;
+      font-weight: 800;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 11px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .score-breakdown {
+      display: flex;
+      gap: 24px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .stat-correct { color: #18ae79; }
+    .stat-incorrect { color: #ff6871; }
+
+    /* Footer & Branding */
+    .footer {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 13px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      width: 34px;
+      height: 34px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Header Card -->
+  <div class="header-card">
+    <div class="title-row">
+      <div>
+        <div class="quiz-title">Immunology: CH1 Introduction to the Immune System</div>
+        <div class="quiz-subtitle">30 High-Yield Multiple Choice Questions & Rationales</div>
+      </div>
+      <button class="list-toggle-btn" id="listToggleBtn" onclick="toggleGrid()">View List</button>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="stats-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </div>
+
+  <!-- Question Overview Grid Drawer -->
+  <div class="grid-modal" id="gridModal">
+    <div class="grid-modal-header">Jump directly to question:</div>
+    <div class="question-grid" id="questionGrid"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <div class="card" id="questionCard">
+    <div class="q-number-tag" id="qNumberTag">Question 1</div>
+    <div class="q-text" id="qText">Loading question stem...</div>
+    <div class="options-list" id="optionsList"></div>
+    <div class="rationale-box" id="rationaleBox">
+      <div class="rationale-title">Explanation & Rationales</div>
+      <div class="rationale-content" id="rationaleContent"></div>
+    </div>
+  </div>
+
+  <!-- Results Scorecard -->
+  <div class="scorecard" id="scoreCard">
+    <h2 style="font-size: 22px; font-weight: 800;">Quiz Completed!</h2>
+    <div class="score-circle">
+      <div class="score-percent" id="scorePercent">0%</div>
+      <div class="score-label">Score</div>
+    </div>
+    <div class="score-breakdown">
+      <span class="stat-correct" id="scoreCorrect">Correct: 0</span>
+      <span class="stat-incorrect" id="scoreIncorrect">Incorrect: 0</span>
+    </div>
+    <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+  </div>
+
+  <!-- Footer Branding -->
+  <div class="footer">
+    <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+      <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+      <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  {
+    q: "Which of the following best describes hematopoietic stem cells (HSCs)?",
+    options: [
+      "Differentiated cells that only produce red blood cells",
+      "Pluripotent cells found in the spleen that cannot self-renew",
+      "Multipotent, self-renewing cells in the bone marrow that give rise to all blood lineages",
+      "Mature lymphocytes that circulate in peripheral blood"
+    ],
+    correct: 2,
+    explanation: "HSCs reside primarily in adult bone marrow and possess two defining properties: self-renewal (to maintain the stem cell pool indefinitely) and multipotency (ability to differentiate into all mature myeloid and lymphoid lineages)."
+  },
+  {
+    q: "Hematopoiesis in healthy adults occurs predominantly in which anatomical site?",
+    options: [
+      "Liver",
+      "Spleen",
+      "Yolk sac",
+      "Bone marrow"
+    ],
+    correct: 3,
+    explanation: "While hematopoiesis initiates in the embryonic yolk sac and shifts to the fetal liver and spleen, in adults it takes place almost exclusively in the red bone marrow (pelvis, sternum, vertebrae, and ribs)."
+  },
+  {
+    q: "Which committed progenitor directly gives rise to B cells, T cells, and Natural Killer (NK) cells?",
+    options: [
+      "Common Myeloid Progenitor (CMP)",
+      "Megakaryocyte-Erythroid Progenitor (MEP)",
+      "Common Lymphoid Progenitor (CLP)",
+      "Granulocyte-Monocyte Progenitor (GMP)"
+    ],
+    correct: 2,
+    explanation: "The Common Lymphoid Progenitor (CLP) is committed to the lymphoid lineage and differentiates into B lymphocytes, T lymphocytes, and NK cells. The CMP gives rise to erythroid, megakaryocytic, and myeloid/granulocytic lineages."
+  },
+  {
+    q: "Which of the following white blood cells is classified as an agranulocyte (monomorphonuclear leukocyte)?",
+    options: [
+      "Neutrophil",
+      "Eosinophil",
+      "Monocyte",
+      "Basophil"
+    ],
+    correct: 2,
+    explanation: "Monocytes and lymphocytes are agranulocytes, possessing a non-segmented round or kidney-shaped nucleus without prominent visible granules. Neutrophils, eosinophils, and basophils are granulocytes (polymorphonuclear leukocytes)."
+  },
+  {
+    q: "What is the primary immunological function of dendritic cells?",
+    options: [
+      "Secrete high titers of neutralizing antibodies",
+      "Phagocytose senescent red blood cells in the red pulp",
+      "Capture antigens in tissues, migrate to lymph nodes, and present them to activate naive T cells",
+      "Release histamine from cytoplasmic granules during acute anaphylaxis"
+    ],
+    correct: 2,
+    explanation: "Dendritic cells (DCs) are the most potent professional antigen-presenting cells (APCs). They bridge innate and adaptive immunity by capturing antigens in peripheral tissues, processing them, and migrating to lymphoid organs to prime naive T cells."
+  },
+  {
+    q: "Which branch of the immune system is exclusively responsible for generating long-lasting immunological memory?",
+    options: [
+      "Innate immunity",
+      "Complement system activation",
+      "Adaptive immunity",
+      "Physical and chemical barriers"
+    ],
+    correct: 2,
+    explanation: "Only adaptive immunity generates immunological memory through long-lived memory T and B cells, which mediate a faster, stronger, and more affinity-matured response upon re-exposure (the basis of vaccination)."
+  },
+  {
+    q: "To which arm of the immune system do Natural Killer (NK) cells belong, and how do they function?",
+    options: [
+      "Adaptive humoral immunity via antibody production",
+      "Adaptive cell-mediated immunity requiring somatic gene rearrangement",
+      "Innate immunity, killing cells lacking MHC Class I without prior sensitization",
+      "Secondary lymphoid stroma providing chemokine gradients"
+    ],
+    correct: 2,
+    explanation: "NK cells are innate lymphocytes. They recognize and rapidly kill virus-infected cells and tumor cells that downregulate MHC Class I ('missing self') using germline-encoded activating and inhibitory receptors, without requiring clonal expansion or previous priming."
+  },
+  {
+    q: "Which of the following is a hallmark feature unique to adaptive immunity and absent in innate immunity?",
+    options: [
+      "Immediate activation within minutes to hours",
+      "Recognition of microbial patterns via germline-encoded Toll-like receptors",
+      "Clonal expansion of antigen-specific lymphocytes bearing unique somatically rearranged receptors",
+      "Phagocytosis and intracellular degradation of bacteria"
+    ],
+    correct: 2,
+    explanation: "Clonal expansion—where a rare antigen-specific lymphocyte undergoes massive proliferation upon encountering its matching epitope—is a cardinal feature of adaptive immunity. Innate defenses do not generate antigen-specific expanded clones."
+  },
+  {
+    q: "Where do B lymphocytes undergo both their generation and primary phenotypic maturation?",
+    options: [
+      "Thymus",
+      "Spleen",
+      "Bone marrow",
+      "High endothelial venules"
+    ],
+    correct: 2,
+    explanation: "B cells are both generated from HSC-derived progenitors and undergo receptor (BCR) rearrangement and central tolerance (negative selection) in the bone marrow before entering peripheral circulation."
+  },
+  {
+    q: "Where do T lymphocytes complete their phenotypic maturation and selection?",
+    options: [
+      "Bone marrow",
+      "Spleen",
+      "Thymus",
+      "Liver"
+    ],
+    correct: 2,
+    explanation: "T cell precursors originate in the bone marrow but migrate to the thymus, where they rearrange TCR genes and undergo stringent positive selection (MHC restriction) and negative selection (self-tolerance)."
+  },
+  {
+    q: "Which secondary lymphoid organ specializes in filtering blood-borne antigens and removing aged or damaged erythrocytes?",
+    options: [
+      "Lymph node",
+      "Peyer's patch",
+      "Spleen",
+      "Palatine tonsil"
+    ],
+    correct: 2,
+    explanation: "The spleen filters blood rather than lymph. Its white pulp mounts immune responses against blood-borne microbes, and its red pulp removes senescent red blood cells and platelets."
+  },
+  {
+    q: "In an organized lymph node, in which histological compartment do naive and resting B lymphocytes primarily reside?",
+    options: [
+      "Paracortex (parafollicular zone)",
+      "Medullary sinus",
+      "Lymphoid follicles",
+      "High endothelial venules (HEVs)"
+    ],
+    correct: 2,
+    explanation: "B cells reside in lymphoid follicles located in the outer cortex of lymph nodes. Upon activation by antigen and helper T cells, germinal centers develop within these follicles."
+  },
+  {
+    q: "Which chemokine-receptor pair specifically directs T cells to migrate into the paracortex of lymph nodes?",
+    options: [
+      "CXCR5 binding to CXCL13",
+      "CCR7 binding to CCL19 and CCL21",
+      "α4β7 integrin binding to MAdCAM-1",
+      "LFA-1 binding to ICAM-1"
+    ],
+    correct: 1,
+    explanation: "T cells express the chemokine receptor CCR7, which responds to gradients of CCL19 and CCL21 produced by stromal cells in the paracortex. B cells express CXCR5 to migrate toward CXCL13 in follicles."
+  },
+  {
+    q: "Which leukocyte is the most abundant in human peripheral blood and acts as the rapid first responder to acute bacterial infections?",
+    options: [
+      "Lymphocyte",
+      "Monocyte",
+      "Neutrophil",
+      "Eosinophil"
+    ],
+    correct: 2,
+    explanation: "Neutrophils make up 50–70% of circulating white blood cells. They are short-lived phagocytes rapidly recruited from blood to extravasate into infected tissues in response to acute inflammatory signals."
+  },
+  {
+    q: "Which mature differentiated cells are specialized for secreting large quantities of soluble antibodies (immunoglobulins)?",
+    options: [
+      "CD4+ Helper T cells",
+      "Monocytes",
+      "Plasma cells (derived from activated B cells)",
+      "Natural Killer (NK) cells"
+    ],
+    correct: 2,
+    explanation: "Activated B lymphocytes differentiate into plasma cells, which lose surface BCRs and develop extensive rough endoplasmic reticulum to secrete thousands of antibody molecules per second."
+  },
+  {
+    q: "What percentage of whole blood volume is occupied by the liquid matrix known as plasma?",
+    options: [
+      "Approximately 10%",
+      "Approximately 45%",
+      "Approximately 55%",
+      "Approximately 90%"
+    ],
+    correct: 2,
+    explanation: "Whole blood is composed of approximately 55% plasma (water, electrolytes, albumin, immunoglobulins, and clotting factors) and approximately 45% formed elements (erythrocytes, leukocytes, and platelets)."
+  },
+  {
+    q: "What is the biological definition of 'immunological self-tolerance'?",
+    options: [
+      "The capacity of phagocytes to engulf non-opsonized viral particles",
+      "The unresponsiveness or deliberate non-reactivity of the immune system to the host's own self-antigens",
+      "The generation of memory B cells following primary infection",
+      "The killing of all microbes that cross mucosal boundaries"
+    ],
+    correct: 1,
+    explanation: "Self-tolerance refers to the physiological elimination, inactivation (anergy), or suppression of lymphocytes that recognize self-antigens during development, preventing autoimmune diseases."
+  },
+  {
+    q: "Humoral immunity is primarily mediated by which molecular effector mechanism against extracellular pathogens?",
+    options: [
+      "Perforin and Granzyme release by CTLs",
+      "Phagocytic killing by splenic red pulp macrophages",
+      "Soluble antibodies (immunoglobulins) secreted into body fluids",
+      "Reactive oxygen species produced by alveolar pneumocytes"
+    ],
+    correct: 2,
+    explanation: "Humoral immunity is mediated by antibodies in body humors (blood, lymph, mucosal secretions). Antibodies neutralize toxins/microbes, promote opsonization, and activate the complement cascade against extracellular threats."
+  },
+  {
+    q: "Why is cell-mediated immunity indispensable for eliminating intracellular pathogens such as viruses and Mycobacterium tuberculosis?",
+    options: [
+      "Antibodies cannot penetrate the plasma membrane of intact host cells to neutralize intracellular pathogens",
+      "Intracellular microbes do not possess protein antigens",
+      "Intracellular pathogens immediately destroy all circulating B lymphocytes",
+      "Bone marrow cannot generate antibodies against viral capsids"
+    ],
+    correct: 0,
+    explanation: "Antibodies are large extracellular macromolecules unable to enter living host cells. Intracellular pathogens hiding in the cytosol or vesicles are detected and eliminated by T lymphocytes (CD8+ CTL lysis and CD4+ Th1 macrophage activation)."
+  },
+  {
+    q: "Which molecule is synthesized and secreted by terminally differentiated plasma cells?",
+    options: [
+      "Interleukin-2 (IL-2)",
+      "Perforin",
+      "Immunoglobulin (antibody)",
+      "Histamine"
+    ],
+    correct: 2,
+    explanation: "Plasma cells are antibody-secreting factories that produce secreted immunoglobulins (IgM, IgG, IgA, or IgE) matching the specificity of the parent B cell's original receptor."
+  },
+  {
+    q: "What biological term describes the process whereby an unspecialized stem cell progressively restricts gene expression to acquire specialized structure and function?",
+    options: [
+      "Apoptosis",
+      "Mitosis",
+      "Cellular differentiation",
+      "Clonal deletion"
+    ],
+    correct: 2,
+    explanation: "Cellular differentiation is the process by which multipotent progenitor cells progressively activate lineage-specific genes and silence multipotency genes, maturing into specialized effector or lineage cells."
+  },
+  {
+    q: "Which pair of organs represents the generative (primary) lymphoid organs in humans?",
+    options: [
+      "Spleen and Lymph nodes",
+      "Peyer's patches and Tonsils",
+      "Bone marrow and Thymus",
+      "Appendix and Mucosa-associated lymphoid tissue (MALT)"
+    ],
+    correct: 2,
+    explanation: "Primary (generative) lymphoid organs are the anatomical sites where lymphocytes originate and mature from precursors without foreign antigen exposure: bone marrow (B cells) and thymus (T cells)."
+  },
+  {
+    q: "What is the typical physiological recirculation pathway of naive lymphocytes?",
+    options: [
+      "Recirculate between infected inflamed tissues and the thymus",
+      "Continuously transit between the bloodstream and secondary lymphoid organs searching for antigen",
+      "Migrate permanently into the gut epithelium and remain non-motile",
+      "Recirculate exclusively within the cerebrospinal fluid"
+    ],
+    correct: 1,
+    explanation: "Naive lymphocytes constantly circulate from blood into secondary lymphoid organs (via HEVs), scan APCs for matching antigens, exit via efferent lymphatics to the thoracic duct, and return to blood, repeating every 12–24 hours."
+  },
+  {
+    q: "Which class of immune cells is specialized to present processed peptide antigens on MHC Class II molecules to CD4+ Helper T cells?",
+    options: [
+      "Erythrocytes",
+      "Neutrophils",
+      "Professional Antigen-Presenting Cells (Dendritic cells, Macrophages, B cells)",
+      "Plasma cells"
+    ],
+    correct: 2,
+    explanation: "MHC Class II is selectively expressed on professional APCs (DCs, macrophages, and B lymphocytes) to present extracellular antigens taken up by endocytosis/phagocytosis to CD4+ T helper cells."
+  },
+  {
+    q: "Toll-like receptors (TLRs) are examples of which innate immune component that detects conserved microbial structures?",
+    options: [
+      "T cell receptors (TCRs)",
+      "B cell receptors (BCRs)",
+      "Pattern Recognition Receptors (PRRs)",
+      "Immunoglobulin class switch factors"
+    ],
+    correct: 2,
+    explanation: "TLRs are germline-encoded Pattern Recognition Receptors (PRRs) that bind conserved Pathogen-Associated Molecular Patterns (PAMPs), such as lipopolysaccharide (LPS), peptidoglycan, and viral nucleic acids."
+  },
+  {
+    q: "What fundamental genetic mechanism produces the vast diversity of antigen receptor specificities in naive T and B lymphocytes?",
+    options: [
+      "Duplication of whole chromosomes during meiosis",
+      "Somatic hypermutation alone in generative organs",
+      "Somatic V(D)J recombination of gene segments",
+      "Alternative mRNA splicing of invariant ribosomal genes"
+    ],
+    correct: 2,
+    explanation: "During development in generative lymphoid organs, lymphocyte precursors somatically recombine variable (V), diversity (D), and joining (J) gene segments, generating over 10¹¹ unique BCR and TCR antigen-binding sites."
+  },
+  {
+    q: "Which antibody isotype is present in the highest concentration in mucosal secretions (gut, respiratory tracts, saliva, tears)?",
+    options: [
+      "Immunoglobulin G (IgG)",
+      "Immunoglobulin M (IgM)",
+      "Secretory Immunoglobulin A (sIgA)",
+      "Immunoglobulin E (IgE)"
+    ],
+    correct: 2,
+    explanation: "Secretory IgA (sIgA) is the predominant antibody synthesized and transported across mucosal epithelia, neutralizing pathogens and toxins in the lumen without triggering damaging inflammatory cascades."
+  },
+  {
+    q: "What is the primary physiological purpose of widespread apoptosis of effector T and B cells following microbial eradication (the contraction phase)?",
+    options: [
+      "Promote runaway clonal expansion in peripheral blood",
+      "Restore immune homeostasis and prevent unnecessary immunopathology or autoimmunity",
+      "Eliminate all long-lived memory cell precursors",
+      "Prevent dendritic cells from capturing new antigens"
+    ],
+    correct: 1,
+    explanation: "Contraction by apoptosis eliminates 90–95% of activated effector lymphocytes once microbial antigen and survival cytokines (IL-2) decline, returning the lymphocyte pool to baseline and preserving homeostasis."
+  },
+  {
+    q: "Which organ in the human body contains the single largest population of resident lymphocytes (~190 billion cells)?",
+    options: [
+      "Spleen",
+      "Bone marrow",
+      "Intestines (mucosa-associated lymphoid tissue / gut)",
+      "Skin epidermis"
+    ],
+    correct: 2,
+    explanation: "The gastrointestinal tract harbors approximately 190 billion lymphocytes (within Peyer's patches, lamina propria, and intraepithelial compartments) due to the immense surface area constantly exposed to dietary antigens and commensal microbes."
+  },
+  {
+    q: "How do effector T lymphocytes successfully migrate and arrest at peripheral sites of microbial infection?",
+    options: [
+      "They downregulate lymph node homing receptors (L-selectin, CCR7) and upregulate integrins and inflammatory chemokine receptors that bind inflamed endothelium",
+      "They follow CXCL13 gradients directly into splenic follicles",
+      "They bind to erythrocyte hemoglobin molecules to drift into tissues passively",
+      "They enter peripheral tissues solely via High Endothelial Venules (HEVs)"
+    ],
+    correct: 0,
+    explanation: "Activated effector T cells shed L-selectin and CCR7, instead expressing adhesion integrins (like VLA-4 and LFA-1) and chemokine receptors (such as CXCR3) that bind VCAM-1, ICAM-1, and inflammatory chemokines displayed on activated endothelium at the infection focus."
+  }
+];
+
+let currentIdx = 0;
+let userAnswers = new Array(quizData.length).fill(null);
+
+function initQuiz() {
+  renderGrid();
+  renderQuestion();
+  updateProgress();
+}
+
+function renderGrid() {
+  const grid = document.getElementById("questionGrid");
+  grid.innerHTML = "";
+  quizData.forEach((_, idx) => {
+    const item = document.createElement("div");
+    item.className = "grid-item";
+    item.id = `grid-item-${idx}`;
+    item.innerText = idx + 1;
+    item.onclick = () => jumpToQuestion(idx);
+    grid.appendChild(item);
+  });
+}
+
+function toggleGrid() {
+  const modal = document.getElementById("gridModal");
+  const btn = document.getElementById("listToggleBtn");
+  if (modal.classList.contains("open")) {
+    modal.classList.remove("open");
+    btn.innerText = "View List";
+  } else {
+    modal.classList.add("open");
+    btn.innerText = "Hide List";
+  }
+}
+
+function jumpToQuestion(idx) {
+  currentIdx = idx;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizData[currentIdx];
+  document.getElementById("qNumberTag").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+  document.getElementById("qText").innerText = q.q;
+  document.getElementById("questionCounter").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+
+  const optionsList = document.getElementById("optionsList");
+  optionsList.innerHTML = "";
+  const rationaleBox = document.getElementById("rationaleBox");
+  const rationaleContent = document.getElementById("rationaleContent");
+
+  const letters = ["A", "B", "C", "D"];
+  const answered = userAnswers[currentIdx] !== null;
+
+  q.options.forEach((optText, optIdx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.disabled = answered;
+
+    const badge = document.createElement("div");
+    badge.className = "badge";
+    badge.innerText = letters[optIdx];
+
+    const textSpan = document.createElement("div");
+    textSpan.className = "option-text";
+    textSpan.innerText = optText;
+
+    const feedbackPill = document.createElement("div");
+    feedbackPill.className = "feedback-pill";
+
+    btn.appendChild(badge);
+    btn.appendChild(textSpan);
+    btn.appendChild(feedbackPill);
+
+    if (answered) {
+      if (optIdx === q.correct) {
+        btn.classList.add("correct");
+        feedbackPill.innerText = "Correct";
+      } else if (optIdx === userAnswers[currentIdx]) {
+        btn.classList.add("incorrect");
+        feedbackPill.innerText = "Incorrect";
+      }
+    } else {
+      btn.onclick = () => handleSelectOption(optIdx);
+    }
+
+    optionsList.appendChild(btn);
+  });
+
+  if (answered) {
+    rationaleBox.style.display = "block";
+    rationaleContent.innerText = q.explanation;
+  } else {
+    rationaleBox.style.display = "none";
+  }
+
+  // Navigation controls
+  document.getElementById("prevBtn").disabled = currentIdx === 0;
+  const nextBtn = document.getElementById("nextBtn");
+  if (currentIdx === quizData.length - 1) {
+    nextBtn.innerText = "Submit Test";
+  } else {
+    nextBtn.innerText = "Next";
+  }
+
+  updateGridStyles();
+}
+
+function handleSelectOption(optIdx) {
+  userAnswers[currentIdx] = optIdx;
+  renderQuestion();
+  updateProgress();
+}
+
+function prevQuestion() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    renderQuestion();
+  }
+}
+
+function nextQuestion() {
+  if (currentIdx < quizData.length - 1) {
+    currentIdx++;
+    renderQuestion();
+  } else {
+    submitQuiz();
+  }
+}
+
+function updateProgress() {
+  const answeredCount = userAnswers.filter(a => a !== null).length;
+  const pct = (answeredCount / quizData.length) * 100;
+  document.getElementById("progressBar").style.width = `${pct}%`;
+  document.getElementById("answeredCounter").innerText = `${answeredCount} / ${quizData.length} Answered`;
+}
+
+function updateGridStyles() {
+  quizData.forEach((_, idx) => {
+    const el = document.getElementById(`grid-item-${idx}`);
+    if (!el) return;
+    el.className = "grid-item";
+    if (idx === currentIdx) {
+      el.classList.add("active");
+    }
+    if (userAnswers[idx] !== null) {
+      el.classList.add("answered");
+    }
+  });
+}
+
+function submitQuiz() {
+  document.getElementById("questionCard").style.display = "none";
+  document.getElementById("navBar").style.display = "none";
+  document.getElementById("gridModal").classList.remove("open");
+  document.getElementById("listToggleBtn").style.display = "none";
+
+  let correctCount = 0;
+  userAnswers.forEach((ans, idx) => {
+    if (ans === quizData[idx].correct) correctCount++;
+  });
+
+  const percent = Math.round((correctCount / quizData.length) * 100);
+  document.getElementById("scorePercent").innerText = `${percent}%`;
+  document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+  document.getElementById("scoreIncorrect").innerText = `Incorrect: ${quizData.length - correctCount}`;
+  document.getElementById("scoreCard").style.display = "flex";
+}
+
+function restartQuiz() {
+  userAnswers = new Array(quizData.length).fill(null);
+  currentIdx = 0;
+  document.getElementById("questionCard").style.display = "flex";
+  document.getElementById("navBar").style.display = "flex";
+  document.getElementById("listToggleBtn").style.display = "inline-block";
+  document.getElementById("scoreCard").style.display = "none";
+  initQuiz();
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
