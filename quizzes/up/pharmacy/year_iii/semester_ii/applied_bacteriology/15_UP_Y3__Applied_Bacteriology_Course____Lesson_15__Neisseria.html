@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 15: Neisseria spp. Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Progress */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #c8d1ff;
+      color: #4255ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .meta-counts {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #e6e9f2;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    /* Question Overview Modal / Grid */
+    .grid-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .grid-card.active {
+      display: block;
+    }
+
+    .grid-card h3 {
+      font-size: 0.9rem;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-btn {
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      border-color: #b8c4ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.current {
+      border: 2px solid #4255ff;
+      font-weight: bold;
+      box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.18);
+    }
+
+    /* Main Question Card */
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .q-number-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .question-stem {
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:hover:not(:disabled) {
+      border-color: #4255ff;
+      background: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .opt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #646f90;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 3px;
+    }
+
+    .opt-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* Feedback styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-tile.correct .opt-badge {
+      background: #18ae79;
+      color: #ffffff;
+    }
+    .option-tile.correct .opt-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-tile.incorrect .opt-badge {
+      background: #ff6871;
+      color: #ffffff;
+    }
+    .option-tile.incorrect .opt-tag {
+      display: inline-block;
+      background: #b31d27;
+      color: #ffffff;
+    }
+
+    /* Explanation Card */
+    .rationale-card {
+      margin-top: 20px;
+      background: #fbfcfe;
+      border: 1px solid #e0e5f2;
+      border-left: 4px solid #4255ff;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #2e3856;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-nav.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Scorecard / Results View */
+    .scorecard {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .scorecard.active {
+      display: block;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4255ff;
+      margin: 0 auto 20px;
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+    }
+
+    .score-breakdown {
+      font-size: 1rem;
+      color: #646f90;
+      margin-bottom: 24px;
+    }
+
+    .score-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 110px;
+    }
+
+    .stat-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .stat-val.correct { color: #0e6948; }
+    .stat-val.incorrect { color: #b31d27; }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: #646f90;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Footer & Branding */
+    .footer-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 0.88rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #2e3856;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      border: 1px solid #e0e5f2;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header / Progress Bar -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Lesson 15: Neisseria spp. Comprehensive Quiz</h1>
+          <p>Applied Bacteriology Course &bull; 30 High-Yield Test Questions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-toggle-grid" id="toggleGridBtn" onclick="toggleGrid()">View List</button>
+          <div class="meta-counts" id="metaCounter">1 / 30</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Question Overview Grid -->
+    <div class="grid-card" id="gridCard">
+      <h3>Question Navigator</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div class="quiz-card" id="quizCard">
+      <span class="q-number-tag" id="qNumberTag">Question 1</span>
+      <div class="question-stem" id="questionStem">Loading question...</div>
+      
+      <div class="options-group" id="optionsGroup"></div>
+
+      <div class="rationale-card" id="rationaleCard">
+        <div class="rationale-title">Explanation & Rationale</div>
+        <div class="rationale-text" id="rationaleText"></div>
+      </div>
+
+      <div class="nav-controls">
+        <button class="btn-nav" id="prevBtn" onclick="navigate(-1)">Previous</button>
+        <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard Interface -->
+    <div class="scorecard" id="scorecard">
+      <div class="score-circle" id="scoreCircle">0%</div>
+      <h2 class="score-title" id="scoreTitle">Exam Completed!</h2>
+      <p class="score-breakdown" id="scoreBreakdown">You answered 0 out of 30 questions correctly.</p>
+      
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val correct" id="statCorrect">0</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val incorrect" id="statIncorrect">0</div>
+          <div class="stat-lbl">Incorrect</div>
+        </div>
+      </div>
+
+      <button class="btn-nav primary" style="padding: 12px 28px;" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer & Attribution -->
+    <div class="footer-card">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+        <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+        <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the microscopic morphology and Gram reaction characteristic of the genus Neisseria?",
+        options: [
+          "Gram-positive lancet-shaped diplococci arranged in short chains",
+          "Gram-negative diplococci with adjacent sides flattened, resembling 'kidney beans' or coffee beans",
+          "Gram-negative pleomorphic coccobacilli with bipolar staining",
+          "Gram-positive thick rods arranged in Chinese letter patterns"
+        ],
+        correct: 1,
+        explanation: "Members of the genus Neisseria are Gram-negative diplococci (pairs) measuring 0.6–1.0 µm, characterized by flattened or indented opposing sides that give them a classic 'kidney bean' or coffee-bean appearance."
+      },
+      {
+        q: "What are the atmospheric and environmental requirements for optimal in vitro growth of Neisseria gonorrhoeae?",
+        options: [
+          "Strict anaerobe requiring hydrogen and nitrogen gas at 42°C",
+          "Aerobic and capnophilic (requiring added 3–7% CO₂), humid environment, at 35–37°C",
+          "Microaerophilic requiring 10% oxygen without CO₂ at 25°C",
+          "Obligate halophile thriving in 10% NaCl at room temperature"
+        ],
+        correct: 1,
+        explanation: "Neisseria species are fastidious, aerobic, and capnophilic—they require enriched media, an atmosphere supplemented with 3–7% carbon dioxide (CO₂), high humidity, and an incubation temperature of 35–37°C."
+      },
+      {
+        q: "Which biochemical reaction is universally positive across ALL members of the genus Neisseria?",
+        options: [
+          "Indole test",
+          "Oxidase test",
+          "Urease test",
+          "Voges-Proskauer test"
+        ],
+        correct: 1,
+        explanation: "All species of Neisseria produce cytochrome c oxidase, rendering the oxidase test universally positive (turning the reagent dark purple within seconds)."
+      },
+      {
+        q: "How are Neisseria gonorrhoeae and Neisseria meningitidis definitively differentiated by carbohydrate fermentation?",
+        options: [
+          "N. gonorrhoeae ferments glucose only, whereas N. meningitidis ferments both glucose and maltose",
+          "N. gonorrhoeae ferments maltose only, whereas N. meningitidis ferments lactose only",
+          "N. gonorrhoeae ferments sucrose and lactose, whereas N. meningitidis ferments glucose",
+          "Neither organism is capable of fermenting any carbohydrate"
+        ],
+        correct: 0,
+        explanation: "Neisseria species produce acid without gas from sugars: N. gonorrhoeae ferments Glucose only (G+), while N. meningitidis ferments both Glucose and Maltose (G+, M+)."
+      },
+      {
+        q: "In contrast to Neisseria meningitidis, what structural virulence component is completely absent in Neisseria gonorrhoeae?",
+        options: [
+          "Outer membrane lipooligosaccharide (LOS)",
+          "Pili (fimbriae)",
+          "A true polysaccharide capsule",
+          "Porin proteins (Por)"
+        ],
+        correct: 2,
+        explanation: "Unlike Neisseria meningitidis, which possesses an antiphagocytic polysaccharide capsule that defines its serogroups, Neisseria gonorrhoeae lacks a capsule."
+      },
+      {
+        q: "What is the primary role of pili (fimbriae) in the pathogenesis of Neisseria gonorrhoeae?",
+        options: [
+          "They hydrolyze host mucosal secretory IgA antibodies",
+          "They mediate initial attachment to non-ciliated epithelial cells and interfere with neutrophil killing",
+          "They degrade host cell basement membranes via collagenase activity",
+          "They actively transport iron from host transferrin across the outer membrane"
+        ],
+        correct: 1,
+        explanation: "Pili extend from the gonococcal outer membrane and are the primary mediators of initial adherence to human non-ciliated mucosal cells. Fresh, virulent clinical strains are heavily piliated."
+      },
+      {
+        q: "What role do Opa (opacity) proteins play in gonococcal cellular adherence and invasion?",
+        options: [
+          "They mediate firm, tight attachment to eukaryotic host cells and promote inter-bacterial clumping",
+          "They form aqueous pore channels across the outer membrane for solute diffusion",
+          "They mask the bacterial cell surface from complement-mediated lysis",
+          "They catalyze the breakdown of penicillin into penicilloic acid"
+        ],
+        correct: 0,
+        explanation: "Opa proteins mediate firm, tight secondary adhesion to host epithelial cells and facilitate adherence between gonococcal cells, conferring an opaque colony appearance."
+      },
+      {
+        q: "How does the Por (porin) protein of Neisseria gonorrhoeae contribute to intracellular survival?",
+        options: [
+          "It cleaves synaptobrevin within host nerve terminals",
+          "It inserts into phagosome membranes and prevents phagolysosome fusion in polymorphonuclear leukocytes",
+          "It actively pumps out ceftriaxone via an ATP-binding cassette",
+          "It neutralizes mucosal secretory IgA"
+        ],
+        correct: 1,
+        explanation: "Gonococcal Por proteins (such as PorB) translocate into host cell membranes and inhibit phagosome-lysosome fusion, enabling gonococci to survive intracellularly within neutrophils and epithelial cells."
+      },
+      {
+        q: "What is the primary biological function of gonococcal Rmp (Reduction-modifiable protein)?",
+        options: [
+          "It stimulates high-affinity uptake of free ionic copper",
+          "It protects other outer membrane surface antigens (Por, LOS) from bactericidal antibodies",
+          "It acts as a primary heat-shock chaperone refolding denatured pili",
+          "It digests mucin lining the endocervical canal"
+        ],
+        correct: 1,
+        explanation: "Rmp associates with Por and LOS. Antibodies directed against Rmp are blocking antibodies that physically shield adjacent Por proteins and LOS from bactericidal antibody binding and complement activation."
+      },
+      {
+        q: "Instead of classic high-molecular-weight lipopolysaccharide (LPS), Neisseria possesses which glycolipid that acts as an endotoxin?",
+        options: [
+          "Lipooligosaccharide (LOS)",
+          "Lipoteichoic acid (LTA)",
+          "Mycolic acid",
+          "Peptidoglycan monomer complex"
+        ],
+        correct: 0,
+        explanation: "Neisseria outer membranes feature lipooligosaccharide (LOS), which lacks repeating O-antigen polysaccharide side chains. Its lipid A moiety possesses potent endotoxic activity, driving intense mucosal inflammation and tissue damage."
+      },
+      {
+        q: "Which enzyme is secreted by both N. gonorrhoeae and N. meningitidis to neutralize mucosal humoral immunity?",
+        options: [
+          "IgA1 protease",
+          "Lecithinase",
+          "Beta-lactamase",
+          "Streptokinase"
+        ],
+        correct: 0,
+        explanation: "Both pathogenic Neisseria synthesize and secrete an extracellular IgA1 protease that cleaves human secretory IgA1 at its hinge region, inactivating host mucosal antibody defenses."
+      },
+      {
+        q: "How does Neisseria gonorrhoeae acquire essential iron for metabolic proliferation in the human host?",
+        options: [
+          "By synthesizing abundant siderophores called enterobactin",
+          "Via surface receptors that directly extract iron from host transferrin, lactoferrin, and hemoglobin",
+          "By lysing erythrocytes and utilizing bacterial ferritin storage granules exclusively",
+          "By utilizing atmospheric iron particles inhaled into mucosal membranes"
+        ],
+        correct: 1,
+        explanation: "N. gonorrhoeae does not produce classic siderophores. Instead, it expresses outer membrane receptor proteins that bind human transferrin, lactoferrin, and hemoglobin to strip and import iron."
+      },
+      {
+        q: "By what mechanism does Neisseria gonorrhoeae penetrate from the mucosal lumen into subepithelial tissues?",
+        options: [
+          "Secretion of lethal neurotoxins that lyse enterocytes",
+          "Parasite-directed endocytosis, where microvilli engulf bacteria, followed by transcytosis to the submucosa",
+          "Passive sliding along motile peritrichous flagella",
+          "Mechanical erosion through bacterial spore germination"
+        ],
+        correct: 1,
+        explanation: "Gonococci trigger 'parasite-directed endocytosis' in non-ciliated epithelial cells. Host microvilli surround and internalize the diplococci, which are transcytosed within vacuoles and extruded into the subepithelial space."
+      },
+      {
+        q: "What is the natural reservoir and primary mode of transmission for Neisseria gonorrhoeae?",
+        options: [
+          "Domestic animal reservoirs; transmitted through animal bites and scratches",
+          "Humans exclusively; transmitted predominantly through direct sexual contact (vaginal, oral, anal)",
+          "Soil and water; transmitted through inhalation of aerosolized dust",
+          "Arthropod vectors such as ticks and mosquitoes"
+        ],
+        correct: 1,
+        explanation: "Humans are the sole natural host and reservoir for N. gonorrhoeae. Transmission occurs almost exclusively via direct sexual intercourse (genital, oral-genital, or rectal contact)."
+      },
+      {
+        q: "Why is non-sexual transmission (e.g., via toilet seats, bedding, or clothing) virtually non-existent for N. gonorrhoeae?",
+        options: [
+          "The bacteria instantly form endospores that remain dormant for 50 years",
+          "Gonococci are exceptionally fastidious and highly sensitive to drying, cold temperatures, and dehydration",
+          "The bacteria only survive when exposed to direct atmospheric sunlight",
+          "Normal ambient room air instantly converts gonococci into non-pathogenic lactobacilli"
+        ],
+        correct: 1,
+        explanation: "N. gonorrhoeae is extremely delicate and susceptible to desiccation, temperature fluctuations, and atmospheric drying, precluding viable environmental transmission on inanimate surfaces."
+      },
+      {
+        q: "Why do asymptomatic infections present a major challenge to the public health control of gonorrhea?",
+        options: [
+          "Asymptomatic carriers produce a different species of bacterium that cannot be identified",
+          "A large reservoir of infected individuals (especially 50–70% of women) remain symptom-free and unknowingly spread the infection",
+          "Asymptomatic carriers are completely resistant to all cephalosporin antibiotics",
+          "Asymptomatic infection eliminates the need for any diagnostic testing"
+        ],
+        correct: 1,
+        explanation: "While over 95% of infected men develop acute painful urethritis and seek care, up to 50–70% of infected women are asymptomatic or exhibit non-specific symptoms, sustaining unnoticed community transmission."
+      },
+      {
+        q: "What is the typical presentation and incubation period of acute gonococcal infection in symptomatic males?",
+        options: [
+          "Painless mucosal ulceration appearing after 6 to 9 months",
+          "Profuse purulent (pus-like) urethral discharge accompanied by intense dysuria, appearing 2 to 7 days post-exposure",
+          "Gross hematuria accompanied by generalized flaccid paralysis",
+          "Bilateral parotid gland enlargement and high fever after 24 hours"
+        ],
+        correct: 1,
+        explanation: "In men, acute gonococcal urethritis manifests after an incubation period of 2 to 7 days with yellow-green, profuse purulent urethral discharge and severe burning pain on urination (dysuria)."
+      },
+      {
+        q: "What is the primary anatomical site of localized genital gonococcal infection in women?",
+        options: [
+          "Endocervix",
+          "Ovarian stroma",
+          "Vulvar hair follicles",
+          "Fallopian ampulla primarily"
+        ],
+        correct: 0,
+        explanation: "The endocervix (columnar and transitional epithelium) is the primary site of localized gonococcal infection in women, frequently accompanied by urethral colonization."
+      },
+      {
+        q: "What serious reproductive complication occurs when gonococci ascend into the uterus, fallopian tubes, and ovaries?",
+        options: [
+          "Pelvic Inflammatory Disease (PID), which may lead to tubal scarring, ectopic pregnancy, and infertility",
+          "Cervical carcinoma mediated by E6/E7 oncoproteins",
+          "Polycystic ovarian syndrome (PCOS)",
+          "Endometriosis caused by glandular metaplasia"
+        ],
+        correct: 0,
+        explanation: "Ascending gonococcal spread causes Pelvic Inflammatory Disease (PID), including endometritis, salpingitis, and tubo-ovarian abscesses, with long-term consequences of tubal scarring, ectopic pregnancy, and involuntary infertility."
+      },
+      {
+        q: "What severe neonatal complication is caused by vertical transmission of N. gonorrhoeae during passage through an infected birth canal?",
+        options: [
+          "Congenital hydrocephalus and intracranial calcifications",
+          "Ophthalmia neonatorum (severe purulent conjunctivitis) that can lead to corneal scarring and blindness",
+          "Neonatal necrotizing enterocolitis",
+          "Congenital sensorineural deafness"
+        ],
+        correct: 1,
+        explanation: "Vertical transmission during vaginal delivery causes gonococcal ophthalmia neonatorum—an acute, profuse purulent conjunctivitis that can ulcerate the cornea and cause permanent blindness if untreated."
+      },
+      {
+        q: "What prophylactic regimen is universally administered to newborn eyes immediately after birth to prevent gonococcal ophthalmia neonatorum?",
+        options: [
+          "Topical corticosteroid drops alone",
+          "Topical 1% silver nitrate drops or 0.5% erythromycin ophthalmic ointment",
+          "Oral amoxicillin suspension for 14 days",
+          "Intravenous metronidazole injection"
+        ],
+        correct: 1,
+        explanation: "Topical ocular prophylaxis with 1% silver nitrate aqueous solution (Credé's prophylaxis) or 0.5% erythromycin ophthalmic ointment administered immediately post-partum effectively prevents gonococcal eye infection."
+      },
+      {
+        q: "What clinical triad classically characterizes Disseminated Gonococcal Infection (DGI)?",
+        options: [
+          "Fever, migratory polyarthralgia, and petechial, pustular, or maculopapular skin lesions on the extremities",
+          "Jaundice, hepatomegaly, and right upper quadrant pain",
+          "Headache, nuchal rigidity, and photophobia without skin lesions",
+          "Flaccid paralysis, diplopia, and dysphagia"
+        ],
+        correct: 0,
+        explanation: "Disseminated Gonococcal Infection (DGI), resulting from gonococcal bacteremia, classically presents with fever, migratory polyarthralgia (joint pain), tenosynovitis, and distinctive petechial/pustular skin lesions on extremities."
+      },
+      {
+        q: "What is the hallmark microscopic finding on a Gram-stained smear of acute urethral discharge in a male patient with gonorrhea?",
+        options: [
+          "Extracellular Gram-positive chains of cocci",
+          "Gram-negative kidney-bean-shaped diplococci located intracellularly within polymorphonuclear leukocytes (PMNs)",
+          "Acid-fast beaded bacilli clustered around epithelial cells",
+          "Free-floating Gram-negative spirilla with terminal bulbs"
+        ],
+        correct: 1,
+        explanation: "The demonstration of Gram-negative diplococci with adjacent flattened sides located intracellularly within polymorphonuclear leukocytes (neutrophils) on a direct urethral smear is diagnostic for gonorrhea in symptomatic men (>95% sensitivity/specificity)."
+      },
+      {
+        q: "Why is a direct Gram-stained smear of endocervical exudate less sensitive and specific for diagnosing gonorrhea in women compared to men?",
+        options: [
+          "Gonococci lose their Gram-negative wall structure in the female reproductive tract",
+          "Normal female genitourinary flora includes morphologically similar Gram-negative coccobacilli, reducing specificity, and bacterial counts may be low",
+          "Endocervical secretions contain enzymes that destroy bacterial DNA instantly",
+          "Neutrophils are completely absent from the female genital tract"
+        ],
+        correct: 1,
+        explanation: "In women, direct Gram stain sensitivity drops to 50–70% because normal vaginal/cervical flora may harbor morphologically similar organisms (e.g., Moraxella, Acinetobacter) and the bacterial load may be lower, making culture or NAAT necessary."
+      },
+      {
+        q: "Which enriched, selective culture medium incorporates vancomycin, colistin, nystatin, and trimethoprim to isolate N. gonorrhoeae from non-sterile sites?",
+        options: [
+          "MacConkey agar",
+          "Thayer-Martin (or Modified Thayer-Martin) medium",
+          "Lowenstein-Jensen medium",
+          "Bacteroides Bile Esculin agar"
+        ],
+        correct: 1,
+        explanation: "Modified Thayer-Martin medium uses a chocolate agar base supplemented with vancomycin (inhibits Gram+), colistin (inhibits Gram– except Neisseria), nystatin (inhibits fungi), and trimethoprim (inhibits Proteus swarming)."
+      },
+      {
+        q: "What diagnostic methodology is considered the most sensitive and specific for detecting Neisseria gonorrhoeae from clinical swabs and urine?",
+        options: [
+          "Direct fluorescent antibody staining alone",
+          "Nucleic Acid Amplification Tests (NAAT / PCR)",
+          "Serum complement fixation test",
+          "Latex agglutination on uncentrifuged urine"
+        ],
+        correct: 1,
+        explanation: "Nucleic Acid Amplification Testing (NAAT/PCR) is the most sensitive and specific method available, detecting gonococcal DNA/RNA from genital swabs or non-invasive first-catch urine samples."
+      },
+      {
+        q: "Why was Penicillin G completely abandoned as first-line therapy for gonorrhea?",
+        options: [
+          "Penicillin G is unstable in human plasma at normal body temperature",
+          "Widespread emergence of plasmid-mediated beta-lactamase (PPNG) and high-level chromosomal resistance",
+          "Penicillin G precipitates acute allergic nephritis in 95% of patients",
+          "Penicillin G directly stimulates the expression of gonococcal pili"
+        ],
+        correct: 1,
+        explanation: "Penicillin-producing N. gonorrhoeae (PPNG) carrying plasmid-mediated TEM beta-lactamases, combined with chromosomal mutations (penA, mtr, penB), rendered penicillin universally unreliable and clinically obsolete."
+      },
+      {
+        q: "What is the recommended first-line antimicrobial therapy for uncomplicated genital gonococcal infection?",
+        options: [
+          "Oral amoxicillin single dose",
+          "Ceftriaxone administered as a single intramuscular injection (often paired with oral doxycycline or azithromycin)",
+          "Intravenous vancomycin for 14 days",
+          "Oral metronidazole single dose"
+        ],
+        correct: 1,
+        explanation: "Current clinical guidelines recommend a single intramuscular dose of Ceftriaxone (a 3rd-generation cephalosporin highly stable against beta-lactamases), commonly co-prescribed with doxycycline or azithromycin to cover Chlamydia trachomatis co-infection."
+      },
+      {
+        q: "Why is an oral macrolide (Azithromycin) or tetracycline (Doxycycline) frequently co-administered with Ceftriaxone in the management of gonorrhea?",
+        options: [
+          "To treat and clear frequent, concomitant co-infection with Chlamydia trachomatis",
+          "To stimulate host antibody production against the gonococcal capsule",
+          "To neutralize gonococcal lipooligosaccharide directly in the bloodstream",
+          "To prevent the development of candidal thrush"
+        ],
+        correct: 0,
+        explanation: "Chlamydia trachomatis frequently co-infects patients with gonorrhea (15–40% co-infection rates). Providing coverage with doxycycline or azithromycin ensures complete syndromic clearance of both pathogens."
+      },
+      {
+        q: "Why has developing an effective vaccine against Neisseria gonorrhoeae proven exceptionally difficult?",
+        options: [
+          "Gonococcal surface antigens (particularly pili and Opa proteins) undergo high-frequency antigenic and phase variation",
+          "N. gonorrhoeae does not express any proteins on its outer membrane",
+          "The bacterium kills all host memory B cells within 10 minutes of infection",
+          "Human antibodies are structurally incapable of recognizing Gram-negative bacteria"
+        ],
+        correct: 0,
+        explanation: "N. gonorrhoeae possesses extensive genetic mechanisms for antigenic and phase variation in its surface structures (notably pilin genes via gene conversion and Opa proteins via slipped-strand mispairing), allowing it to continually evade host protective antibody responses."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function init() {
+      buildGrid();
+      loadQuestion(0);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById("questionGrid");
+      grid.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `gridBtn_${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function toggleGrid() {
+      const gridCard = document.getElementById("gridCard");
+      const toggleBtn = document.getElementById("toggleGridBtn");
+      if (gridCard.classList.contains("active")) {
+        gridCard.classList.remove("active");
+        toggleBtn.textContent = "View List";
+      } else {
+        gridCard.classList.add("active");
+        toggleBtn.textContent = "Hide List";
+      }
+    }
+
+    function jumpToQuestion(index) {
+      currentQ = index;
+      loadQuestion(currentQ);
+      document.getElementById("quizCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function loadQuestion(index) {
+      currentQ = index;
+      const data = quizData[index];
+      const answered = userAnswers[index] !== null;
+
+      // Update Header & Counters
+      document.getElementById("qNumberTag").textContent = `Question ${index + 1} of ${quizData.length}`;
+      document.getElementById("metaCounter").textContent = `${index + 1} / ${quizData.length}`;
+      
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      const progressPct = (totalAnswered / quizData.length) * 100;
+      document.getElementById("progressBar").style.width = `${progressPct}%`;
+
+      // Update Question text
+      document.getElementById("questionStem").textContent = data.q;
+
+      // Render Options
+      const optionsGroup = document.getElementById("optionsGroup");
+      optionsGroup.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      data.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-tile";
+        btn.disabled = answered;
+
+        let tagText = "";
+        if (answered) {
+          if (optIdx === data.correct) {
+            btn.classList.add("correct");
+            tagText = "CORRECT";
+          } else if (optIdx === userAnswers[index]) {
+            btn.classList.add("incorrect");
+            tagText = "INCORRECT";
+          }
+        }
+
+        btn.innerHTML = `
+          <span class="opt-badge">${letters[optIdx]}</span>
+          <span class="opt-text">${optText}</span>
+          ${tagText ? `<span class="opt-tag">${tagText}</span>` : ""}
+        `;
+
+        if (!answered) {
+          btn.onclick = () => selectOption(optIdx);
+        }
+
+        optionsGroup.appendChild(btn);
+      });
+
+      // Rationale Box
+      const rationaleCard = document.getElementById("rationaleCard");
+      const rationaleText = document.getElementById("rationaleText");
+      if (answered) {
+        rationaleText.textContent = data.explanation;
+        rationaleCard.classList.add("show");
+      } else {
+        rationaleCard.classList.remove("show");
+      }
+
+      // Update Nav Buttons
+      document.getElementById("prevBtn").disabled = index === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      if (index === quizData.length - 1) {
+        nextBtn.textContent = "Finish & Review";
+      } else {
+        nextBtn.textContent = "Next";
+      }
+
+      // Update Grid Buttons state
+      updateGridUI();
+    }
+
+    function selectOption(selectedIdx) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = selectedIdx;
+      loadQuestion(currentQ);
+    }
+
+    function updateGridUI() {
+      quizData.forEach((_, idx) => {
+        const btn = document.getElementById(`gridBtn_${idx}`);
+        if (!btn) return;
+        btn.className = "grid-btn";
+        if (userAnswers[idx] !== null) {
+          btn.classList.add("answered");
+        }
+        if (idx === currentQ) {
+          btn.classList.add("current");
+        }
+      });
+    }
+
+    function navigate(delta) {
+      const nextIndex = currentQ + delta;
+      if (nextIndex >= 0 && nextIndex < quizData.length) {
+        loadQuestion(nextIndex);
+      } else if (nextIndex >= quizData.length) {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("gridCard").classList.remove("active");
+      document.getElementById("toggleGridBtn").style.display = "none";
+      
+      const scorecard = document.getElementById("scorecard");
+      scorecard.classList.add("active");
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) correctCount++;
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("scoreCircle").textContent = `${percentage}%`;
+      document.getElementById("scoreBreakdown").textContent = `You correctly answered ${correctCount} of ${quizData.length} questions.`;
+      document.getElementById("statCorrect").textContent = correctCount;
+      document.getElementById("statIncorrect").textContent = incorrectCount;
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("metaCounter").textContent = `${quizData.length} / ${quizData.length}`;
+
+      if (percentage >= 80) {
+        document.getElementById("scoreTitle").textContent = "Outstanding Performance!";
+      } else if (percentage >= 60) {
+        document.getElementById("scoreTitle").textContent = "Good Effort - Review Notes!";
+      } else {
+        document.getElementById("scoreTitle").textContent = "Keep Practicing Bacteriology!";
+      }
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById("scorecard").classList.remove("active");
+      document.getElementById("quizCard").style.display = "block";
+      document.getElementById("toggleGridBtn").style.display = "inline-block";
+      document.getElementById("toggleGridBtn").textContent = "View List";
+      loadQuestion(0);
+    }
+
+    // Initialize application on load
+    window.onload = init;
+  </script>
+</body>
+</html>
