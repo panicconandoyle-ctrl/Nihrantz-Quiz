@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 20: Campylobacter spp. Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Progress */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #c8d1ff;
+      color: #4255ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .meta-counts {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #e6e9f2;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    /* Question Overview Grid */
+    .grid-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .grid-card.active {
+      display: block;
+    }
+
+    .grid-card h3 {
+      font-size: 0.9rem;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-btn {
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      border-color: #b8c4ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.current {
+      border: 2px solid #4255ff;
+      font-weight: bold;
+      box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.18);
+    }
+
+    /* Main Question Card */
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .q-number-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .question-stem {
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:hover:not(:disabled) {
+      border-color: #4255ff;
+      background: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .opt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #646f90;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 3px;
+    }
+
+    .opt-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* Feedback styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-tile.correct .opt-badge {
+      background: #18ae79;
+      color: #ffffff;
+    }
+    .option-tile.correct .opt-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-tile.incorrect .opt-badge {
+      background: #ff6871;
+      color: #ffffff;
+    }
+    .option-tile.incorrect .opt-tag {
+      display: inline-block;
+      background: #b31d27;
+      color: #ffffff;
+    }
+
+    /* Explanation Card */
+    .rationale-card {
+      margin-top: 20px;
+      background: #fbfcfe;
+      border: 1px solid #e0e5f2;
+      border-left: 4px solid #4255ff;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #2e3856;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-nav.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Scorecard / Results View */
+    .scorecard {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .scorecard.active {
+      display: block;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4255ff;
+      margin: 0 auto 20px;
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+    }
+
+    .score-breakdown {
+      font-size: 1rem;
+      color: #646f90;
+      margin-bottom: 24px;
+    }
+
+    .score-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 110px;
+    }
+
+    .stat-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .stat-val.correct { color: #0e6948; }
+    .stat-val.incorrect { color: #b31d27; }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: #646f90;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Footer & Branding */
+    .footer-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 0.88rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #2e3856;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      border: 1px solid #e0e5f2;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header / Progress Bar -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Lesson 20: Campylobacter spp. Comprehensive Quiz</h1>
+          <p>Applied Bacteriology Course &bull; 30 High-Yield Test Questions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-toggle-grid" id="toggleGridBtn" onclick="toggleGrid()">View List</button>
+          <div class="meta-counts" id="metaCounter">1 / 30</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Question Overview Grid -->
+    <div class="grid-card" id="gridCard">
+      <h3>Question Navigator</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div class="quiz-card" id="quizCard">
+      <span class="q-number-tag" id="qNumberTag">Question 1</span>
+      <div class="question-stem" id="questionStem">Loading question...</div>
+      
+      <div class="options-group" id="optionsGroup"></div>
+
+      <div class="rationale-card" id="rationaleCard">
+        <div class="rationale-title">Explanation & Rationale</div>
+        <div class="rationale-text" id="rationaleText"></div>
+      </div>
+
+      <div class="nav-controls">
+        <button class="btn-nav" id="prevBtn" onclick="navigate(-1)">Previous</button>
+        <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard Interface -->
+    <div class="scorecard" id="scorecard">
+      <div class="score-circle" id="scoreCircle">0%</div>
+      <h2 class="score-title" id="scoreTitle">Exam Completed!</h2>
+      <p class="score-breakdown" id="scoreBreakdown">You answered 0 out of 30 questions correctly.</p>
+      
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val correct" id="statCorrect">0</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val incorrect" id="statIncorrect">0</div>
+          <div class="stat-lbl">Incorrect</div>
+        </div>
+      </div>
+
+      <button class="btn-nav primary" style="padding: 12px 28px;" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer & Attribution -->
+    <div class="footer-card">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+        <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+        <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the characteristic microscopic morphology and Gram reaction of Campylobacter species?",
+        options: [
+          "Gram-positive spore-forming thick rods arranged in chains",
+          "Gram-negative slender rods that are curved, spiral, or S-shaped with a 'seagull-wing' appearance",
+          "Gram-negative coccobacilli with prominent bipolar metachromatic granules",
+          "Acid-fast beaded filamentous bacilli forming serpentine cords"
+        ],
+        correct: 1,
+        explanation: "Campylobacter species are small, slender, Gram-negative rods that display curved, comma-shaped, spiral, or S-shaped forms; when two joined cells meet end-to-end, they characteristically resemble a 'seagull-wing' or 'gull-wing' shape."
+      },
+      {
+        q: "What distinct type of motility is typically observed on a direct wet mount examination of stool containing viable Campylobacter?",
+        options: [
+          "Slow gliding motility",
+          "Tumbling end-over-end motility",
+          "Rapid, corkscrew-like or 'darting' motility",
+          "Complete lack of motility"
+        ],
+        correct: 2,
+        explanation: "Campylobacter bacilli possess polar flagella conferring a distinctive, rapid 'darting' or corkscrew-like motility readily visible on darkfield or phase-contrast wet mount microscopy."
+      },
+      {
+        q: "What specific atmospheric conditions are required for the growth of Campylobacter jejuni in the laboratory?",
+        options: [
+          "Strictly anaerobic atmosphere with 0% oxygen",
+          "Microaerophilic atmosphere requiring reduced oxygen (~5% O₂) with increased CO₂ and N₂",
+          "Ambient room air with 21% oxygen and low humidity",
+          "Hyperbaric oxygen atmosphere (100% O₂)"
+        ],
+        correct: 1,
+        explanation: "Campylobacter is microaerophilic—it cannot survive in standard ambient air (21% O₂) or in strict anaerobic chambers, but thrives best under reduced oxygen (~5% O₂) supplemented with 10% CO₂ and 85% N₂."
+      },
+      {
+        q: "At what incubation temperature is Campylobacter jejuni routinely cultured to suppress competing normal fecal microbiota?",
+        options: [
+          "22°C",
+          "30°C",
+          "37°C",
+          "42°C (Thermotolerant)"
+        ],
+        correct: 3,
+        explanation: "C. jejuni and C. coli are thermotolerant Campylobacter species capable of growing at 42°C. Culturing at 42°C selectively inhibits the vast majority of normal colonic Enterobacteriaceae (like E. coli) that cannot grow well at this elevated temperature."
+      },
+      {
+        q: "Which species is responsible for the overwhelming majority (80–85%) of human clinical Campylobacter gastroenteritis cases worldwide?",
+        options: [
+          "Campylobacter fetus",
+          "Campylobacter jejuni",
+          "Campylobacter coli",
+          "Campylobacter lari"
+        ],
+        correct: 1,
+        explanation: "Campylobacter jejuni accounts for approximately 80–85% of all human Campylobacter gastroenteritis cases, while Campylobacter coli accounts for 10–15%."
+      },
+      {
+        q: "Which animal species serves as the primary, natural asymptomatic reservoir host for Campylobacter jejuni?",
+        options: [
+          "Swine (pigs)",
+          "Poultry (chickens and turkeys)",
+          "Wild rodents",
+          "Marine fish"
+        ],
+        correct: 1,
+        explanation: "Poultry, especially broiler chickens and turkeys, are the principal natural reservoir for C. jejuni; they carry high bacterial titers asymptomatically in their gastrointestinal tracts due to their higher natural body temperatures (~41–42°C)."
+      },
+      {
+        q: "Which animal species is predominantly recognized as the primary reservoir for Campylobacter coli?",
+        options: [
+          "Swine (pigs)",
+          "Poultry",
+          "Reptiles",
+          "Horses"
+        ],
+        correct: 0,
+        explanation: "While C. jejuni is primarily associated with poultry, Campylobacter coli is most frequently colonized in the gastrointestinal tracts of swine (pigs)."
+      },
+      {
+        q: "What is the single most common vehicle and risk factor for sporadic human Campylobacter infection in developed nations?",
+        options: [
+          "Consumption of commercially canned acidic foods",
+          "Ingestion of undercooked poultry or cross-contamination from raw poultry handling",
+          "Inhalation of pollen during early spring",
+          "Consumption of chlorinated swimming pool water"
+        ],
+        correct: 1,
+        explanation: "Handling and eating raw or undercooked poultry, or cross-contaminating ready-to-eat foods via unwashed cutting boards and knives that contacted raw poultry, represents the leading source of infection."
+      },
+      {
+        q: "What key biochemical test reliably differentiates Campylobacter jejuni from Campylobacter coli?",
+        options: [
+          "Catalase test",
+          "Oxidase test",
+          "Hippurate hydrolysis test",
+          "Indole test"
+        ],
+        correct: 2,
+        explanation: "The hippurate hydrolysis test is the gold standard discriminator: Campylobacter jejuni hydrolyzes sodium hippurate to benzoic acid and glycine (Hippurate Positive, +), whereas Campylobacter coli is Hippurate Negative (–)."
+      },
+      {
+        q: "What is the typical incubation period of Campylobacter gastroenteritis following oral ingestion of contaminated food?",
+        options: [
+          "1 to 6 hours",
+          "1 to 10 days (average 2 to 3 days)",
+          "30 to 45 days",
+          "6 to 12 months"
+        ],
+        correct: 1,
+        explanation: "The incubation period of Campylobacter ranges from 1 to 10 days, averaging 2 to 3 days, which is notably longer than typical preformed toxin food poisonings (e.g., S. aureus or B. cereus)."
+      },
+      {
+        q: "Which clinical feature of Campylobacter gastroenteritis often leads to a misdiagnosis of acute appendicitis, especially in older children and young adults?",
+        options: [
+          "Painless watery diarrhea without fever",
+          "Severe localized lower quadrant abdominal pain mimicking pseudoappendicitis",
+          "Isolated profuse hematemesis",
+          "Rapid development of bilateral parotid swelling"
+        ],
+        correct: 1,
+        explanation: "Campylobacter can induce acute mesenteric adenitis and terminal ileitis, resulting in intense right lower quadrant abdominal pain and tenderness that closely mimics acute surgical appendicitis."
+      },
+      {
+        q: "What post-infectious, immune-mediated neurological complication is classically triggered by molecular mimicry following Campylobacter jejuni infection?",
+        options: [
+          "Multiple sclerosis",
+          "Guillain-Barré Syndrome (GBS)",
+          "Parkinson's disease",
+          "Amyotrophic lateral sclerosis (ALS)"
+        ],
+        correct: 1,
+        explanation: "Guillain-Barré Syndrome is an acute ascending demyelinating polyneuropathy caused by molecular mimicry: antibodies formed against the lipooligosaccharide (LOS) of C. jejuni cross-react with human peripheral nerve gangliosides (e.g., GM1)."
+      },
+      {
+        q: "How does Campylobacter jejuni respond to refrigeration temperatures (0–10°C)?",
+        options: [
+          "It is instantly killed and disintegrated within 5 minutes",
+          "It can survive and persist viable for weeks in chilled raw poultry meat",
+          "It actively multiplies faster than at 42°C",
+          "It forms thick endospores to survive cold shock"
+        ],
+        correct: 1,
+        explanation: "Although C. jejuni cannot actively multiply below 30°C, it remains viable and survives well at refrigeration temperatures (0–10°C), allowing it to persist on refrigerated retail poultry."
+      },
+      {
+        q: "Which physical or chemical conditions readily destroy Campylobacter jejuni?",
+        options: [
+          "Cooking temperatures exceeding 60°C, desiccation (drying), salt, and standard disinfectants",
+          "Freezing without oxygen at -80°C exclusively",
+          "Only gamma radiation at industrial sterilization doses",
+          "It is completely indestructible by standard food cooking practices"
+        ],
+        correct: 0,
+        explanation: "Campylobacter is fragile outside its host: it is rapidly inactivated by thorough cooking (temperatures >60°C), atmospheric drying (desiccation), high salt concentrations, and common chlorine/alcohol-based disinfectants."
+      },
+      {
+        q: "What selective culture medium incorporating blood and an antibiotic cocktail (such as vancomycin, polymyxin B, and trimethoprim) is standard for isolating Campylobacter from stool?",
+        options: [
+          "MacConkey agar",
+          "Skirrow medium",
+          "Lowenstein-Jensen medium",
+          "Thiosulfate-Citrate-Bile Salts-Sucrose (TCBS) agar"
+        ],
+        correct: 1,
+        explanation: "Skirrow medium (and similar formulations like Campy-BAP or Karmali agar) uses an enriched blood agar base supplemented with antibiotics to inhibit normal Gram-positive, Gram-negative, and fungal stool flora."
+      },
+      {
+        q: "What is the oxidase reaction of the genus Campylobacter?",
+        options: [
+          "Consistently Oxidase Negative",
+          "Consistently Oxidase Positive (+)",
+          "Variable depending on incubation humidity",
+          "Only positive when grown on starch agar"
+        ],
+        correct: 1,
+        explanation: "All clinically relevant Campylobacter species are cytochrome c oxidase positive (+)."
+      },
+      {
+        q: "Which species of Campylobacter was historically known as 'Vibrio fetus' and is predominantly associated with systemic vascular infections and bacteremia in immunocompromised hosts?",
+        options: [
+          "Campylobacter jejuni",
+          "Campylobacter fetus",
+          "Campylobacter coli",
+          "Campylobacter concisus"
+        ],
+        correct: 1,
+        explanation: "Originally identified as Vibrio fetus in 1913, Campylobacter fetus causes septicemia, thrombophlebitis, endocarditis, and septic abortion in livestock and compromised humans, possessing an S-layer capsule that confers serum resistance."
+      },
+      {
+        q: "What is the natural intrinsic resistance profile of Campylobacter jejuni and coli against traditional antimicrobial agents?",
+        options: [
+          "Naturally resistant to Colistin, Trimethoprim, and Cephalothin",
+          "Naturally resistant to all Macrolides and Carbapenems",
+          "Naturally resistant to Aminoglycosides and Vancomycin only",
+          "Completely susceptible to every existing antibiotic class"
+        ],
+        correct: 0,
+        explanation: "Campylobacter species display natural, intrinsic resistance to cephalothin (a 1st-generation cephalosporin), trimethoprim, and colistin (polymyxin E), which allows these agents to be incorporated into selective media."
+      },
+      {
+        q: "What is the primary recommended therapeutic approach for mild, uncomplicated acute Campylobacter gastroenteritis in an otherwise healthy host?",
+        options: [
+          "Immediate high-dose intravenous fluoroquinolones",
+          "Supportive care with oral rehydration, fluids, and electrolyte management",
+          "Prophylactic appendectomy and exploratory laparotomy",
+          "Total parenteral nutrition and complete bowel rest for 3 weeks"
+        ],
+        correct: 1,
+        explanation: "Uncomplicated Campylobacter enteritis is generally self-limiting, resolving spontaneously within about one week. Supportive therapy focusing on rehydration and electrolyte replenishment is the primary standard of care."
+      },
+      {
+        q: "When antimicrobial therapy is clinically indicated for severe, invasive, or prolonged Campylobacter gastroenteritis, which drug class is considered first-line?",
+        options: [
+          "First-generation cephalosporins (e.g., Cephalothin)",
+          "Macrolides (e.g., Azithromycin or Erythromycin)",
+          "Polymyxins (e.g., Colistin)",
+          "Lincosamides monotherapy"
+        ],
+        correct: 1,
+        explanation: "Macrolides (Azithromycin or Erythromycin) represent the first-line antibiotic treatment of choice due to excellent mucosal tissue levels and consistently low rates of resistance compared to quinolones."
+      },
+      {
+        q: "Why has the empirical use of fluoroquinolones (such as Ciprofloxacin) for treating Campylobacter enteritis become increasingly restricted?",
+        options: [
+          "Fluoroquinolones directly stimulate the production of cytolethal distending toxin",
+          "High and rapidly rising rates of acquired chromosomal gyrA mutations conferring fluoroquinolone resistance worldwide",
+          "Ciprofloxacin is rapidly destroyed by gastric acid",
+          "Campylobacter possesses intrinsic plasmid-mediated beta-lactamases against quinolones"
+        ],
+        correct: 1,
+        explanation: "Widespread agricultural and veterinary use of fluoroquinolones in poultry farming has driven a massive global surge in acquired fluoroquinolone resistance in Campylobacter, making ciprofloxacin unadvisable as an empirical first-line choice."
+      },
+      {
+        q: "Which bacterial toxin produced by certain Campylobacter strains halts host cell cycle progression at the G2/M phase, causing cell distension and death?",
+        options: [
+          "Shiga toxin (Stx)",
+          "Cytolethal Distending Toxin (CDT)",
+          "Tetanospasmin",
+          "Alpha-toxin lecithinase"
+        ],
+        correct: 1,
+        explanation: "Cytolethal Distending Toxin (CDT) is a tripartite A-B type genotoxin whose active subunit (CdtB) possesses DNase I-like activity, causing host DNA double-strand breaks and cell cycle arrest at G2/M."
+      },
+      {
+        q: "Besides undercooked poultry, what other dietary exposure is a well-established vehicle for Campylobacter outbreaks?",
+        options: [
+          "Consumption of unpasteurized (raw) milk or contaminated municipal water",
+          "Pasteurized yogurt",
+          "Commercially sterilized infant formula",
+          "Freshly baked wheat bread"
+        ],
+        correct: 0,
+        explanation: "Drinking unpasteurized raw cow's milk or untreated surface water from contaminated streams/wells are recognized causes of large, multi-person Campylobacter gastroenteritis outbreaks."
+      },
+      {
+        q: "What domestic pet contact represents a documented zoonotic risk factor for acquiring Campylobacter enteritis, especially in young children?",
+        options: [
+          "Contact with healthy, caged adult birds",
+          "Contact with household puppies or kittens suffering from diarrhea",
+          "Handling aquarium tropical fish",
+          "Grooming healthy adult indoor cats"
+        ],
+        correct: 1,
+        explanation: "Household pets, particularly puppies and kittens with active diarrheal illness, shed Campylobacter in high numbers in their feces and can transmit the pathogen to human family members via direct contact."
+      },
+      {
+        q: "Why is human-to-human transmission of Campylobacter relatively uncommon compared to Shigella or Norovirus?",
+        options: [
+          "Campylobacter dies immediately upon touching human skin, and the required infectious dose is relatively higher than that of Shigella",
+          "Humans do not shed Campylobacter in their feces during acute illness",
+          "The human digestive tract permanently immunizes contacts through aerosolized IgA",
+          "Campylobacter only replicates inside avian intestinal cells"
+        ],
+        correct: 0,
+        explanation: "Most Campylobacter cases are sporadic zoonotic foodborne infections. The organism is susceptible to drying on skin and hands, and human-to-human transmission is rare outside of diapered infant cohorts."
+      },
+      {
+        q: "During the processing of broiler chickens in industrial slaughterhouses, what step causes the most significant cross-contamination of carcasses with Campylobacter?",
+        options: [
+          "Packaging into airtight vacuum packs",
+          "Automated mechanical evisceration (removal of internal organs) and defeathering",
+          "Dry blast freezing at -40°C",
+          "Quality control weight inspection"
+        ],
+        correct: 1,
+        explanation: "Mechanical defeathering and automated evisceration can rupture chicken intestinal tracts, aerosolizing cecal contents and heavily contaminating the skin of multiple carcasses along the processing line."
+      },
+      {
+        q: "Which post-infectious reactive condition, characterized by aseptic joint inflammation, can develop 1 to 3 weeks following Campylobacter enteritis?",
+        options: [
+          "Rheumatoid arthritis",
+          "Reactive Arthritis (Reiter's syndrome)",
+          "Gouty arthritis",
+          "Osteoarthritis"
+        ],
+        correct: 1,
+        explanation: "Reactive arthritis (sterile post-dysenteric arthritis, sometimes part of Reiter's syndrome) is a known immune-mediated sequela following Campylobacter enteritis, especially in HLA-B27-positive patients."
+      },
+      {
+        q: "How does the carbohydrate metabolism of Campylobacter species differ fundamentally from members of the family Enterobacteriaceae?",
+        options: [
+          "They rapidly ferment lactose with intense gas production",
+          "They are non-fermentative and do not oxidize or ferment carbohydrates, relying instead on amino acids and TCA intermediates for energy",
+          "They produce cellulose from sucrose",
+          "They ferment mannitol into alcohol anaerobically"
+        ],
+        correct: 1,
+        explanation: "Campylobacter species lack the complete glycolytic pathway and do not ferment or oxidize carbohydrates; they obtain metabolic energy by metabolizing amino acids (e.g., aspartate, glutamate, serine) and Krebs cycle intermediates."
+      },
+      {
+        q: "Why was the historical classification of Campylobacter under the genus Vibrio (e.g., 'Vibrio fetus') revised in 1963?",
+        options: [
+          "Campylobacter has a microaerophilic nature, non-fermentative metabolism, and different DNA base composition from true halophilic Vibrio species",
+          "Campylobacter was discovered to be a Gram-positive spore-forming anaerobe",
+          "Campylobacter has four flagella at both poles simultaneously",
+          "Vibrio species are exclusively plant pathogens"
+        ],
+        correct: 0,
+        explanation: "Vibrio species are facultatively anaerobic, carbohydrate-fermenting, and often halophilic organisms. In 1963, Sebald and Véron separated the microaerophilic, non-fermentative, low-G+C curved rods into the genus Campylobacter (from the Greek for 'curved rod')."
+      },
+      {
+        q: "What critical consumer kitchen hygiene practice is most effective in preventing poultry-associated Campylobacter transmission?",
+        options: [
+          "Washing raw chicken in the kitchen sink with cold water before cooking",
+          "Avoiding washing raw poultry (to prevent aerosol splash contamination), thoroughly cooking meat to >60–75°C, and using dedicated cutting boards",
+          "Soaking raw chicken in mild vinegar for 30 seconds before eating it rare",
+          "Storing raw poultry uncovered on the top shelf of the refrigerator directly above salad greens"
+        ],
+        correct: 1,
+        explanation: "Washing raw chicken in a sink is strongly discouraged by public health authorities because splashing droplets spread Campylobacter across countertops. Safe prevention requires cooking poultry thoroughly (>60–75°C), strict separation of raw meat boards from ready-to-eat items, and thorough hand hygiene."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function init() {
+      buildGrid();
+      loadQuestion(0);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById("questionGrid");
+      grid.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `gridBtn_${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function toggleGrid() {
+      const gridCard = document.getElementById("gridCard");
+      const toggleBtn = document.getElementById("toggleGridBtn");
+      if (gridCard.classList.contains("active")) {
+        gridCard.classList.remove("active");
+        toggleBtn.textContent = "View List";
+      } else {
+        gridCard.classList.add("active");
+        toggleBtn.textContent = "Hide List";
+      }
+    }
+
+    function jumpToQuestion(index) {
+      currentQ = index;
+      loadQuestion(currentQ);
+      document.getElementById("quizCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function loadQuestion(index) {
+      currentQ = index;
+      const data = quizData[index];
+      const answered = userAnswers[index] !== null;
+
+      // Update Header & Counters
+      document.getElementById("qNumberTag").textContent = `Question ${index + 1} of ${quizData.length}`;
+      document.getElementById("metaCounter").textContent = `${index + 1} / ${quizData.length}`;
+      
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      const progressPct = (totalAnswered / quizData.length) * 100;
+      document.getElementById("progressBar").style.width = `${progressPct}%`;
+
+      // Update Question text
+      document.getElementById("questionStem").textContent = data.q;
+
+      // Render Options
+      const optionsGroup = document.getElementById("optionsGroup");
+      optionsGroup.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      data.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-tile";
+        btn.disabled = answered;
+
+        let tagText = "";
+        if (answered) {
+          if (optIdx === data.correct) {
+            btn.classList.add("correct");
+            tagText = "CORRECT";
+          } else if (optIdx === userAnswers[index]) {
+            btn.classList.add("incorrect");
+            tagText = "INCORRECT";
+          }
+        }
+
+        btn.innerHTML = `
+          <span class="opt-badge">${letters[optIdx]}</span>
+          <span class="opt-text">${optText}</span>
+          ${tagText ? `<span class="opt-tag">${tagText}</span>` : ""}
+        `;
+
+        if (!answered) {
+          btn.onclick = () => selectOption(optIdx);
+        }
+
+        optionsGroup.appendChild(btn);
+      });
+
+      // Rationale Box
+      const rationaleCard = document.getElementById("rationaleCard");
+      const rationaleText = document.getElementById("rationaleText");
+      if (answered) {
+        rationaleText.textContent = data.explanation;
+        rationaleCard.classList.add("show");
+      } else {
+        rationaleCard.classList.remove("show");
+      }
+
+      // Update Nav Buttons
+      document.getElementById("prevBtn").disabled = index === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      if (index === quizData.length - 1) {
+        nextBtn.textContent = "Finish & Review";
+      } else {
+        nextBtn.textContent = "Next";
+      }
+
+      // Update Grid Buttons state
+      updateGridUI();
+    }
+
+    function selectOption(selectedIdx) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = selectedIdx;
+      loadQuestion(currentQ);
+    }
+
+    function updateGridUI() {
+      quizData.forEach((_, idx) => {
+        const btn = document.getElementById(`gridBtn_${idx}`);
+        if (!btn) return;
+        btn.className = "grid-btn";
+        if (userAnswers[idx] !== null) {
+          btn.classList.add("answered");
+        }
+        if (idx === currentQ) {
+          btn.classList.add("current");
+        }
+      });
+    }
+
+    function navigate(delta) {
+      const nextIndex = currentQ + delta;
+      if (nextIndex >= 0 && nextIndex < quizData.length) {
+        loadQuestion(nextIndex);
+      } else if (nextIndex >= quizData.length) {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("gridCard").classList.remove("active");
+      document.getElementById("toggleGridBtn").style.display = "none";
+      
+      const scorecard = document.getElementById("scorecard");
+      scorecard.classList.add("active");
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) correctCount++;
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("scoreCircle").textContent = `${percentage}%`;
+      document.getElementById("scoreBreakdown").textContent = `You correctly answered ${correctCount} of ${quizData.length} questions.`;
+      document.getElementById("statCorrect").textContent = correctCount;
+      document.getElementById("statIncorrect").textContent = incorrectCount;
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("metaCounter").textContent = `${quizData.length} / ${quizData.length}`;
+
+      if (percentage >= 80) {
+        document.getElementById("scoreTitle").textContent = "Outstanding Performance!";
+      } else if (percentage >= 60) {
+        document.getElementById("scoreTitle").textContent = "Good Effort - Review Notes!";
+      } else {
+        document.getElementById("scoreTitle").textContent = "Keep Practicing Bacteriology!";
+      }
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById("scorecard").classList.remove("active");
+      document.getElementById("quizCard").style.display = "block";
+      document.getElementById("toggleGridBtn").style.display = "inline-block";
+      document.getElementById("toggleGridBtn").textContent = "View List";
+      loadQuestion(0);
+    }
+
+    // Initialize application on load
+    window.onload = init;
+  </script>
+</body>
+</html>
