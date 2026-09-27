@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 07: Salmonella Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Progress */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #c8d1ff;
+      color: #4255ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .meta-counts {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #e6e9f2;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    /* Question Overview Modal / Drawer */
+    .grid-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .grid-card.active {
+      display: block;
+    }
+
+    .grid-card h3 {
+      font-size: 0.9rem;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-btn {
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      border-color: #b8c4ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.current {
+      border: 2px solid #4255ff;
+      font-weight: bold;
+      box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.18);
+    }
+
+    /* Main Question Card */
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .q-number-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .question-stem {
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:hover:not(:disabled) {
+      border-color: #4255ff;
+      background: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .opt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #646f90;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 3px;
+    }
+
+    .opt-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* Feedback styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-tile.correct .opt-badge {
+      background: #18ae79;
+      color: #ffffff;
+    }
+    .option-tile.correct .opt-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-tile.incorrect .opt-badge {
+      background: #ff6871;
+      color: #ffffff;
+    }
+    .option-tile.incorrect .opt-tag {
+      display: inline-block;
+      background: #b31d27;
+      color: #ffffff;
+    }
+
+    /* Explanation Card */
+    .rationale-card {
+      margin-top: 20px;
+      background: #fbfcfe;
+      border: 1px solid #e0e5f2;
+      border-left: 4px solid #4255ff;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #2e3856;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-nav.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Scorecard / Results View */
+    .scorecard {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .scorecard.active {
+      display: block;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4255ff;
+      margin: 0 auto 20px;
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+    }
+
+    .score-breakdown {
+      font-size: 1rem;
+      color: #646f90;
+      margin-bottom: 24px;
+    }
+
+    .score-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 110px;
+    }
+
+    .stat-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .stat-val.correct { color: #0e6948; }
+    .stat-val.incorrect { color: #b31d27; }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: #646f90;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Footer & Branding */
+    .footer-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 0.88rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #2e3856;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      border: 1px solid #e0e5f2;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header / Progress Bar -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Lesson 07: Salmonella Comprehensive Quiz</h1>
+          <p>Applied Bacteriology Course &bull; 30 High-Yield Test Questions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-toggle-grid" id="toggleGridBtn" onclick="toggleGrid()">View List</button>
+          <div class="meta-counts" id="metaCounter">1 / 30</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Question Overview Modal/Grid -->
+    <div class="grid-card" id="gridCard">
+      <h3>Question Navigator</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div class="quiz-card" id="quizCard">
+      <span class="q-number-tag" id="qNumberTag">Question 1</span>
+      <div class="question-stem" id="questionStem">Loading question...</div>
+      
+      <div class="options-group" id="optionsGroup"></div>
+
+      <div class="rationale-card" id="rationaleCard">
+        <div class="rationale-title">Explanation & Rationale</div>
+        <div class="rationale-text" id="rationaleText"></div>
+      </div>
+
+      <div class="nav-controls">
+        <button class="btn-nav" id="prevBtn" onclick="navigate(-1)">Previous</button>
+        <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard Interface -->
+    <div class="scorecard" id="scorecard">
+      <div class="score-circle" id="scoreCircle">0%</div>
+      <h2 class="score-title" id="scoreTitle">Exam Completed!</h2>
+      <p class="score-breakdown" id="scoreBreakdown">You answered 0 out of 30 questions correctly.</p>
+      
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val correct" id="statCorrect">0</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val incorrect" id="statIncorrect">0</div>
+          <div class="stat-lbl">Incorrect</div>
+        </div>
+      </div>
+
+      <button class="btn-nav primary" style="padding: 12px 28px;" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer & Attribution -->
+    <div class="footer-card">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+        <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+        <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "According to modern taxonomy and the Kauffmann-White scheme, how are pathogenic Salmonella scientifically classified?",
+        options: [
+          "They belong to numerous distinct species, such as Salmonella typhi and Salmonella enteritidis",
+          "All pathogenic Salmonella belong to Salmonella enterica, which has 6 subspecies and over 2,000 serovars",
+          "They are grouped under Salmonella choleraesuis as the single parent species with over 500 biotypes",
+          "They are classified purely by Gram stain morphology into 12 distinct sub-genera"
+        ],
+        correct: 1,
+        explanation: "Modern bacterial taxonomy places all pathogenic Salmonella into a single species, Salmonella enterica (subdivided into 6 subspecies), with more than 2,000 distinct serovars identified via the Kauffmann-White antigenic scheme. Serovar names are capitalized but not italicized (e.g., Salmonella Typhi)."
+      },
+      {
+        q: "Which serovar of Salmonella is strictly human-restricted and possesses no animal reservoir?",
+        options: [
+          "Salmonella Enteritidis",
+          "Salmonella Typhimurium",
+          "Salmonella Typhi",
+          "Salmonella Choleraesuis"
+        ],
+        correct: 2,
+        explanation: "Salmonella Typhi (and Paratyphi) infects humans exclusively—there is no known animal reservoir. Non-typhoidal serovars like Enteritidis, Typhimurium, and Choleraesuis have broad or swine/animal reservoirs."
+      },
+      {
+        q: "What is the primary morphological and motility characteristic of Salmonella species?",
+        options: [
+          "Gram-positive cocci arranged in clusters; non-motile",
+          "Gram-negative bacilli; non-motile under all conditions",
+          "Gram-negative bacilli; motile via peritrichous flagella",
+          "Acid-fast bacilli; motile via polar monotrichous flagella"
+        ],
+        correct: 2,
+        explanation: "Salmonella organisms are Gram-negative bacilli that are typically motile by means of peritrichous flagella (distributed all around the bacterial cell body)."
+      },
+      {
+        q: "Which bacterial antigen defines the Salmonella somatic serogroup (such as Group D) and is part of the outer membrane lipopolysaccharide?",
+        options: [
+          "H antigen",
+          "Vi antigen",
+          "O antigen",
+          "K antigen"
+        ],
+        correct: 2,
+        explanation: "The 'O' antigen is the somatic, heat-stable polysaccharide component of the lipopolysaccharide (LPS) outer membrane that defines the serogroup (e.g., Group D for S. Typhi)."
+      },
+      {
+        q: "What is the nature and clinical significance of the Vi antigen found in Salmonella Typhi?",
+        options: [
+          "It is a heat-labile flagellar protein responsible for phase variation",
+          "It is a capsular virulence polysaccharide that inhibits phagocytosis and masks the somatic O antigen",
+          "It is an exotoxin responsible for cyclic AMP activation in enterocytes",
+          "It is an outer membrane porin that facilitates lactose uptake"
+        ],
+        correct: 1,
+        explanation: "The Vi ('virulence') antigen is a capsular polysaccharide found in S. Typhi, S. Paratyphi C, and Citrobacter freundii. It impairs neutrophil/macrophage phagocytosis and masks the underlying O antigen from antibody recognition."
+      },
+      {
+        q: "Which component of the lipopolysaccharide (LPS) complex is directly responsible for triggering endotoxic shock, fever, and DIC?",
+        options: [
+          "O-specific polysaccharide chain",
+          "R core oligosaccharide",
+          "Lipid A",
+          "Peritrichous flagellin"
+        ],
+        correct: 2,
+        explanation: "Lipid A is the toxic, hydrophobic anchor of LPS embedded in the outer membrane. When released, it triggers endogenous pyrogens (fever), activates complement, the kinin system, and the coagulation cascade (DIC)."
+      },
+      {
+        q: "How does non-typhoidal Salmonella initially invade the intestinal epithelium of the ileum?",
+        options: [
+          "By attaching to M cells and enterocytes and injecting effectors via a Type III Secretion System (T3SS)",
+          "By synthesizing a thick biofilm that erodes the muscularis mucosa through collagenase",
+          "By purely extracellular growth and releasing potent neurotoxins without cell entry",
+          "By passive diffusion through intercellular tight junctions without host cytoskeletal change"
+        ],
+        correct: 0,
+        explanation: "Salmonella adheres to microfold (M) cells and enterocytes in Peyer's patches, utilizing a Type III Secretion System (T3SS) to inject effector proteins that trigger host actin rearrangement and bacterial uptake."
+      },
+      {
+        q: "What is the typical incubation period and clinical duration of non-typhoidal Salmonella gastroenteritis?",
+        options: [
+          "Incubation: 1–2 hours; Duration: 12 hours",
+          "Incubation: 8–48 hours; Duration: 2–5 days (self-limiting)",
+          "Incubation: 10–14 days; Duration: 4–6 weeks",
+          "Incubation: 30–60 days; Duration: 6–12 months"
+        ],
+        correct: 1,
+        explanation: "Non-typhoidal gastroenteritis typically manifests 8 to 48 hours after ingestion of contaminated food/water and is typically self-limiting within 2 to 5 days."
+      },
+      {
+        q: "Which classic clinical sign is characterized by a pulse-temperature dissociation in patients with enteric (typhoid) fever?",
+        options: [
+          "Tachycardia during hypothermia",
+          "Relative bradycardia (Faget's sign)",
+          "Pulsus paradoxus",
+          "Bounding bifid carotid pulse"
+        ],
+        correct: 1,
+        explanation: "Enteric fever frequently exhibits relative bradycardia (pulse rate slower than expected for the degree of fever, also known as pulse-temperature dissociation or Faget's sign)."
+      },
+      {
+        q: "What are 'rose spots' and where are they classically observed during typhoid fever?",
+        options: [
+          "Pustular eruptions on the palms and soles",
+          "Faint pink, blanching macules predominantly on the trunk/abdomen",
+          "Necrotic eschars surrounded by erythematous rings on extremities",
+          "Vesicular crusted lesions around the perioral margin"
+        ],
+        correct: 1,
+        explanation: "Rose spots are transient, faint salmon-pink, blanching maculopapular lesions that typically appear on the trunk and abdomen during the second week of typhoid fever."
+      },
+      {
+        q: "Patients with sickle cell disease are unusually prone to Salmonella-induced focal infections of which system?",
+        options: [
+          "Bacterial endocarditis",
+          "Osteomyelitis",
+          "Glomerulonephritis",
+          "Interstitial pneumonitis"
+        ],
+        correct: 1,
+        explanation: "Due to microvascular sickle vaso-occlusion, bowel ischemia, and functional asplenia, patients with sickle cell disease have a pronounced susceptibility to Salmonella osteomyelitis."
+      },
+      {
+        q: "Which Salmonella serovar is classically associated with swine reservoirs and a high predilection for septicemia with minimal GI symptoms?",
+        options: [
+          "Salmonella Enteritidis",
+          "Salmonella Typhi",
+          "Salmonella Choleraesuis",
+          "Salmonella Gallinarum"
+        ],
+        correct: 2,
+        explanation: "Salmonella Choleraesuis is primarily adapted to swine and in humans classically produces high remittent fever, septicemia, and metastatic focal seeding with minimal diarrhea."
+      },
+      {
+        q: "Why do patients taking proton-pump inhibitors (PPIs) or antacids face a significantly higher risk of acquiring Salmonella infections?",
+        options: [
+          "PPIs stimulate the expression of bacterial flagellar antigens",
+          "Reduced gastric acidity lowers the infectious dose threshold by permitting more viable bacteria to survive into the intestine",
+          "PPIs directly destroy the colonic commensal anaerobic bacteria",
+          "Antacids act as chemical cofactors for the Salmonella T3SS needle complex"
+        ],
+        correct: 1,
+        explanation: "Normal gastric acid (pH < 3) rapidly kills most swallowed Salmonella. Raising the pH through antacids, PPIs, or achlorhydria significantly lowers the minimum infectious dose needed to cause illness."
+      },
+      {
+        q: "Which host antibody isotype produced by gut-associated lymphoid tissue (GALT) neutralizes Salmonella prior to epithelial attachment?",
+        options: [
+          "Serum IgM",
+          "Secretory IgA (sIgA)",
+          "Circulating IgE",
+          "Placental IgG"
+        ],
+        correct: 1,
+        explanation: "Secretory IgA (sIgA), produced by intestinal plasma cells in the lamina propria, dimerizes and binds Salmonella surface epitopes, blocking adherence and invasion."
+      },
+      {
+        q: "How does the human body exert 'nutritional immunity' against Salmonella through iron sequestration?",
+        options: [
+          "Hepcidin decreases serum iron, while proteins like transferrin and lactoferrin bind free iron required for bacterial proliferation",
+          "Enterocytes excrete abundant ionic iron directly into the lumen to intoxicate Salmonella",
+          "Gastrointestinal macrophages actively synthesize ferritin to feed non-pathogenic lactobacilli",
+          "The liver consumes all dietary zinc to restrict bacterial ribosomal translation"
+        ],
+        correct: 0,
+        explanation: "Salmonella strictly requires iron for growth and virulence. The host mounts nutritional immunity via hepcidin-mediated reduction of serum iron and chelation by lactoferrin and transferrin."
+      },
+      {
+        q: "Which food item is recognized globally as the single most frequent vehicle for Salmonella Enteritidis transmission?",
+        options: [
+          "Canned acidic tomatoes",
+          "Raw or undercooked poultry and eggs",
+          "Fermented pasteurized cheeses",
+          "Commercially sterilized dry biscuits"
+        ],
+        correct: 1,
+        explanation: "S. Enteritidis colonizes poultry ovarian tissue, resulting in transovarial contamination of intact eggs. Poultry meat and raw/undercooked eggs remain the primary global food reservoirs."
+      },
+      {
+        q: "What is the primary anatomical sanctuary where Salmonella Typhi persists in chronic asymptomatic carriers (e.g., 'Typhoid Mary')?",
+        options: [
+          "Urinary bladder mucosa",
+          "Gallbladder (often within gallstones/biofilms)",
+          "Parotid salivary glands",
+          "Alveolar macrophages in the lungs"
+        ],
+        correct: 1,
+        explanation: "In chronic carriers of S. Typhi, the bacteria colonize the gallbladder (often forming persistent biofilms on cholesterol gallstones) and are shed intermittently into the feces."
+      },
+      {
+        q: "In regional settings such as Cambodia and ASEAN, which combination of factors maintains ongoing endemic enteric fever risk?",
+        options: [
+          "Excessive intake of pasteurized dairy products",
+          "Surface water contamination coupled with limited WASH infrastructure",
+          "Tick bites and mosquito vector overgrowth",
+          "Over-chlorination of domestic municipal water piping"
+        ],
+        correct: 1,
+        explanation: "Enteric fever spreads via contaminated water and poor sanitation. In developing regions, untreated surface water and deficits in WASH (Water, Sanitation, Hygiene) sustain transmission."
+      },
+      {
+        q: "Why is clinical examination alone considered insufficient for diagnosing Salmonella gastroenteritis?",
+        options: [
+          "Salmonella gastroenteritis produces zero detectable clinical symptoms",
+          "Its presentation overlaps indistinguishably with shigellosis, campylobacteriosis, and viral gastroenteritis",
+          "All patients with Salmonella infection solely present with septic arthritis",
+          "Stethoscope examination reliably distinguishes Salmonella from all other pathogens"
+        ],
+        correct: 1,
+        explanation: "Clinical symptoms (nausea, fever, watery/bloody diarrhea, abdominal cramps) mimic other pathogens like Campylobacter, Shigella, and rotavirus, necessitating definitive lab culture or molecular assays."
+      },
+      {
+        q: "How does Salmonella appear on differential and selective agar like Hektoen Enteric or Salmonella-Shigella (SS) agar?",
+        options: [
+          "Bright pink-red colonies due to rapid lactose fermentation",
+          "Colorless / translucent colonies with distinctive black centers due to H₂S production",
+          "Bright yellow colonies that ferment mannitol and sucrose",
+          "Mucoid green colonies with metallic sheen"
+        ],
+        correct: 1,
+        explanation: "Salmonella does not ferment lactose (remaining translucent/colorless) and reduces thiosulfate to produce hydrogen sulfide (H₂S), which reacts with iron to form black colonies/centers."
+      },
+      {
+        q: "What are the biochemical reactions of Salmonella on Triple Sugar Iron (TSI) agar?",
+        options: [
+          "Lactose fermenter (+), H₂S negative, Oxidase positive",
+          "Glucose fermenter (+), Lactose non-fermenter (-), H₂S positive (black precipitate)",
+          "Glucose non-fermenter (-), Gas producer (+), Oxidase positive",
+          "Sucrose fermenter (+), Indole positive, Motility negative"
+        ],
+        correct: 1,
+        explanation: "Salmonella ferments glucose (acidic butt), does not ferment lactose or sucrose (alkaline red slant: K/A), and produces H₂S gas visible as blackening of the agar butt."
+      },
+      {
+        q: "What is the primary role of Selenite broth or Tetrathionate broth in processing fecal specimens for suspected Salmonella?",
+        options: [
+          "Direct serotyping of capsular Vi antigens",
+          "Selective enrichment to suppress normal fecal coliforms while allowing Salmonella to multiply",
+          "Spectrophotometric antibiotic susceptibility profiling",
+          "Cell-wall digestion to facilitate Gram staining"
+        ],
+        correct: 1,
+        explanation: "Selenite broth is a selective liquid enrichment medium that inhibits commensal intestinal flora (such as E. coli) while promoting Salmonella recovery from stool."
+      },
+      {
+        q: "During the first week of enteric (typhoid) fever, which diagnostic test has the highest clinical yield (~80% positivity)?",
+        options: [
+          "Stool wet mount microscopy",
+          "Blood culture",
+          "Urine antigen lateral flow test",
+          "Skin patch biopsy"
+        ],
+        correct: 1,
+        explanation: "During the first week of typhoid fever, transient primary bacteremia is present, yielding positive blood cultures in roughly 80% of patients. Bone marrow culture is even more sensitive."
+      },
+      {
+        q: "What is the biological mechanism of 'phase variation' seen in the Salmonella flagellar 'H' antigen?",
+        options: [
+          "The bacterium can reversibly alternate between two distinct flagellar proteins (Phase 1 and Phase 2)",
+          "The bacterium sheds its outer membrane upon entering the bloodstream",
+          "The bacterium transforms its somatic O carbohydrate into a lipid capsule",
+          "Flagellar subunits convert from left-handed helices into rigid pili"
+        ],
+        correct: 0,
+        explanation: "Salmonella can coordinately switch the expression of its flagellin genes (fliC for Phase 1 and fljB for Phase 2), an immune evasion strategy called antigenic phase variation."
+      },
+      {
+        q: "Why is routine antibiotic treatment contraindicated in uncomplicated, non-typhoidal Salmonella gastroenteritis in healthy individuals?",
+        options: [
+          "Antibiotics accelerate death by precipitating sudden toxic shock",
+          "It does not shorten illness duration, increases fecal carriage duration, and promotes antimicrobial resistance",
+          "Non-typhoidal Salmonella is inherently 100% resistant to all known pharmacological antimicrobials",
+          "Antibiotics inactivate host gastric acid secretion permanently"
+        ],
+        correct: 1,
+        explanation: "Randomized trials show antibiotics do not shorten clinical symptoms in mild non-typhoidal gastroenteritis, but paradoxically prolong intestinal shedding/carrier status and select for resistant bacteria."
+      },
+      {
+        q: "What constitutes the appropriate primary clinical management for uncomplicated Salmonella gastroenteritis?",
+        options: [
+          "Immediate high-dose intravenous fluoroquinolones",
+          "Supportive care with Oral Rehydration Therapy (ORT) and electrolyte replacement",
+          "Urgent surgical resection of the terminal ileum",
+          "Total parenteral nutrition accompanied by anti-motility loperamide"
+        ],
+        correct: 1,
+        explanation: "Because gastroenteritis is self-limiting in healthy hosts, supportive care focusing on fluid hydration (ORT) and electrolyte repletion is the standard of care."
+      },
+      {
+        q: "Which modern typhoid vaccine is recommended by the WHO for infants and children due to its superior immunogenicity and long-lasting protection?",
+        options: [
+          "Heat-killed whole-cell parenteral vaccine",
+          "Typhoid Conjugate Vaccine (TCV / Vi-conjugate vaccine)",
+          "Unconjugated capsular Vi polysaccharide vaccine",
+          "Subunit flagellar protein injection"
+        ],
+        correct: 1,
+        explanation: "The Vi-conjugate vaccine (TCV) links the Vi polysaccharide to a tetanus toxoid carrier protein, triggering a T-dependent immune response effective in infants as young as 6 months."
+      },
+      {
+        q: "Why do typhoid vaccines have limited efficacy in eliminating pre-existing intracellular Salmonella infections?",
+        options: [
+          "Vaccine antibodies are quickly degraded by bacterial enterotoxins in the blood",
+          "Antibodies only clear extracellular bacteria during bacteremia; they cannot access Salmonella hiding inside host macrophages",
+          "The Vi polysaccharide vaccine completely blocks antibody production in human bone marrow",
+          "Vaccine antigens are neutralized immediately by commensal gut bacteriophages"
+        ],
+        correct: 1,
+        explanation: "Vaccine-induced circulating antibodies can only bind and opsonize Salmonella during the extracellular bacteremic phase. Once the pathogen enters macrophages, it is shielded from humorally mediated clearance."
+      },
+      {
+        q: "What critical farm-level intervention significantly reduces Salmonella Enteritidis transmission into the human food chain?",
+        options: [
+          "Feeding cattle and swine exclusively raw unpasteurized dairy",
+          "Vaccinating laying hens and treating animal feed against Salmonella Enteritidis",
+          "Spraying retail egg cartons with antifungal solutions",
+          "Eliminating all vegetable-based proteins from commercial poultry diets"
+        ],
+        correct: 1,
+        explanation: "Vaccinating poultry flocks against S. Enteritidis and maintaining treated, Salmonella-free animal feed have proven exceptionally effective in cutting human egg-associated outbreaks."
+      },
+      {
+        q: "What specific biochemical characteristic differentiates Salmonella Typhi from most other Salmonella serovars on a TSI slant?",
+        options: [
+          "Produces abundant gas from glucose and ferments lactose rapidly",
+          "Produces H₂S without significant gas production (anaerogenic or trace gas)",
+          "Is completely negative for H₂S production and turns the entire tube alkaline",
+          "Produces a bright green fluorescent pigment under UV illumination"
+        ],
+        correct: 1,
+        explanation: "Unlike many non-typhoidal Salmonella that generate large amounts of gas (H₂ + CO₂) along with heavy H₂S, S. Typhi produces a characteristic smaller curved line of H₂S at the slant/butt junction without gas production (gas-negative)."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function init() {
+      buildGrid();
+      loadQuestion(0);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById("questionGrid");
+      grid.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `gridBtn_${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function toggleGrid() {
+      const gridCard = document.getElementById("gridCard");
+      const toggleBtn = document.getElementById("toggleGridBtn");
+      if (gridCard.classList.contains("active")) {
+        gridCard.classList.remove("active");
+        toggleBtn.textContent = "View List";
+      } else {
+        gridCard.classList.add("active");
+        toggleBtn.textContent = "Hide List";
+      }
+    }
+
+    function jumpToQuestion(index) {
+      currentQ = index;
+      loadQuestion(currentQ);
+      // scroll smoothly to question card
+      document.getElementById("quizCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function loadQuestion(index) {
+      currentQ = index;
+      const data = quizData[index];
+      const answered = userAnswers[index] !== null;
+
+      // Update Header & Counters
+      document.getElementById("qNumberTag").textContent = `Question ${index + 1} of ${quizData.length}`;
+      document.getElementById("metaCounter").textContent = `${index + 1} / ${quizData.length}`;
+      
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      const progressPct = (totalAnswered / quizData.length) * 100;
+      document.getElementById("progressBar").style.width = `${progressPct}%`;
+
+      // Update Question text
+      document.getElementById("questionStem").textContent = data.q;
+
+      // Render Options
+      const optionsGroup = document.getElementById("optionsGroup");
+      optionsGroup.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      data.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-tile";
+        btn.disabled = answered;
+
+        let tagText = "";
+        if (answered) {
+          if (optIdx === data.correct) {
+            btn.classList.add("correct");
+            tagText = "CORRECT";
+          } else if (optIdx === userAnswers[index]) {
+            btn.classList.add("incorrect");
+            tagText = "INCORRECT";
+          }
+        }
+
+        btn.innerHTML = `
+          <span class="opt-badge">${letters[optIdx]}</span>
+          <span class="opt-text">${optText}</span>
+          ${tagText ? `<span class="opt-tag">${tagText}</span>` : ""}
+        `;
+
+        if (!answered) {
+          btn.onclick = () => selectOption(optIdx);
+        }
+
+        optionsGroup.appendChild(btn);
+      });
+
+      // Rationale Box
+      const rationaleCard = document.getElementById("rationaleCard");
+      const rationaleText = document.getElementById("rationaleText");
+      if (answered) {
+        rationaleText.textContent = data.explanation;
+        rationaleCard.classList.add("show");
+      } else {
+        rationaleCard.classList.remove("show");
+      }
+
+      // Update Nav Buttons
+      document.getElementById("prevBtn").disabled = index === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      if (index === quizData.length - 1) {
+        nextBtn.textContent = "Finish & Review";
+      } else {
+        nextBtn.textContent = "Next";
+      }
+
+      // Update Grid Buttons state
+      updateGridUI();
+    }
+
+    function selectOption(selectedIdx) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = selectedIdx;
+      loadQuestion(currentQ);
+    }
+
+    function updateGridUI() {
+      quizData.forEach((_, idx) => {
+        const btn = document.getElementById(`gridBtn_${idx}`);
+        if (!btn) return;
+        btn.className = "grid-btn";
+        if (userAnswers[idx] !== null) {
+          btn.classList.add("answered");
+        }
+        if (idx === currentQ) {
+          btn.classList.add("current");
+        }
+      });
+    }
+
+    function navigate(delta) {
+      const nextIndex = currentQ + delta;
+      if (nextIndex >= 0 && nextIndex < quizData.length) {
+        loadQuestion(nextIndex);
+      } else if (nextIndex >= quizData.length) {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("gridCard").classList.remove("active");
+      document.getElementById("toggleGridBtn").style.display = "none";
+      
+      const scorecard = document.getElementById("scorecard");
+      scorecard.classList.add("active");
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) correctCount++;
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("scoreCircle").textContent = `${percentage}%`;
+      document.getElementById("scoreBreakdown").textContent = `You correctly answered ${correctCount} of ${quizData.length} questions.`;
+      document.getElementById("statCorrect").textContent = correctCount;
+      document.getElementById("statIncorrect").textContent = incorrectCount;
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("metaCounter").textContent = `${quizData.length} / ${quizData.length}`;
+
+      if (percentage >= 80) {
+        document.getElementById("scoreTitle").textContent = "Outstanding Performance!";
+      } else if (percentage >= 60) {
+        document.getElementById("scoreTitle").textContent = "Good Effort - Review Notes!";
+      } else {
+        document.getElementById("scoreTitle").textContent = "Keep Practicing Bacteriology!";
+      }
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById("scorecard").classList.remove("active");
+      document.getElementById("quizCard").style.display = "block";
+      document.getElementById("toggleGridBtn").style.display = "inline-block";
+      document.getElementById("toggleGridBtn").textContent = "View List";
+      loadQuestion(0);
+    }
+
+    // Initialize application on load
+    window.onload = init;
+  </script>
+</body>
+</html>
