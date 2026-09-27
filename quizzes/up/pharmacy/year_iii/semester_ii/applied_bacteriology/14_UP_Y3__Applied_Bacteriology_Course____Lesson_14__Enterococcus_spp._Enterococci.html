@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 14: Enterococcus spp. Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 14: Enterococcus spp.</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the typical microscopic morphology and Gram reaction of Enterococcus species?",
+        options: [
+          "Gram-negative bacilli arranged in parallel palisades",
+          "Gram-positive spherical or oval cocci in pairs (diplococci) or short chains",
+          "Gram-negative coccobacilli with bipolar staining",
+          "Gram-positive large spore-forming rods arranged in bamboo canes"
+        ],
+        correct: 1,
+        explanation: "Enterococcus species are Gram-positive cocci (often oval or coccobacillary) typically arranged in pairs (diplococci) or short chains. They are non-spore-forming and non-motile."
+      },
+      {
+        q: "Which biochemical test result immediately distinguishes Enterococcus from Staphylococcus?",
+        options: [
+          "Catalase negative for Enterococcus, while Staphylococcus is catalase positive",
+          "Oxidase positive for Enterococcus, while Staphylococcus is oxidase negative",
+          "Coagulase positive for Enterococcus, while Staphylococcus is coagulase negative",
+          "Urease positive for Enterococcus, while Staphylococcus is urease negative"
+        ],
+        correct: 0,
+        explanation: "Enterococcus is catalase negative (does not produce oxygen bubbles when exposed to hydrogen peroxide), distinguishing it from Staphylococcus species, which are catalase positive."
+      },
+      {
+        q: "Under the Lancefield serological classification system, which cell-wall carbohydrate antigen is carried by Enterococci?",
+        options: [
+          "Group A antigen",
+          "Group B antigen",
+          "Group D antigen",
+          "Group F antigen"
+        ],
+        correct: 2,
+        explanation: "Enterococci possess the Lancefield Group D glycerol teichoic acid cell-wall antigen, which historically led to their classification as 'Group D Streptococci'."
+      },
+      {
+        q: "Which Enterococcus species is the most common cause of human clinical infections?",
+        options: [
+          "Enterococcus faecalis",
+          "Enterococcus faecium",
+          "Enterococcus gallinarum",
+          "Enterococcus casseliflavus"
+        ],
+        correct: 0,
+        explanation: "Enterococcus faecalis is responsible for the vast majority (80–90%) of clinical enterococcal infections in humans, although E. faecium is notable for higher rates of vancomycin resistance (VRE)."
+      },
+      {
+        q: "Which growth condition correctly differentiates Enterococcus from most non-enterococcal Streptococci?",
+        options: [
+          "Inability to grow in environments above 30°C",
+          "Ability to grow in nutrient broth containing 6.5% NaCl",
+          "Strict obligate anaerobic requirement",
+          "Complete inhibition by low concentrations of bile salts"
+        ],
+        correct: 1,
+        explanation: "Enterococci are extremely hardy and tolerate high salinity (growth in 6.5% NaCl broth), whereas most Streptococci (including S. pneumoniae and S. pyogenes) are completely inhibited."
+      },
+      {
+        q: "What upper temperature and alkaline pH tolerance limits are characteristically exhibited by Enterococcus spp.?",
+        options: [
+          "Growth at 45°C and pH 9.6",
+          "Growth limited to 25°C and pH 5.0",
+          "Obligate psychrophilic growth at 4°C only",
+          "Thermal death at temperatures above 37°C within 5 minutes"
+        ],
+        correct: 0,
+        explanation: "Enterococci are remarkably resilient extremotolerant organisms capable of multiplying at temperatures up to 45°C, tolerating 60°C for 30 minutes, and growing in alkaline media up to pH 9.6."
+      },
+      {
+        q: "What typical hemolytic pattern is most frequently observed when Enterococci grow on sheep blood agar?",
+        options: [
+          "Vigorous wide-zone beta (β) hemolysis",
+          "Alpha (α) partial greening or gamma (γ) non-hemolysis",
+          "Double-zone beta-hemolysis identical to Clostridium perfringens",
+          "Complete clearing with metallic green sheen"
+        ],
+        correct: 1,
+        explanation: "Most enterococcal clinical isolates display alpha (α)-hemolysis (partial green discoloration) or gamma (γ)-hemolysis (no hemolysis) on sheep blood agar; true beta (β)-hemolysis is rare."
+      },
+      {
+        q: "What color change occurs on Bile-Esculin-Azide agar when Enterococcus is inoculated, and what causes it?",
+        options: [
+          "The medium turns bright yellow due to lactose fermentation",
+          "The medium turns black due to esculin hydrolysis and iron complex formation",
+          "The medium becomes completely clear due to gelatin liquefaction",
+          "The agar turns deep blue from bromothymol blue oxidation"
+        ],
+        correct: 1,
+        explanation: "Enterococci hydrolyze esculin into esculetin and glucose in the presence of bile. Esculetin reacts with ferric citrate in the medium to form a dark black phenolic iron precipitate."
+      },
+      {
+        q: "In Bile-Esculin-Azide medium, what is the specific role of sodium azide?",
+        options: [
+          "It selectively inhibits Gram-negative bacteria",
+          "It acts as a pH indicator turning red under acid conditions",
+          "It serves as the sole carbon source for Enterococci",
+          "It neutralizes bile salts to allow fastidious streptococci to grow"
+        ],
+        correct: 0,
+        explanation: "Sodium azide acts as a selective inhibitory agent against Gram-negative bacilli, while bile salts inhibit most other Gram-positive bacteria, allowing Enterococci to be selectively isolated."
+      },
+      {
+        q: "Which rapid enzymatic test is characteristically POSITIVE in Enterococcus spp., aiding its differentiation from most non-Group A streptococci?",
+        options: [
+          "PYR (Pyrrolidonyl Arylamidase) test",
+          "CAMP test",
+          "Hippurate hydrolysis test",
+          "Coagulase test"
+        ],
+        correct: 0,
+        explanation: "Enterococci are PYR positive (possess the enzyme pyrrolidonyl arylamidase). In contrast, they are negative for both the CAMP test and hippurate hydrolysis (distinguishing them from Group B Streptococcus, S. agalactiae)."
+      },
+      {
+        q: "How does Enterococcus respond to Optochin and Bacitracin disc tests?",
+        options: [
+          "Sensitive to Optochin, Resistant to Bacitracin",
+          "Resistant to both Optochin and Bacitracin",
+          "Sensitive to both Optochin and Bacitracin",
+          "Resistant to Optochin, Sensitive to Bacitracin"
+        ],
+        correct: 1,
+        explanation: "Enterococci are intrinsically resistant to Optochin (which differentiates them from sensitive S. pneumoniae) and resistant to Bacitracin (which differentiates them from sensitive S. pyogenes)."
+      },
+      {
+        q: "What is the primary natural reservoir and habitat of Enterococcus species in the human body?",
+        options: [
+          "Alveolar spaces of the lungs",
+          "Normal gastrointestinal (gut) microbiota",
+          "Sebaceous glands of dry epidermis",
+          "Biliary canaliculi of healthy liver tissue"
+        ],
+        correct: 1,
+        explanation: "Enterococci are commensal organisms forming a significant permanent component of the normal intestinal (colonic) microbiota of humans and animals."
+      },
+      {
+        q: "Why are enterococcal counts routinely evaluated in municipal water supplies and environmental epidemiology?",
+        options: [
+          "They are obligate airborne spores indicating fungal contamination",
+          "They serve as reliable microbiological indicators of fecal contamination in water",
+          "They prove the presence of industrial heavy metal toxicity",
+          "They indicate high levels of ambient carbon monoxide"
+        ],
+        correct: 1,
+        explanation: "Because Enterococci reside in high numbers in feces and survive harsh environmental conditions longer than many coliforms, their detection in water sources indicates recent fecal/sewage contamination."
+      },
+      {
+        q: "What is the most frequent mode of transmission for clinical enterococcal infections in hospitalized patients?",
+        options: [
+          "Endogenous spread of the patient's own gut flora to normally sterile anatomical sites",
+          "Inhalation of aerosolized respiratory droplets from coughing visitors",
+          "Vector-borne inoculation by body lice",
+          "Zoonotic bites from household domestic felines"
+        ],
+        correct: 0,
+        explanation: "Most enterococcal infections are endogenous—arising from translocation or contamination by the patient's own gastrointestinal microflora into sterile areas (e.g., the urinary tract, bloodstream, or surgical wounds)."
+      },
+      {
+        q: "Why does prolonged treatment with broad-spectrum cephalosporins dramatically increase the risk of enterococcal superinfections?",
+        options: [
+          "Cephalosporins actively mutagenize enterococcal chromosomes into capsule-producers",
+          "Enterococci are intrinsically resistant to cephalosporins, allowing them to overgrow when competing bowel flora is eradicated",
+          "Cephalosporins act as direct metabolic carbon substrates for enterococcal ATP synthesis",
+          "Cephalosporins enhance enterococcal flagellar locomotion"
+        ],
+        correct: 1,
+        explanation: "Enterococci possess intrinsic resistance to all cephalosporins (due to low affinity of penicillin-binding proteins). When cephalosporins wipe out competing intestinal flora, Enterococci multiply unchecked, leading to colonisation and invasive superinfection."
+      },
+      {
+        q: "What percentage of all hospital-acquired (nosocomial) infections are estimated to be caused by Enterococcus species?",
+        options: [
+          "Less than 0.1%",
+          "1% to 2%",
+          "10% to 15%",
+          "Over 65%"
+        ],
+        correct: 2,
+        explanation: "Enterococci are among the top opportunistic nosocomial pathogens, accounting for approximately 10% to 15% of all hospital-acquired infections (especially UTIs, bacteremias, and surgical wound infections)."
+      },
+      {
+        q: "Which clinical site represents the MOST COMMON presentation of enterococcal infection?",
+        options: [
+          "Primary bacterial meningitis",
+          "Urinary tract infections (UTIs)",
+          "Lobar cavitary pneumonia",
+          "Suppurative osteomyelitis of the mandible"
+        ],
+        correct: 1,
+        explanation: "Urinary tract infections (UTIs) are the most frequent clinical manifestation of Enterococcus, commonly presenting with dysuria and pyuria, and often associated with urinary catheterization or instrumentation."
+      },
+      {
+        q: "How is the pathogenic virulence level of Enterococcus generally categorized compared to pathogens like Staphylococcus aureus or Streptococcus pyogenes?",
+        options: [
+          "Highly virulent aggressive pathogen producing necrotizing exotoxins that cause immediate tissue gangrene",
+          "Facultative, opportunistic pathogen with relatively low inherent virulence that takes advantage of weakened host defenses",
+          "Obligate intracellular cytotoxin-producing pathogen",
+          "Strictly non-pathogenic commensal that never causes bloodstream illness"
+        ],
+        correct: 1,
+        explanation: "Enterococci have relatively low intrinsic virulence compared to aggressive toxin-producers like S. aureus. They act as opportunistic 'facultative parasites,' primarily causing disease in compromised hosts, catheterized patients, or polymicrobial infections."
+      },
+      {
+        q: "Which virulence capability enables Enterococci to persist stubbornly on indwelling medical devices such as catheters and prosthetic heart valves?",
+        options: [
+          "Rapid spore germination in anaerobic lumens",
+          "Surface adhesins and biofilm formation",
+          "Gliding motility across plastic surfaces",
+          "Production of botulinum-like neurotoxins"
+        ],
+        correct: 1,
+        explanation: "Enterococci express cell-surface adhesins and synthesize robust extracellular biofilms on abiotic surfaces (urinary catheters, central lines, prosthetic valves), shielding them from host immune cells and antimicrobial penetration."
+      },
+      {
+        q: "What extracellular enzyme produced by some Enterococcus strains contributes to tissue invasion by degrading gelatin and host collagen?",
+        options: [
+          "Gelatinase",
+          "Coagulase",
+          "Streptokinase",
+          "Pneumolysin"
+        ],
+        correct: 0,
+        explanation: "Gelatinase is a secreted zinc metalloprotease produced by Enterococci that cleaves collagen, gelatin, and small bioactive peptides, facilitating tissue destruction and bacterial dissemination."
+      },
+      {
+        q: "What serious cardiovascular condition can result from enterococcal bacteremia, particularly in patients with pre-existing or prosthetic heart valves?",
+        options: [
+          "Endocarditis",
+          "Coarctation of the aorta",
+          "Aortic dissection",
+          "Coronary atheroma calcification"
+        ],
+        correct: 0,
+        explanation: "Enterococci are a classical cause of subacute and acute infective endocarditis (infecting heart valves and endocardial linings), often secondary to bacteremia originating from the urinary tract or pelvic/abdominal manipulation."
+      },
+      {
+        q: "Why are aminoglycosides (e.g., Gentamicin) ineffective when administered alone (monotherapy) against Enterococcus?",
+        options: [
+          "Enterococci completely lack bacterial ribosomes",
+          "The enterococcal cell wall has low permeability, preventing effective drug entry into the cell",
+          "Aminoglycosides are neutralized by gastric acid inside the blood",
+          "Enterococci actively secrete penicillinase that digests aminoglycosides"
+        ],
+        correct: 1,
+        explanation: "Enterococci exhibit low-level intrinsic aminoglycoside resistance because their thick cell wall and membrane permeability barriers prevent aminoglycosides from entering the cytoplasm in sufficient quantities to reach ribosomes."
+      },
+      {
+        q: "What is the biological mechanism underlying the 'bactericidal synergy' of combining a cell wall-active agent (Ampicillin/Penicillin) with Gentamicin for severe enterococcal infections?",
+        options: [
+          "Gentamicin breaks the capsule, allowing penicillin to mutate bacterial DNA",
+          "The cell wall agent inhibits cell wall synthesis, increasing permeability and allowing Gentamicin to enter and inhibit ribosomes",
+          "Penicillin acts as a surfactant that neutralizes enterococcal cytolysin",
+          "Both drugs bind simultaneously to the same 50S ribosomal subunit"
+        ],
+        correct: 1,
+        explanation: "Penicillin/Ampicillin damages the cell wall, opening the door for the aminoglycoside (Gentamicin) to penetrate into the bacterial interior, where it binds to 30S ribosomes and achieves bactericidal killing."
+      },
+      {
+        q: "What specific molecular target modification accounts for high-level Vancomycin resistance in Vancomycin-Resistant Enterococci (VRE)?",
+        options: [
+          "Enzymatic alteration of the peptidoglycan precursor terminus from D-Ala-D-Ala to D-Ala-D-Lactate",
+          "Complete loss of the bacterial outer membrane",
+          "Overproduction of dihydrofolate reductase",
+          "Methylation of 23S ribosomal RNA"
+        ],
+        correct: 0,
+        explanation: "In VRE (mediated by plasmid/transposon-encoded ligases such as vanA), the cell synthesizes peptidoglycan cell-wall precursors ending in D-Alanine-D-Lactate instead of D-Alanine-D-Alanine. Vancomycin cannot bind to D-Ala-D-Lactate, rendering the antibiotic ineffective."
+      },
+      {
+        q: "Which Enterococcus species is clinically notorious for displaying significantly higher rates of multidrug and vancomycin resistance?",
+        options: [
+          "Enterococcus faecalis",
+          "Enterococcus faecium",
+          "Enterococcus durans",
+          "Enterococcus avium"
+        ],
+        correct: 1,
+        explanation: "Although E. faecalis causes more total infections, Enterococcus faecium is far more notorious for expressing extensive multidrug resistance, including high rates of ampicillin and vancomycin resistance (VRE)."
+      },
+      {
+        q: "Which antibiotic belonging to the oxazolidinone class is clinically indicated for the treatment of Vancomycin-Resistant Enterococci (VRE)?",
+        options: [
+          "Linezolid",
+          "Cefazolin",
+          "Penicillin V",
+          "Vancomycin"
+        ],
+        correct: 0,
+        explanation: "Linezolid (an oxazolidinone that inhibits bacterial protein synthesis by binding to the 50S subunit) is a primary therapeutic choice for treating serious infections caused by VRE."
+      },
+      {
+        q: "Which cyclic lipopeptide antibiotic that disrupts bacterial cell membrane function is an effective alternative for treating multidrug-resistant VRE?",
+        options: [
+          "Daptomycin",
+          "Cefteram",
+          "Aztreonam",
+          "Colistin"
+        ],
+        correct: 0,
+        explanation: "Daptomycin is a bactericidal lipopeptide antibiotic active against Gram-positive organisms, including vancomycin-resistant enterococcal bloodstream and endocardial infections."
+      },
+      {
+        q: "Which standardized commercial biochemical micro-test strip system is specifically referenced for identifying Streptococci and Enterococci?",
+        options: [
+          "API 20E",
+          "API 20S",
+          "API 20NE",
+          "API Coryne"
+        ],
+        correct: 1,
+        explanation: "The API 20S strip is the standardized miniaturized biochemical gallery designed specifically for the species identification of Streptococci and Enterococci."
+      },
+      {
+        q: "What clinical manifestations typically indicate enterococcal peritonitis in a patient undergoing peritoneal dialysis?",
+        options: [
+          "Painless hematuria without abdominal discomfort",
+          "Diffuse abdominal pain, tenderness, guarding/rigidity, and abdominal distension",
+          "Bilateral flaccid lower extremity paralysis",
+          "Cough with rusty sputum and chest pain"
+        ],
+        correct: 1,
+        explanation: "Peritonitis presents with classic peritoneal signs: severe diffuse abdominal pain, tenderness upon palpation, guarding/rigidity, fever, and cloudy peritoneal dialysis effluent containing abundant neutrophils."
+      },
+      {
+        q: "What is the single most critical hospital infection control measure to prevent patient-to-patient cross-transmission of Vancomycin-Resistant Enterococci (VRE)?",
+        options: [
+          "Universal prophylactic vancomycin administration to all admitted patients",
+          "Rigorous hand hygiene, contact precautions, and thorough environmental disinfection",
+          "Sterilizing ambient hospital air with high-dose ultraviolet C radiation while patients are present",
+          "Switching all intravenous medications to oral tablets"
+        ],
+        correct: 1,
+        explanation: "VRE is primarily transmitted exogenously via the transiently contaminated hands of healthcare workers and contaminated medical surfaces. Strict hand hygiene, patient isolation/contact precautions, and environmental decontamination are vital."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
