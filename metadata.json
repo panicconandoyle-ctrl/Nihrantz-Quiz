@@ -1,0 +1,8 @@
+{
+  "name": "Nihrantz Quiz Explorer",
+  "description": "Windows File Explorer-style portal for interactive standalone HTML quizzes with directory navigation, sandboxed player, and creator support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
