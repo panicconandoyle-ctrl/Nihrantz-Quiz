@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 26: Streptococcus pneumoniae Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 26: Streptococcus pneumoniae</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the characteristic microscopic morphology and arrangement of Streptococcus pneumoniae under Gram stain?",
+        options: [
+          "Gram-negative pleomorphic rods arranged in palisades",
+          "Gram-positive lancet-shaped oval cocci typically arranged in pairs (diplococci)",
+          "Gram-positive spherical cocci in large grape-like clusters",
+          "Gram-negative comma-shaped curved bacilli"
+        ],
+        correct: 1,
+        explanation: "Streptococcus pneumoniae characteristically appears as Gram-positive, lancet-shaped (oval, flame-shaped, or bullet-shaped) cocci arranged end-to-end in pairs (diplococci), occasionally forming short chains."
+      },
+      {
+        q: "Which cellular structure serves as the primary and most indispensable virulence determinant of Streptococcus pneumoniae?",
+        options: [
+          "Polysaccharide capsule",
+          "Peritrichous flagella",
+          "Outer membrane lipopolysaccharide",
+          "Central endospore"
+        ],
+        correct: 0,
+        explanation: "The polysaccharide capsule is the paramount virulence factor of S. pneumoniae. It prevents phagocytosis by masking underlying cell-wall antigens and inhibiting complement-mediated opsonization. Non-encapsulated strains are essentially avirulent."
+      },
+      {
+        q: "What hemolytic pattern does Streptococcus pneumoniae produce when cultivated on sheep blood agar?",
+        options: [
+          "Beta (β) complete clear hemolysis",
+          "Alpha (α) partial green hemolysis",
+          "Gamma (γ) completely non-hemolytic",
+          "Double-zone synergistic beta-hemolysis"
+        ],
+        correct: 1,
+        explanation: "S. pneumoniae displays alpha (α)-hemolysis on blood agar—a greenish zone of partial erythrocyte breakdown surrounding the colonies resulting from hemoglobin reduction to methemoglobin by pneumolysin and hydrogen peroxide."
+      },
+      {
+        q: "Why do aging colonies of Streptococcus pneumoniae develop a sunken, central depression known as a 'draughtsman' or checker-piece appearance?",
+        options: [
+          "Due to endogenous autolysin (N-acetylmuramoyl-L-alanine amidase) degrading the central peptidoglycan wall",
+          "Due to rapid uptake of agar water causing cellular shrinkage",
+          "Due to evaporation of atmospheric carbon dioxide",
+          "Due to secretion of gelatinase liquefying the surrounding media"
+        ],
+        correct: 0,
+        explanation: "S. pneumoniae synthesizes an endogenous autolysin (N-acetylmuramoyl-L-alanine amidase). As the colony ages in stationary phase, the autolysins self-destruct the older, central bacteria, creating a flattened, depressed 'draughtsman' colony."
+      },
+      {
+        q: "Which antimicrobial disk test definitively differentiates S. pneumoniae from alpha-hemolytic Viridans streptococci?",
+        options: [
+          "Bacitracin (0.04 units) susceptibility test",
+          "Optochin (ethylhydrocupreine hydrochloride) sensitivity test: S. pneumoniae is sensitive",
+          "Vancomycin disc test",
+          "Polymyxin B resistance test"
+        ],
+        correct: 1,
+        explanation: "S. pneumoniae is uniquely susceptible to Optochin (ethylhydrocupreine hydrochloride), showing a significant zone of inhibition (≥14 mm with a 6-mm disc). In contrast, Viridans group streptococci are completely resistant."
+      },
+      {
+        q: "How does Streptococcus pneumoniae behave in the Bile Solubility test, and what enzymatic mechanism explains this reaction?",
+        options: [
+          "It is bile-insoluble; colonies turn bright yellow without lysis",
+          "It is bile-soluble; bile salts activate bacterial autolysins, leading to rapid cell wall lysis and clearing of the suspension",
+          "It forms an insoluble black iron precipitate within 10 minutes",
+          "Bile salts trigger immediate endospore formation"
+        ],
+        correct: 1,
+        explanation: "S. pneumoniae is bile-soluble. Adding bile salts (such as sodium deoxycholate) lowers surface tension and activates the bacterium's own peptidoglycan-degrading autolysins, resulting in rapid lysis of the cells and clearing of a turbid broth or dissolution of colonies."
+      },
+      {
+        q: "What microscopic observation characterizes a positive Quellung (Neufeld capsular swelling) reaction?",
+        options: [
+          "Complete lysis and disappearance of all bacterial cells under darkfield illumination",
+          "Apparent swelling, increased refractility, and sharp demarcation of the capsule upon adding homologous anticapsular antiserum",
+          "Immediate precipitation of green pigment inside the cytoplasm",
+          "Rapid linear motility across the visual field"
+        ],
+        correct: 1,
+        explanation: "When pneumococci are mixed with type-specific anticapsular antisera, antibody binding changes the optical refractive index of the capsule. Under the microscope, the capsule appears sharply defined and swollen ('quellung')."
+      },
+      {
+        q: "What is the biological function of Secretory IgA (sIgA) Protease produced by Streptococcus pneumoniae?",
+        options: [
+          "It degrades mucosal secretory IgA antibodies, impairing host clearance and facilitating nasopharyngeal colonization",
+          "It digests dietary albumin in the stomach",
+          "It hydrolyzes systemic IgG antibodies in synovial fluid",
+          "It dissolves fibrin clots during bacteremia"
+        ],
+        correct: 0,
+        explanation: "Secretory IgA protease specifically cleaves the hinge region of human sIgA on mucosal surfaces, eliminating its agglutinating and neutralizing capabilities and allowing pneumococci to colonize the respiratory epithelium."
+      },
+      {
+        q: "What is the pathogenic mechanism and effect of the pore-forming toxin Pneumolysin?",
+        options: [
+          "It elevates host cell cAMP by irreversibly activating adenylate cyclase",
+          "It binds membrane cholesterol, forms transmembrane pores that lyse host cells, disrupts ciliary beating, and suppresses neutrophil oxidative bursts",
+          "It halts protein translation by inactivating the 60S eukaryotic ribosome",
+          "It digests extracellular gelatin and connective tissue laminin"
+        ],
+        correct: 1,
+        explanation: "Pneumolysin is a cholesterol-dependent cytolysin that forms large pores in host cell membranes. It lyses epithelial and endothelial cells, paralyzes respiratory mucociliary clearance, and inhibits the bactericidal oxidative burst of phagocytes."
+      },
+      {
+        q: "Which component of the pneumococcal cell wall is known as the C-polysaccharide (Teichoic acid) and what is its immunological significance?",
+        options: [
+          "It is a surface lipid that prevents Gram staining",
+          "It is linked to peptidoglycan, contains phosphorylcholine, and activates the alternative complement pathway to trigger acute inflammation",
+          "It is an exotoxin that causes flaccid paralysis",
+          "It forms an impermeable capsule that absorbs penicillins"
+        ],
+        correct: 1,
+        explanation: "Pneumococcal teichoic acid (C-polysaccharide) extends through the capsule, contains phosphorylcholine, and reacts with C-reactive protein (CRP). Its fragments strongly activate the alternative complement pathway, inciting intense inflammatory cytokine release."
+      },
+      {
+        q: "What is the natural reservoir and primary carriage site of Streptococcus pneumoniae?",
+        options: [
+          "Exclusively animal reservoirs, primarily dairy cattle and pigs",
+          "Human host; asymptomatically carried in the nasopharynx of 5% to 50% of healthy individuals",
+          "Free-living saprophyte persisting in stagnant freshwater ponds",
+          "Soil spore reservoir that germinates at neutral pH"
+        ],
+        correct: 1,
+        explanation: "Humans are the sole natural reservoir of S. pneumoniae. It resides as an asymptomatic commensal in the nasopharynx of 5% to 50% of the population, with carriage rates highest among young children."
+      },
+      {
+        q: "How is Streptococcus pneumoniae predominantly transmitted from person to person?",
+        options: [
+          "Through the fecal-oral route via contaminated food and water",
+          "Via inhalation of infectious respiratory droplets expelled during coughing/sneezing or direct contact with oral secretions",
+          "By the bite of infected ticks and rat fleas",
+          "Exclusively through vertical transplacental transmission"
+        ],
+        correct: 1,
+        explanation: "Pneumococci are transmitted from person to person through respiratory secretions, aerosolized droplets generated by coughing or sneezing, and direct contact with infected nasopharyngeal secretions."
+      },
+      {
+        q: "Approximately how many distinct capsular serotypes of Streptococcus pneumoniae have been identified to date?",
+        options: [
+          "Only 4 serotypes (A, B, C, D)",
+          "Over 90 distinct capsular serotypes",
+          "Exactly 2 biovars",
+          "155 O-antigen serogroups"
+        ],
+        correct: 1,
+        explanation: "More than 90 distinct capsular serotypes (such as serotypes 6, 14, 18, 19, 23 in children, and 1, 3, 4, 7, 8 in adults) have been characterized based on structural differences in their polysaccharide capsule."
+      },
+      {
+        q: "What classic clinical hallmark describes the sputum produced during typical Pneumococcal Lobar Pneumonia?",
+        options: [
+          "Profuse milky 'rice-water' sputum",
+          "Productive cough yielding characteristic 'rusty' or blood-tinged pink sputum",
+          "Thin, watery sputum containing sulfur granules",
+          "Dry, non-productive staccato cough devoid of any sputum"
+        ],
+        correct: 1,
+        explanation: "Pneumococcal pneumonia typically produces purulent sputum that turns 'rusty' or pink due to the leakage and lysis of red blood cells into alveolar spaces driven by pneumolysin and acute alveolar capillary congestion."
+      },
+      {
+        q: "Which clinical triad classically marks the abrupt onset of acute pneumococcal pneumonia?",
+        options: [
+          "Sudden shaking chills (rigors), high fever (39–41°C), and severe pleuritic chest pain aggravated by respiration",
+          "Painless jaundice, dark urine, and acholic stools",
+          "Gradual weight loss, night sweats, and localized cervical lymphadenitis over 6 months",
+          "Bilateral flaccid paralysis, ptosis, and blurred vision"
+        ],
+        correct: 0,
+        explanation: "Classic pneumococcal pneumonia strikes suddenly with a single severe shaking chill (rigor), rapid spiking of high fever (39–41°C), productive cough with rusty sputum, and sharp pleuritic chest pain on inspiration."
+      },
+      {
+        q: "What is the estimated mortality rate of untreated or severe Pneumococcal Meningitis, highlighting its status as a critical medical emergency?",
+        options: [
+          "Less than 0.1%",
+          "Around 25% (or higher in elderly/immunocompromised patients)",
+          "0% as it resolves spontaneously without neurologic sequelae",
+          "Strictly 100% regardless of advanced intensive care therapy"
+        ],
+        correct: 1,
+        explanation: "Pneumococcal meningitis carries a grim prognosis with a mortality rate of approximately 20% to 25% even with modern hospital care (and much higher in the elderly), often leaving surviving patients with long-term neurological deficits."
+      },
+      {
+        q: "What anatomical condition or organ absence places a patient at extraordinary risk for overwhelming, fulminant pneumococcal sepsis?",
+        options: [
+          "Asplenia (anatomical or functional absence of the spleen)",
+          "Surgical appendectomy during childhood",
+          "History of uncomplicated tonsillectomy",
+          "Unilateral nephrectomy"
+        ],
+        correct: 0,
+        explanation: "The spleen is the principal filtration organ responsible for clearing encapsulated bacteria and generating early IgM opsonins. Asplenic patients (e.g., splenectomy, sickle cell disease) are at immense risk for Overwhelming Post-Splenectomy Infection (OPSI)."
+      },
+      {
+        q: "Which common localized upper respiratory infections in pediatric patients are frequently caused by S. pneumoniae following contiguous spread from the nasopharynx?",
+        options: [
+          "Acute Otitis Media and Sinusitis",
+          "Follicular keratoconjunctivitis and trichiasis",
+          "Chancroid and femoral buboes",
+          "Gastroenteritis and mesenteric adenitis"
+        ],
+        correct: 0,
+        explanation: "Following viral upper respiratory infections that compromise mucosal clearance, pneumococci spread along the Eustachian tube or sinus ostia, making S. pneumoniae the leading bacterial cause of acute otitis media and acute sinusitis in children."
+      },
+      {
+        q: "What atmospheric requirement promotes the optimal laboratory growth of fastidious S. pneumoniae on blood agar plates?",
+        options: [
+          "Incubation in 5% to 10% CO2 (capnophilic conditions) at 35–37°C",
+          "Strict anaerobic jar devoid of all carbon dioxide",
+          "Direct ambient sun exposure at room temperature",
+          "Hyperbaric oxygen chamber with 99% pure O2"
+        ],
+        correct: 0,
+        explanation: "Although S. pneumoniae is a facultative anaerobe, primary clinical isolates are fastidious and capnophilic, requiring or significantly preferring an atmosphere supplemented with 5% to 10% CO2 at 35–37°C."
+      },
+      {
+        q: "What is the biochemical catalase and oxidase status of Streptococcus pneumoniae?",
+        options: [
+          "Catalase-positive, Oxidase-positive",
+          "Catalase-negative, Oxidase-negative",
+          "Catalase-positive, Oxidase-negative",
+          "Catalase-negative, Oxidase-positive"
+        ],
+        correct: 1,
+        explanation: "Like other members of the genus Streptococcus, S. pneumoniae is catalase-negative (lacks catalase enzyme) and oxidase-negative."
+      },
+      {
+        q: "What is the main biochemical mechanism of Penicillin resistance in Streptococcus pneumoniae?",
+        options: [
+          "Production of plasmid-encoded beta-lactamase (penicillinase) enzymes",
+          "Alteration of Penicillin-Binding Proteins (PBPs) due to mosaic gene mutations, decreasing beta-lactam affinity",
+          "Synthesis of a D-Ala-D-Lactate peptidoglycan terminus",
+          "Active extrusion of penicillin through multidrug efflux pumps"
+        ],
+        correct: 1,
+        explanation: "Unlike staphylococci or Enterobacteriaceae, pneumococcal beta-lactam resistance is NOT mediated by beta-lactamase production; rather, it results from genetic recombination creating altered Penicillin-Binding Proteins (PBPs) with reduced affinity for beta-lactams."
+      },
+      {
+        q: "What dual-drug empirical antimicrobial regimen is recommended for suspected acute bacterial meningitis pending pneumococcal susceptibility results?",
+        options: [
+          "Vancomycin combined with a Third-Generation Cephalosporin (e.g., Ceftriaxone or Cefotaxime)",
+          "Oral Penicillin V monotherapy",
+          "Gentamicin combined with Metronidazole",
+          "Erythromycin eye drops"
+        ],
+        correct: 0,
+        explanation: "Because of the prevalence of penicillin- and intermediate cephalosporin-resistant pneumococci, guidelines mandate empiric therapy with high-dose intravenous Vancomycin plus a 3rd-generation cephalosporin (Ceftriaxone or Cefotaxime) for suspected meningitis."
+      },
+      {
+        q: "Which pneumococcal vaccine is formulated as a conjugate vaccine (polysaccharide covalently linked to a protein carrier) and routinely administered to infants under 2 years of age?",
+        options: [
+          "PPSV23 (23-valent pneumococcal polysaccharide vaccine)",
+          "PCV13 (13-valent pneumococcal conjugate vaccine)",
+          "BCG vaccine",
+          "Meningococcal polysaccharide vaccine MPSV4"
+        ],
+        correct: 1,
+        explanation: "PCV13 contains capsular polysaccharides from 13 prevalent serotypes covalently conjugated to a non-toxic diphtheria CRM197 carrier protein. This converts it into a T-cell-dependent antigen that elicits strong antibody responses and immune memory in infants under 2 years."
+      },
+      {
+        q: "Who is the primary target population for the PPSV23 (23-valent Pneumococcal Polysaccharide Vaccine)?",
+        options: [
+          "Healthy infants at 2, 4, and 6 months of age",
+          "Adults aged 65 years and older, and individuals aged 2–64 with high-risk underlying conditions (asplenia, COPD, immunocompromise)",
+          "Military recruits strictly during winter training",
+          "Exclusively newborn premature infants"
+        ],
+        correct: 1,
+        explanation: "PPSV23 consists of purified unconjugated capsular polysaccharides representing 23 serotypes. It is recommended for adults ≥65 years and individuals with chronic medical illnesses (cardiovascular, pulmonary, hepatic diseases, asplenia, immunosuppression)."
+      },
+      {
+        q: "Why is the unconjugated 23-valent polysaccharide vaccine (PPSV23) ineffective in infants younger than 2 years of age?",
+        options: [
+          "It stimulates T-independent immune responses, which an infant's immature splenic B-cell system cannot effectively process without a protein carrier",
+          "Infant stomach acid destroys the vaccine antigens immediately upon injection",
+          "Infants possess high levels of maternal anti-PPSV23 antibodies that cause vaccine toxicity",
+          "The polysaccharide molecules precipitate inside infant skeletal muscle"
+        ],
+        correct: 0,
+        explanation: "Unconjugated polysaccharides are T-cell independent antigens. Children younger than 2 years have an immature immune system that cannot mount an effective antibody response to T-independent antigens, requiring protein-conjugated formulations (PCV13)."
+      },
+      {
+        q: "What rapid non-culture diagnostic test can detect pneumococcal disease in patients with meningitis or pneumonia, even after antibiotics have been started?",
+        options: [
+          "Detection of pneumococcal capsular / C-polysaccharide antigen in urine or CSF using immunochromatographic assays",
+          "Direct darkfield microscopy of blood smears for darting motility",
+          "Stool examination for ova and parasites",
+          "Measuring serum alkaline phosphatase"
+        ],
+        correct: 0,
+        explanation: "Urinary and CSF antigen tests detect pneumococcal cell wall C-polysaccharide. These rapid tests remain positive even after initial antimicrobial doses have rendered standard bacterial cultures negative."
+      },
+      {
+        q: "What role does surface Phosphorylcholine play in the invasiveness of Streptococcus pneumoniae?",
+        options: [
+          "It binds to the platelet-activating factor (PAF) receptor on host endothelial and epithelial cells, facilitating bacterial adherence and intracellular translocation",
+          "It serves as a siderophore capturing elemental iron from hemoglobin",
+          "It acts as a neurotoxin blocking postsynaptic glycine receptors",
+          "It synthesizes the outer peptidoglycan cross-links"
+        ],
+        correct: 0,
+        explanation: "Phosphorylcholine residues on pneumococcal cell-wall teichoic acids bind specifically to host Platelet-Activating Factor (PAF) receptors, allowing the bacteria to adhere, enter host cells via endocytosis, and cross tissue barriers into the bloodstream."
+      },
+      {
+        q: "Why are clinical sputum and CSF specimens from suspected pneumococcal cases highly perishable and prone to false-negative cultures if delayed in transport?",
+        options: [
+          "S. pneumoniae produces potent autolysins that rapidly cause self-lysis and loss of viability upon reaching stationary phase or exposure to environmental changes",
+          "Pneumococci replicate so fast that they exhaust all global atmospheric nitrogen",
+          "Sputum contains penicillin that destroys the bacteria in vitro",
+          "The bacteria transform into non-culturable fungal hyphae within 15 minutes"
+        ],
+        correct: 0,
+        explanation: "Pneumococci are fastidious and produce active autolysins that trigger spontaneous cellular lysis as nutrients deplete or as temperature/pH fluctuates, requiring prompt plating on blood agar within hours of collection."
+      },
+      {
+        q: "Which serotypes of Streptococcus pneumoniae are traditionally responsible for 60% to 80% of lower respiratory tract infections in pediatric cohorts?",
+        options: [
+          "Serotypes 6, 14, 18, 19, and 23",
+          "Serotypes 1, 2, 3, and 5 only",
+          "Serotypes 30 through 35 exclusively",
+          "Serotypes O1 and O139"
+        ],
+        correct: 0,
+        explanation: "In pediatric populations, capsular serotypes 6, 14, 18, 19, and 23 cause the vast majority (60% to 80%) of severe pneumococcal respiratory tract and invasive infections, which is why these are prioritized in pediatric conjugate vaccines."
+      },
+      {
+        q: "How does the clinical progression of untreated classic pneumococcal pneumonia historically behave around days 5 to 10 of illness?",
+        options: [
+          "Fever and toxicity persist until reaching a 'crisis', marked by either rapid defervescence (dramatic temperature drop and recovery as anticapsular antibodies appear) or fatal circulatory collapse",
+          "The disease completely transforms into a chronic skin ulcer that persists for 30 years",
+          "Patients develop immediate ascending paralysis without fever",
+          "The infection permanently migrates into the teeth causing painless caries"
+        ],
+        correct: 0,
+        explanation: "Historically (in the pre-antibiotic era), untreated pneumococcal pneumonia ran an acute course of 5–10 days with high fever terminating in a dramatic 'crisis'—either rapid defervescence and recovery corresponding to the appearance of natural type-specific anticapsular antibodies, or death from overwhelming sepsis."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
