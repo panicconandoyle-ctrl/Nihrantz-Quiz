@@ -9,7 +9,8 @@ import { CommandBar } from './components/CommandBar';
 import { Sidebar } from './components/Sidebar';
 import { ExplorerContent } from './components/ExplorerContent';
 import { QuizPlayerModal } from './components/QuizPlayerModal';
-import { DonationModal } from './components/DonationModal';
+import { DonationModal, DEFAULT_CREATOR_SUPPORT } from './components/DonationModal';
+import { SupportCreatorWidget } from './components/SupportCreatorWidget';
 import { GitHubSyncModal } from './components/GitHubSyncModal';
 import { DeploymentGuideModal } from './components/DeploymentGuideModal';
 import { UploadQuizModal } from './components/UploadQuizModal';
@@ -18,6 +19,7 @@ import { OwnerLoginModal } from './components/OwnerLoginModal';
 import { AdminConfigModal } from './components/AdminConfigModal';
 import { DeleteConfirmModal, DeleteItemTarget } from './components/DeleteConfirmModal';
 import { MoveItemModal, MoveTarget } from './components/MoveItemModal';
+import { RenameItemModal, RenameTarget } from './components/RenameItemModal';
 import { 
   GitHubConfig, 
   getStoredGithubConfig, 
@@ -25,9 +27,12 @@ import {
   fetchGitHubQuizTree,
   deleteFileFromGitHub,
   deleteFolderFromGitHub,
+  batchDeleteFromGitHub,
   syncLocalQuizToGitHub,
   moveQuizOnGitHub,
-  moveFolderOnGitHub
+  moveFolderOnGitHub,
+  renameQuizOnGitHub,
+  renameFolderOnGitHub
 } from './services/githubService';
 import { 
   QuizManifest, 
@@ -35,7 +40,8 @@ import {
   QuizItem, 
   ViewMode, 
   SortField, 
-  SortDirection 
+  SortDirection,
+  CreatorSupportConfig
 } from './types';
 import { 
   defaultManifest, 
@@ -90,11 +96,34 @@ export default function App() {
   // Modals & Overlays
   const [activeQuiz, setActiveQuiz] = useState<QuizItem | null>(null);
   const [showDonation, setShowDonation] = useState<boolean>(false);
+  const [isDonationEditMode, setIsDonationEditMode] = useState<boolean>(false);
   const [showGuide, setShowGuide] = useState<boolean>(false);
   const [showGitHubSync, setShowGitHubSync] = useState<boolean>(false);
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
+  // Creator Support Configuration (stored locally or updated by Owner)
+  const [supportConfig, setSupportConfig] = useState<CreatorSupportConfig>(() => {
+    try {
+      const saved = localStorage.getItem('nihrantz_creator_support_config');
+      if (saved) {
+        return { ...DEFAULT_CREATOR_SUPPORT, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.warn('Failed to load saved creator support config:', e);
+    }
+    return DEFAULT_CREATOR_SUPPORT;
+  });
+
+  const handleUpdateSupportConfig = (newConfig: CreatorSupportConfig) => {
+    setSupportConfig(newConfig);
+    try {
+      localStorage.setItem('nihrantz_creator_support_config', JSON.stringify(newConfig));
+    } catch (e) {
+      console.warn('Failed to persist creator support config:', e);
+    }
+  };
 
   // Move Management
   const [moveTarget, setMoveTarget] = useState<MoveTarget | null>(null);
@@ -108,7 +137,13 @@ export default function App() {
 
   // Deletion Management
   const [deleteTarget, setDeleteTarget] = useState<DeleteItemTarget | null>(null);
+  const [deleteTargets, setDeleteTargets] = useState<DeleteItemTarget[]>([]);
+  const [selectedDeleteTargets, setSelectedDeleteTargets] = useState<Map<string, DeleteItemTarget>>(new Map());
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+  // Renaming Management
+  const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
+  const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
 
   // Dynamic GitHub Sync State
   const [isDynamicMode, setIsDynamicMode] = useState<boolean>(true);
@@ -445,6 +480,7 @@ export default function App() {
     setNavHistory(updatedHistory);
     setHistoryIndex(updatedHistory.length - 1);
     setSearchQuery('');
+    setSelectedDeleteTargets(new Map());
   }, [currentPath, navHistory, historyIndex]);
 
   // History Back
@@ -607,6 +643,7 @@ export default function App() {
       path: quiz.path,
       sha: quiz.sha,
     });
+    setDeleteTargets([]);
     setIsDeleteModalOpen(true);
   };
 
@@ -623,36 +660,131 @@ export default function App() {
       path: folder.path,
       quizCount: countFolderQuizzes(folder),
     });
+    setDeleteTargets([]);
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = async (
-    target: DeleteItemTarget
-  ): Promise<{ success: boolean; error?: string }> => {
-    if (target.type === 'quiz') {
-      const ghRes = await deleteFileFromGitHub(target.path, target.sha, undefined, ghConfig);
-      if (!ghRes.success) {
-        return { success: false, error: `GitHub delete failed: ${ghRes.error}` };
+  const handleToggleSelectTarget = (target: DeleteItemTarget) => {
+    setSelectedDeleteTargets((prev) => {
+      const next = new Map(prev);
+      if (next.has(target.path)) {
+        next.delete(target.path);
+      } else {
+        next.set(target.path, target);
       }
-    } else {
-      const ghRes = await deleteFolderFromGitHub(target.path, ghConfig);
-      if (!ghRes.success) {
-        return { success: false, error: `GitHub folder delete failed: ${ghRes.error}` };
-      }
+      return next;
+    });
+  };
+
+  const handleSelectAllTargets = (targets: DeleteItemTarget[]) => {
+    setSelectedDeleteTargets(() => {
+      const next = new Map<string, DeleteItemTarget>();
+      targets.forEach((t) => next.set(t.path, t));
+      return next;
+    });
+  };
+
+  const handleClearSelection = () => {
+    setSelectedDeleteTargets(new Map());
+  };
+
+  const handleRequestDeleteSelected = () => {
+    if (!isOwnerLoggedIn && !isAdminActive) {
+      setLoginActionReason('Owner login or GitHub Admin credentials required to delete items.');
+      setShowOwnerLoginModal(true);
+      return;
     }
+    const targets = Array.from(selectedDeleteTargets.values());
+    if (targets.length === 0) return;
+    setDeleteTargets(targets);
+    setDeleteTarget(null);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleOpenMultiDelete = () => {
+    if (!isOwnerLoggedIn && !isAdminActive) {
+      setLoginActionReason('Owner login or GitHub Admin credentials required to delete items.');
+      setShowOwnerLoginModal(true);
+      return;
+    }
+    setDeleteTargets(availableDeleteItemsInCurrentFolder);
+    setDeleteTarget(null);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmBatchDelete = async (
+    targets: DeleteItemTarget[],
+    onProgress?: (
+      index: number,
+      total: number,
+      item: DeleteItemTarget,
+      status: 'deleting' | 'success' | 'error',
+      errorMsg?: string
+    ) => void
+  ): Promise<{
+    success: boolean;
+    deletedCount: number;
+    errors: { item: DeleteItemTarget; error: string }[];
+  }> => {
+    const res = await batchDeleteFromGitHub(targets, ghConfig, onProgress);
 
     // Refresh live from GitHub
     await loadRepositoryData();
 
+    // Clear selection after deletion
+    setSelectedDeleteTargets(new Map());
+
     // If currentPath is deleted folder or inside it, navigate up
-    if (target.type === 'folder' && (currentPath === target.path || currentPath.startsWith(target.path + '/'))) {
-      const parts = target.path.split('/');
-      parts.pop();
-      const parentPath = parts.join('/') || 'quizzes';
-      handleNavigatePath(parentPath);
+    const deletedFolders = targets.filter(t => t.type === 'folder');
+    for (const f of deletedFolders) {
+      if (currentPath === f.path || currentPath.startsWith(f.path + '/')) {
+        const parts = f.path.split('/');
+        parts.pop();
+        const parentPath = parts.join('/') || 'quizzes';
+        handleNavigatePath(parentPath);
+        break;
+      }
     }
 
-    return { success: true };
+    return res;
+  };
+
+  // Renaming Handlers
+  const handleRequestRenameItem = (target: RenameTarget) => {
+    if (!isOwnerLoggedIn && !isAdminActive) {
+      setLoginActionReason('Owner login or GitHub Admin credentials required to rename items.');
+      setShowOwnerLoginModal(true);
+      return;
+    }
+    setRenameTarget(target);
+    setShowRenameModal(true);
+  };
+
+  const handleConfirmRename = async (
+    target: RenameTarget,
+    newName: string,
+    newTitle?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (target.type === 'quiz' && target.quiz) {
+      const res = await renameQuizOnGitHub(target.quiz, newName, newTitle, ghConfig);
+      if (res.success) {
+        await loadRepositoryData();
+        return { success: true };
+      }
+      return { success: false, error: res.error };
+    } else if (target.type === 'folder' && target.folder) {
+      const res = await renameFolderOnGitHub(target.folder.path, newName, ghConfig);
+      if (res.success) {
+        await loadRepositoryData();
+        if (res.newFolderPath && (currentPath === target.folder.path || currentPath.startsWith(target.folder.path + '/'))) {
+          const suffix = currentPath.slice(target.folder.path.length);
+          handleNavigatePath(`${res.newFolderPath}${suffix}`);
+        }
+        return { success: true };
+      }
+      return { success: false, error: res.error };
+    }
+    return { success: false, error: 'Invalid rename target' };
   };
 
   // Auto-Discovery GitHub API fetch
@@ -683,6 +815,31 @@ export default function App() {
   const currentFolder = useMemo(() => {
     return findFolderByPath(rootFolder, currentPath) || rootFolder;
   }, [rootFolder, currentPath]);
+
+  // Compute all available items in current folder as DeleteItemTarget objects
+  const availableDeleteItemsInCurrentFolder = useMemo<DeleteItemTarget[]>(() => {
+    const list: DeleteItemTarget[] = [];
+    (currentFolder.folders || []).forEach((f) => {
+      list.push({
+        type: 'folder',
+        id: f.id,
+        name: f.name,
+        path: f.path,
+        quizCount: countFolderQuizzes(f),
+      });
+    });
+    (currentFolder.quizzes || []).forEach((q) => {
+      list.push({
+        type: 'quiz',
+        id: q.id,
+        name: q.title,
+        path: q.path,
+        sha: q.sha,
+        category: q.category,
+      });
+    });
+    return list;
+  }, [currentFolder]);
 
   // Compute Display Items (Quizzes & Subfolders)
   const { quizzesToDisplay, subfoldersToDisplay } = useMemo(() => {
@@ -764,7 +921,10 @@ export default function App() {
         onToggleTheme={handleToggleTheme}
         isSound={isSound}
         onToggleSound={handleToggleSound}
-        onOpenDonation={() => setShowDonation(true)}
+        onOpenDonation={() => {
+          setIsDonationEditMode(false);
+          setShowDonation(true);
+        }}
         onOpenGuide={() => setShowGuide(true)}
         onOpenGitHubSync={() => setShowGitHubSync(true)}
         onOpenUpload={handleRequestUpload}
@@ -812,6 +972,9 @@ export default function App() {
         isSyncing={isLoadingRepo}
         pendingSyncCount={pendingSyncQuizzes.length}
         onSyncAllToGitHub={handleSyncAllToGitHub}
+        selectedCount={selectedDeleteTargets.size}
+        onDeleteSelected={handleRequestDeleteSelected}
+        onOpenMultiDelete={handleOpenMultiDelete}
       />
 
       {/* 3. Main Workspace: Sidebar + Explorer Content */}
@@ -848,7 +1011,13 @@ export default function App() {
             setMoveTarget(target);
             setShowMoveModal(true);
           }}
+          onRequestRenameItem={handleRequestRenameItem}
           onDropExternalFile={handleDropExternalFile}
+          selectedTargets={selectedDeleteTargets}
+          onToggleSelectTarget={handleToggleSelectTarget}
+          onSelectAllTargets={handleSelectAllTargets}
+          onClearSelection={handleClearSelection}
+          onRequestDeleteSelected={handleRequestDeleteSelected}
         />
       </div>
 
@@ -865,7 +1034,19 @@ export default function App() {
       {/* 5. Creator Bank QR Donation Modal */}
       <DonationModal
         isOpen={showDonation}
-        onClose={() => setShowDonation(false)}
+        onClose={() => {
+          setShowDonation(false);
+          setIsDonationEditMode(false);
+        }}
+        isOwnerLoggedIn={isOwnerLoggedIn}
+        isAdminActive={isAdminActive}
+        supportConfig={supportConfig}
+        onUpdateSupportConfig={handleUpdateSupportConfig}
+        initialEditMode={isDonationEditMode}
+        onOpenOwnerLogin={() => {
+          setLoginActionReason('Owner login required to upload QR and update support details.');
+          setShowOwnerLoginModal(true);
+        }}
       />
 
       {/* 6. GitHub Two-Way Sync Modal */}
@@ -942,18 +1123,21 @@ export default function App() {
         }}
       />
 
-      {/* 12. Delete Confirmation Modal */}
+      {/* 12. Delete Confirmation Modal (Multi-Select Supported) */}
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);
           setDeleteTarget(null);
+          setDeleteTargets([]);
         }}
         target={deleteTarget}
+        targets={deleteTargets}
+        availableItems={availableDeleteItemsInCurrentFolder}
         isAdminActive={isAdminActive}
         ghOwner={ghConfig.owner}
         ghRepo={ghConfig.repo}
-        onConfirmDelete={handleConfirmDelete}
+        onConfirmDelete={handleConfirmBatchDelete}
         onOpenAdminConfig={() => {
           setIsDeleteModalOpen(false);
           setShowAdminModal(true);
@@ -970,6 +1154,39 @@ export default function App() {
         target={moveTarget}
         rootFolder={rootFolder}
         onConfirmMove={handleConfirmMove}
+      />
+
+      {/* 14. Rename File or Folder Modal */}
+      <RenameItemModal
+        isOpen={showRenameModal}
+        onClose={() => {
+          setShowRenameModal(false);
+          setRenameTarget(null);
+        }}
+        target={renameTarget}
+        isAdminActive={isAdminActive}
+        ghOwner={ghConfig.owner}
+        ghRepo={ghConfig.repo}
+        onConfirmRename={handleConfirmRename}
+        onOpenAdminConfig={() => {
+          setShowRenameModal(false);
+          setShowAdminModal(true);
+        }}
+      />
+
+      {/* 15. Floating Support Creator Widget (Bottom-Right, shows uploaded QR) */}
+      <SupportCreatorWidget
+        supportConfig={supportConfig}
+        onOpenDonationModal={(editMode) => {
+          setIsDonationEditMode(Boolean(editMode));
+          setShowDonation(true);
+        }}
+        isOwnerLoggedIn={isOwnerLoggedIn}
+        isAdminActive={isAdminActive}
+        onOpenOwnerLogin={() => {
+          setLoginActionReason('Owner login required to upload QR and update support details.');
+          setShowOwnerLoginModal(true);
+        }}
       />
     </div>
   );

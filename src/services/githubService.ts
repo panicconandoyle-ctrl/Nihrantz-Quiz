@@ -4,7 +4,7 @@
  * and direct file commits using GitHub Personal Access Tokens (PAT).
  */
 
-import { FolderNode, QuizItem } from '../types';
+import { FolderNode, QuizItem, DeleteItemTarget } from '../types';
 
 export interface GitHubConfig {
   owner: string;
@@ -381,6 +381,74 @@ export async function deleteFolderFromGitHub(
 }
 
 /**
+ * Batch delete multiple files and/or folders permanently from GitHub
+ */
+export async function batchDeleteFromGitHub(
+  items: DeleteItemTarget[],
+  config?: GitHubConfig,
+  onProgress?: (
+    index: number,
+    total: number,
+    item: DeleteItemTarget,
+    status: 'deleting' | 'success' | 'error',
+    errorMsg?: string
+  ) => void
+): Promise<{
+  success: boolean;
+  deletedCount: number;
+  errors: { item: DeleteItemTarget; error: string }[];
+}> {
+  const cfg = config || getStoredGithubConfig();
+  if (!cfg.token) {
+    return {
+      success: false,
+      deletedCount: 0,
+      errors: items.map((item) => ({ item, error: 'GitHub Personal Access Token is required.' })),
+    };
+  }
+
+  let deletedCount = 0;
+  const errors: { item: DeleteItemTarget; error: string }[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    onProgress?.(i + 1, items.length, item, 'deleting');
+
+    try {
+      if (item.type === 'quiz') {
+        const res = await deleteFileFromGitHub(item.path, item.sha, undefined, cfg);
+        if (res.success) {
+          deletedCount++;
+          onProgress?.(i + 1, items.length, item, 'success');
+        } else {
+          errors.push({ item, error: res.error || 'Failed to delete file' });
+          onProgress?.(i + 1, items.length, item, 'error', res.error);
+        }
+      } else {
+        const res = await deleteFolderFromGitHub(item.path, cfg);
+        if (res.success) {
+          deletedCount++;
+          onProgress?.(i + 1, items.length, item, 'success');
+        } else {
+          errors.push({ item, error: res.error || 'Failed to delete folder' });
+          onProgress?.(i + 1, items.length, item, 'error', res.error);
+        }
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown deletion error';
+      errors.push({ item, error: msg });
+      onProgress?.(i + 1, items.length, item, 'error', msg);
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    deletedCount,
+    errors,
+  };
+}
+
+/**
  * Fetch raw HTML content directly from GitHub or raw URL
  */
 export async function fetchQuizRawHtml(quiz: QuizItem, config?: GitHubConfig): Promise<string> {
@@ -572,6 +640,184 @@ export async function moveFolderOnGitHub(
     return { success: true, movedCount: count };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Error moving folder on GitHub';
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Rename a quiz file and optionally update its title on GitHub
+ */
+export async function renameQuizOnGitHub(
+  quiz: QuizItem,
+  newFilename: string,
+  newTitle?: string,
+  config?: GitHubConfig
+): Promise<{ success: boolean; error?: string; newPath?: string }> {
+  const cfg = config || getStoredGithubConfig();
+  if (!cfg.token) {
+    return { success: false, error: 'GitHub Personal Access Token is required to rename quizzes.' };
+  }
+
+  // Ensure .html extension
+  let cleanFilename = newFilename.trim();
+  if (!cleanFilename.toLowerCase().endsWith('.html')) {
+    cleanFilename += '.html';
+  }
+
+  const pathParts = quiz.path.split('/');
+  pathParts.pop(); // remove old filename
+  const parentFolder = pathParts.join('/');
+  const newPath = parentFolder ? `${parentFolder}/${cleanFilename}` : cleanFilename;
+
+  // 1. Fetch current content
+  let content = await fetchQuizRawHtml(quiz, cfg);
+  if (!content) {
+    return { success: false, error: 'Failed to read quiz HTML content before renaming.' };
+  }
+
+  // If newTitle provided and differs from old title, update <title> tag in HTML
+  if (newTitle && newTitle.trim() && newTitle.trim() !== quiz.title) {
+    const trimmedTitle = newTitle.trim();
+    if (content.includes('<title>')) {
+      content = content.replace(/<title>[\s\S]*?<\/title>/i, `<title>${trimmedTitle}</title>`);
+    } else if (content.includes('<head>')) {
+      content = content.replace(/<head>/i, `<head>\n  <title>${trimmedTitle}</title>`);
+    }
+  }
+
+  if (newPath === quiz.path) {
+    // Just updating the title/content in place
+    const updateRes = await commitFileToGitHub(
+      parentFolder,
+      cleanFilename,
+      content,
+      `Update title of ${cleanFilename} to "${newTitle}" via Nihrantz Quiz Explorer`,
+      cfg
+    );
+    return { success: updateRes.success, error: updateRes.error, newPath };
+  }
+
+  // 2. Commit file with new name
+  const commitRes = await commitFileToGitHub(
+    parentFolder,
+    cleanFilename,
+    content,
+    `Rename ${quiz.filename} to ${cleanFilename} via Nihrantz Quiz Explorer`,
+    cfg
+  );
+
+  if (!commitRes.success) {
+    return { success: false, error: `Failed to commit renamed file: ${commitRes.error}` };
+  }
+
+  // 3. Delete old file
+  const delRes = await deleteFileFromGitHub(
+    quiz.path,
+    quiz.sha,
+    `Remove old file after renaming to ${cleanFilename}`,
+    cfg
+  );
+
+  if (!delRes.success) {
+    console.warn(`File created at ${newPath} but old file delete reported:`, delRes.error);
+  }
+
+  return { success: true, newPath };
+}
+
+/**
+ * Rename a folder and all its contents on GitHub
+ */
+export async function renameFolderOnGitHub(
+  folderPath: string,
+  newFolderName: string,
+  config?: GitHubConfig
+): Promise<{ success: boolean; error?: string; newFolderPath?: string; movedCount?: number }> {
+  const cfg = config || getStoredGithubConfig();
+  if (!cfg.token) {
+    return { success: false, error: 'GitHub Personal Access Token is required to rename folders.' };
+  }
+
+  const cleanSource = folderPath.replace(/^\/+|\/+$/g, '');
+  const pathParts = cleanSource.split('/');
+  pathParts.pop(); // remove old folder name
+  const parentPath = pathParts.join('/');
+  const cleanNewName = newFolderName.trim().replace(/^\/+|\/+$/g, '').replace(/[\/\\]/g, '_');
+  const newFolderPath = parentPath ? `${parentPath}/${cleanNewName}` : cleanNewName;
+
+  if (cleanSource === newFolderPath) {
+    return { success: true, newFolderPath, movedCount: 0 };
+  }
+
+  try {
+    // 1. Get git tree
+    const treeRes = await fetch(
+      `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/git/trees/${cfg.branch || 'main'}?recursive=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${cfg.token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
+
+    if (!treeRes.ok) {
+      return { success: false, error: 'Failed to query git tree from GitHub.' };
+    }
+
+    const data = await treeRes.json();
+    const allEntries: GitTreeEntry[] = data.tree || [];
+    const sourceFiles = allEntries.filter((e) =>
+      e.type === 'blob' && (e.path === cleanSource || e.path.startsWith(`${cleanSource}/`))
+    );
+
+    if (sourceFiles.length === 0) {
+      // Create .gitkeep in new folder location
+      await commitFileToGitHub(
+        newFolderPath,
+        '.gitkeep',
+        `# Renamed directory\n`,
+        `Rename directory ${cleanSource} to ${newFolderPath}`,
+        cfg
+      );
+      return { success: true, newFolderPath, movedCount: 0 };
+    }
+
+    let movedCount = 0;
+    for (const file of sourceFiles) {
+      const relativePart = file.path.slice(cleanSource.length).replace(/^\//, '');
+      const targetFilePath = relativePart ? `${newFolderPath}/${relativePart}` : newFolderPath;
+      const targetFileDir = targetFilePath.includes('/') ? targetFilePath.substring(0, targetFilePath.lastIndexOf('/')) : '';
+      const targetFileName = targetFilePath.split('/').pop() || 'file';
+
+      const rawRes = await fetch(
+        `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch || 'main'}/${file.path}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cfg.token}`,
+          },
+        }
+      );
+      if (!rawRes.ok) continue;
+      const content = await rawRes.text();
+
+      const commitRes = await commitFileToGitHub(
+        targetFileDir,
+        targetFileName,
+        content,
+        `Rename folder ${cleanSource} to ${newFolderPath}: write ${targetFilePath}`,
+        cfg
+      );
+
+      if (commitRes.success) {
+        await deleteFileFromGitHub(file.path, file.sha, `Remove old path ${file.path} after folder rename`, cfg);
+        movedCount++;
+      }
+    }
+
+    return { success: true, newFolderPath, movedCount };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Error renaming folder on GitHub';
     return { success: false, error: msg };
   }
 }

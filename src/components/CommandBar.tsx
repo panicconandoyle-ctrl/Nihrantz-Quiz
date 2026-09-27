@@ -21,7 +21,8 @@ import {
   Github,
   ExternalLink,
   RefreshCw,
-  ArrowUpCircle
+  ArrowUpCircle,
+  Trash2
 } from 'lucide-react';
 import { ViewMode, SortField, SortDirection } from '../types';
 import { playNavSound } from '../utils/audio';
@@ -54,12 +55,17 @@ interface CommandBarProps {
   isSyncing?: boolean;
   pendingSyncCount?: number;
   onSyncAllToGitHub?: () => void;
+  selectedCount?: number;
+  onDeleteSelected?: () => void;
+  onOpenMultiDelete?: () => void;
 }
 
 export const CommandBar: React.FC<CommandBarProps> = ({
   currentPath,
   canGoBack,
   canGoForward,
+  onGoBack,
+  onGoForward,
   onGoUp,
   onRefresh,
   onNavigatePath,
@@ -82,6 +88,9 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   isSyncing = false,
   pendingSyncCount = 0,
   onSyncAllToGitHub,
+  selectedCount = 0,
+  onDeleteSelected,
+  onOpenMultiDelete,
 }) => {
   const [copiedPath, setCopiedPath] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -291,6 +300,33 @@ export const CommandBar: React.FC<CommandBarProps> = ({
                 <FolderPlus className="w-3.5 h-3.5 text-amber-500" />
                 <span className="hidden sm:inline">New Folder</span>
               </button>
+
+              {/* Multi-Delete or Clean Up action */}
+              {selectedCount > 0 ? (
+                <button
+                  onClick={() => {
+                    playNavSound();
+                    onDeleteSelected?.();
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-md font-bold text-xs transition-colors shadow-2xs h-8 animate-in fade-in zoom-in-95"
+                  title={`Delete ${selectedCount} selected items permanently from repository`}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete ({selectedCount})</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    playNavSound();
+                    onOpenMultiDelete?.();
+                  }}
+                  className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-[#1f1f1f] border border-neutral-200 dark:border-neutral-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-neutral-700 dark:text-neutral-200 hover:text-rose-600 dark:hover:text-rose-400 rounded-md font-medium text-xs transition-colors h-8"
+                  title="Select and delete multiple quizzes or folders"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-neutral-400 group-hover:text-rose-500" />
+                  <span className="hidden sm:inline">Clean Up</span>
+                </button>
+              )}
 
               <button
                 onClick={() => {

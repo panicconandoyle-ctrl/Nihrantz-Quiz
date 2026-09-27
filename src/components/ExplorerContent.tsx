@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Folder, 
   Play, 
@@ -15,9 +15,13 @@ import {
   RefreshCw,
   FolderInput,
   Upload,
-  GripVertical
+  GripVertical,
+  Check,
+  CheckSquare,
+  Square,
+  Edit3
 } from 'lucide-react';
-import { FolderNode, QuizItem, ViewMode } from '../types';
+import { FolderNode, QuizItem, ViewMode, DeleteItemTarget } from '../types';
 import { countFolderQuizzes } from '../data/defaultManifest';
 import { playOpenSound, playNavSound, playDragSound, playDropSound } from '../utils/audio';
 
@@ -39,7 +43,13 @@ interface ExplorerContentProps {
   ghConfig?: { owner: string; repo: string; branch: string };
   onDropOnFolder?: (source: { type: 'quiz' | 'folder'; quiz?: QuizItem; folder?: FolderNode }, targetFolderPath: string) => void;
   onRequestMoveItem?: (target: { type: 'quiz' | 'folder'; quiz?: QuizItem; folder?: FolderNode }) => void;
+  onRequestRenameItem?: (target: { type: 'quiz' | 'folder'; quiz?: QuizItem; folder?: FolderNode }) => void;
   onDropExternalFile?: (file: File) => void;
+  selectedTargets?: Map<string, DeleteItemTarget>;
+  onToggleSelectTarget?: (target: DeleteItemTarget) => void;
+  onSelectAllTargets?: (targets: DeleteItemTarget[]) => void;
+  onClearSelection?: () => void;
+  onRequestDeleteSelected?: () => void;
 }
 
 export const ExplorerContent: React.FC<ExplorerContentProps> = ({
@@ -60,7 +70,13 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
   ghConfig = { owner: 'panicconandoyle-ctrl', repo: 'Nihrantz-Quiz', branch: 'main' },
   onDropOnFolder,
   onRequestMoveItem,
+  onRequestRenameItem,
   onDropExternalFile,
+  selectedTargets,
+  onToggleSelectTarget,
+  onSelectAllTargets,
+  onClearSelection,
+  onRequestDeleteSelected,
 }) => {
   const totalItems = subfoldersToDisplay.length + quizzesToDisplay.length;
 
@@ -68,6 +84,34 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
   const [hoveredFolderPath, setHoveredFolderPath] = useState<string | null>(null);
   const [isDraggingExternal, setIsDraggingExternal] = useState<boolean>(false);
   const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
+
+  // Compute all visible items as DeleteItemTarget objects
+  const allVisibleTargets = useMemo<DeleteItemTarget[]>(() => {
+    const list: DeleteItemTarget[] = [];
+    subfoldersToDisplay.forEach((f) => {
+      list.push({
+        type: 'folder',
+        id: f.id,
+        name: f.name,
+        path: f.path,
+        quizCount: countFolderQuizzes(f),
+      });
+    });
+    quizzesToDisplay.forEach((q) => {
+      list.push({
+        type: 'quiz',
+        id: q.id,
+        name: q.title,
+        path: q.path,
+        sha: q.sha,
+        category: q.category,
+      });
+    });
+    return list;
+  }, [subfoldersToDisplay, quizzesToDisplay]);
+
+  const selectedCount = selectedTargets ? selectedTargets.size : 0;
+  const isAllSelected = allVisibleTargets.length > 0 && selectedCount === allVisibleTargets.length;
 
   const handleShareQuiz = (quiz: QuizItem, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -235,6 +279,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                     const count = countFolderQuizzes(folder);
                     const isHovered = hoveredFolderPath === folder.path;
                     const isDragging = draggingItemId === folder.path;
+                    const isFolderSelected = selectedTargets ? selectedTargets.has(folder.path) : false;
 
                     return (
                       <div
@@ -252,12 +297,43 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                         className={`group relative flex flex-col items-center p-3 rounded-xl border cursor-pointer transition-all text-center ${
                           isDragging
                             ? 'opacity-40 border-dashed border-blue-400'
+                            : isFolderSelected
+                            ? 'border-2 border-rose-500 bg-rose-50/70 dark:bg-rose-950/40 shadow-xs'
                             : isHovered
                             ? 'border-2 border-blue-500 bg-blue-100/70 dark:bg-blue-900/50 scale-105 shadow-md'
                             : 'border-transparent hover:border-neutral-200 dark:hover:border-neutral-700/60 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
                         }`}
                         title={`Folder: ${folder.name} (Drag to move, or drop items here)`}
                       >
+                        {/* Checkbox for Multi-Select */}
+                        {canManageItems && (
+                          <div
+                            className={`absolute top-2 left-2 z-20 transition-opacity ${
+                              isFolderSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              playNavSound();
+                              onToggleSelectTarget?.({
+                                type: 'folder',
+                                id: folder.id,
+                                name: folder.name,
+                                path: folder.path,
+                                quizCount: count,
+                              });
+                            }}
+                            title={isFolderSelected ? 'Deselect folder' : 'Select folder for action'}
+                          >
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors cursor-pointer ${
+                              isFolderSelected 
+                                ? 'bg-rose-600 border-rose-600 text-white' 
+                                : 'bg-white dark:bg-[#2a2a2a] border-neutral-300 dark:border-neutral-600 hover:border-rose-400'
+                            }`}>
+                              {isFolderSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Action buttons (Move & Delete) */}
                         <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all z-10">
                           {/* Move Folder button */}
@@ -271,6 +347,21 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                               title={`Move folder ${folder.name}`}
                             >
                               <FolderInput className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {/* Rename Folder button */}
+                          {canManageItems && onRequestRenameItem && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                playNavSound();
+                                onRequestRenameItem({ type: 'folder', folder });
+                              }}
+                              className="p-1 rounded-md text-neutral-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                              title={`Rename folder ${folder.name}`}
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
                             </button>
                           )}
 
@@ -327,6 +418,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                     const record = completedQuizzes[quiz.id];
                     const isPendingSync = quiz.syncStatus === 'pending_sync';
                     const isDragging = draggingItemId === quiz.id;
+                    const isQuizSelected = selectedTargets ? selectedTargets.has(quiz.path) : false;
 
                     return (
                       <div
@@ -341,6 +433,8 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                         className={`group relative flex flex-col justify-between p-4 rounded-xl border bg-white dark:bg-[#202020] hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${
                           isDragging
                             ? 'opacity-40 border-dashed border-blue-400'
+                            : isQuizSelected
+                            ? 'border-2 border-rose-500 bg-rose-50/30 dark:bg-rose-950/30 shadow-xs'
                             : isPendingSync
                             ? 'border-amber-300 dark:border-amber-700/70 hover:border-amber-400'
                             : 'border-neutral-200/80 dark:border-neutral-800/80 hover:border-blue-400/80 dark:hover:border-blue-500/80'
@@ -351,6 +445,37 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                           {/* Header: Icon + Category + Sync Status Badge + Favorite */}
                           <div className="flex items-center justify-between mb-2.5">
                             <div className="flex items-center gap-1.5 flex-wrap">
+                              {/* Multi-Select Checkbox */}
+                              {canManageItems && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    playNavSound();
+                                    onToggleSelectTarget?.({
+                                      type: 'quiz',
+                                      id: quiz.id,
+                                      name: quiz.title,
+                                      path: quiz.path,
+                                      sha: quiz.sha,
+                                      category: quiz.category,
+                                    });
+                                  }}
+                                  className={`p-0.5 rounded border transition-colors cursor-pointer mr-0.5 ${
+                                    isQuizSelected 
+                                      ? 'bg-rose-600 border-rose-600 text-white' 
+                                      : 'bg-white dark:bg-[#2a2a2a] border-neutral-300 dark:border-neutral-600 hover:border-rose-400 opacity-60 group-hover:opacity-100'
+                                  }`}
+                                  title={isQuizSelected ? 'Deselect quiz' : 'Select quiz for action'}
+                                >
+                                  {isQuizSelected ? (
+                                    <Check className="w-3 h-3 stroke-[3]" />
+                                  ) : (
+                                    <div className="w-3 h-3" />
+                                  )}
+                                </button>
+                              )}
+
                               <span className="text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-400 cursor-grab">
                                 <GripVertical className="w-3.5 h-3.5" />
                               </span>
@@ -477,6 +602,21 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                               </a>
                             )}
 
+                            {/* Rename Quiz button */}
+                            {canManageItems && onRequestRenameItem && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  playNavSound();
+                                  onRequestRenameItem({ type: 'quiz', quiz });
+                                }}
+                                className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                title={`Rename quiz ${quiz.title}`}
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
                             {canManageItems && (
                               <button
                                 onClick={(e) => {
@@ -517,6 +657,29 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-neutral-50 dark:bg-[#202020] text-neutral-500 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-800 select-none">
+                  {canManageItems && (
+                    <th className="py-2 px-2.5 w-8 text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          playNavSound();
+                          if (isAllSelected) {
+                            onClearSelection?.();
+                          } else {
+                            onSelectAllTargets?.(allVisibleTargets);
+                          }
+                        }}
+                        className="p-0.5 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+                        title={isAllSelected ? 'Deselect All' : `Select All (${allVisibleTargets.length})`}
+                      >
+                        {isAllSelected ? (
+                          <CheckSquare className="w-3.5 h-3.5 text-rose-600" />
+                        ) : (
+                          <Square className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </th>
+                  )}
                   <th className="py-2 px-3 font-semibold">Name</th>
                   <th className="py-2 px-3 font-semibold">GitHub Sync</th>
                   <th className="py-2 px-3 font-semibold">Category</th>
@@ -532,6 +695,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                 {subfoldersToDisplay.map((folder) => {
                   const count = countFolderQuizzes(folder);
                   const isHovered = hoveredFolderPath === folder.path;
+                  const isFolderSelected = selectedTargets ? selectedTargets.has(folder.path) : false;
 
                   return (
                     <tr
@@ -547,11 +711,32 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                         onNavigatePath(folder.path);
                       }}
                       className={`cursor-pointer transition-colors group ${
-                        isHovered 
+                        isFolderSelected
+                          ? 'bg-rose-50/70 dark:bg-rose-950/40 font-semibold'
+                          : isHovered 
                           ? 'bg-blue-100 dark:bg-blue-900/60 font-bold' 
                           : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
                       }`}
                     >
+                      {canManageItems && (
+                        <td className="py-2 px-2.5 w-8 text-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={isFolderSelected}
+                            onChange={() => {
+                              playNavSound();
+                              onToggleSelectTarget?.({
+                                type: 'folder',
+                                id: folder.id,
+                                name: folder.name,
+                                path: folder.path,
+                                quizCount: count,
+                              });
+                            }}
+                            className="w-3.5 h-3.5 rounded text-rose-600 focus:ring-rose-500 cursor-pointer"
+                          />
+                        </td>
+                      )}
                       <td className="py-2 px-3 flex items-center gap-2 font-medium text-neutral-800 dark:text-neutral-200">
                         <GripVertical className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600" />
                         <Folder className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
@@ -586,6 +771,18 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                               <FolderInput className="w-3.5 h-3.5" />
                             </button>
                           )}
+                          {canManageItems && onRequestRenameItem && (
+                            <button
+                              onClick={() => {
+                                playNavSound();
+                                onRequestRenameItem({ type: 'folder', folder });
+                              }}
+                              className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                              title={`Rename folder ${folder.name}`}
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           {canManageItems && (
                             <button
                               onClick={() => onRequestDeleteFolder(folder)}
@@ -606,6 +803,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                 {quizzesToDisplay.map((quiz) => {
                   const isFav = favorites.includes(quiz.id);
                   const isPendingSync = quiz.syncStatus === 'pending_sync';
+                  const isQuizSelected = selectedTargets ? selectedTargets.has(quiz.path) : false;
 
                   return (
                     <tr
@@ -617,8 +815,32 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                         playOpenSound();
                         onOpenQuiz(quiz);
                       }}
-                      className="hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60 cursor-pointer transition-colors group"
+                      className={`cursor-pointer transition-colors group ${
+                        isQuizSelected 
+                          ? 'bg-rose-50/60 dark:bg-rose-950/30 font-semibold' 
+                          : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
+                      }`}
                     >
+                      {canManageItems && (
+                        <td className="py-2 px-2.5 w-8 text-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={isQuizSelected}
+                            onChange={() => {
+                              playNavSound();
+                              onToggleSelectTarget?.({
+                                type: 'quiz',
+                                id: quiz.id,
+                                name: quiz.title,
+                                path: quiz.path,
+                                sha: quiz.sha,
+                                category: quiz.category,
+                              });
+                            }}
+                            className="w-3.5 h-3.5 rounded text-rose-600 focus:ring-rose-500 cursor-pointer"
+                          />
+                        </td>
+                      )}
                       <td className="py-2 px-3 font-medium text-neutral-900 dark:text-neutral-100">
                         <div className="flex items-center gap-2">
                           <GripVertical className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 cursor-grab" />
@@ -682,6 +904,18 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                               <FolderInput className="w-3.5 h-3.5" />
                             </button>
                           )}
+                          {canManageItems && onRequestRenameItem && (
+                            <button
+                              onClick={() => {
+                                playNavSound();
+                                onRequestRenameItem({ type: 'quiz', quiz });
+                              }}
+                              className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                              title={`Rename quiz ${quiz.title}`}
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           {!isPendingSync && (
                             <a
                               href={getGitHubFileUrl(quiz)}
@@ -725,6 +959,55 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
           </div>
         )}
       </div>
+
+      {/* Floating Multi-Select Action Bar */}
+      {selectedCount > 0 && (
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 bg-neutral-900/95 dark:bg-[#202020]/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-neutral-700/80 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold px-2 py-0.5 bg-rose-600 text-white rounded-full">
+              {selectedCount} selected
+            </span>
+            <button
+              onClick={() => {
+                playNavSound();
+                if (isAllSelected) {
+                  onClearSelection?.();
+                } else {
+                  onSelectAllTargets?.(allVisibleTargets);
+                }
+              }}
+              className="text-xs text-neutral-300 hover:text-white font-medium hover:underline cursor-pointer"
+            >
+              {isAllSelected ? 'Deselect All' : `Select All (${allVisibleTargets.length})`}
+            </button>
+            <button
+              onClick={() => {
+                playNavSound();
+                onClearSelection?.();
+              }}
+              className="text-xs text-neutral-400 hover:text-white font-medium hover:underline cursor-pointer ml-1"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="h-4 w-px bg-neutral-700" />
+
+          {canManageItems && onRequestDeleteSelected && (
+            <button
+              onClick={() => {
+                playNavSound();
+                onRequestDeleteSelected();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+              title="Delete all selected items permanently from repository"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete Selected ({selectedCount})</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Windows 11 Status Bar */}
       <div className="h-6 bg-[#f3f3f3] dark:bg-[#1e1e1e] border-t border-neutral-200 dark:border-neutral-800 px-3 flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 shrink-0">

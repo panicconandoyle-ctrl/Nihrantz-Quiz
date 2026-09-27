@@ -52,3 +52,25 @@ export interface QuizScoreRecord {
   percentage: number;
   timestamp: number;
 }
+
+export interface DeleteItemTarget {
+  type: 'quiz' | 'folder';
+  id: string;
+  name: string;
+  path: string;
+  sha?: string;
+  quizCount?: number;
+  category?: string;
+  size?: string;
+}
+
+export interface CreatorSupportConfig {
+  holderName: string;
+  accountNumber: string;
+  bankName: string;
+  swiftCode: string;
+  currency: string;
+  message?: string;
+  customQrImageUrl?: string;
+  qrType?: 'khqr' | 'promptpay' | 'universal' | 'custom';
+}
