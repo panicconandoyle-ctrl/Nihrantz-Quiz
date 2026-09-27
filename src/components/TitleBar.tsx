@@ -14,7 +14,11 @@ import {
   Upload, 
   Lock, 
   Crown, 
-  LogOut 
+  LogOut,
+  RefreshCw,
+  ExternalLink,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { playNavSound } from '../utils/audio';
 
@@ -33,6 +37,11 @@ interface TitleBarProps {
   onLogoutOwner: () => void;
   isAdminActive: boolean;
   onOpenAdminConfig: () => void;
+  ghConfig: { owner: string; repo: string; branch: string };
+  isSyncing?: boolean;
+  lastSyncTime?: string;
+  pendingSyncCount?: number;
+  onTriggerSync?: () => void;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -50,18 +59,65 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   onLogoutOwner,
   isAdminActive,
   onOpenAdminConfig,
+  ghConfig,
+  isSyncing = false,
+  lastSyncTime,
+  pendingSyncCount = 0,
+  onTriggerSync,
 }) => {
   const currentFolderName = currentPath.split('/').filter(Boolean).pop() || 'quizzes';
+  const repoUrl = `https://github.com/${ghConfig.owner}/${ghConfig.repo}`;
 
   return (
     <header className="h-10 bg-[#f3f3f3] dark:bg-[#202020] border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-3 select-none text-xs text-neutral-600 dark:text-neutral-300 shrink-0">
-      {/* Left: Window Tab / Brand + Admin Status Badge */}
+      {/* Left: Window Tab / Brand + GitHub Synchronized Status Badge */}
       <div className="flex items-center gap-2 overflow-hidden">
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-[#2b2b2b] rounded-t-md border-t border-x border-neutral-200 dark:border-neutral-700 font-medium text-neutral-800 dark:text-neutral-100 shadow-xs max-w-[200px] truncate">
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-[#2b2b2b] rounded-t-md border-t border-x border-neutral-200 dark:border-neutral-700 font-medium text-neutral-800 dark:text-neutral-100 shadow-xs max-w-[180px] truncate">
           <Folder className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
           <span className="truncate">{currentFolderName}</span>
         </div>
         <span className="text-neutral-400 dark:text-neutral-500 hidden sm:inline">Nihrantz Quiz Explorer</span>
+
+        {/* GitHub Linked Repository Link Badge */}
+        <a
+          href={repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-neutral-200/80 dark:bg-neutral-800 hover:bg-neutral-300/80 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-colors border border-neutral-300/70 dark:border-neutral-700"
+          title={`View repository on GitHub: ${ghConfig.owner}/${ghConfig.repo}`}
+        >
+          <Github className="w-3.5 h-3.5" />
+          <span className="font-mono">{ghConfig.owner}/{ghConfig.repo}</span>
+          <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+        </a>
+
+        {/* GitHub Sync Status Badge */}
+        <button
+          onClick={() => {
+            playNavSound();
+            if (onTriggerSync) onTriggerSync();
+          }}
+          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold transition-all border shadow-2xs ${
+            isSyncing
+              ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/60'
+              : pendingSyncCount > 0
+              ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 hover:bg-amber-100'
+              : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/60 hover:bg-emerald-100'
+          }`}
+          title={
+            isSyncing
+              ? "Synchronizing live with GitHub..."
+              : pendingSyncCount > 0
+              ? `${pendingSyncCount} item(s) pending sync to GitHub (Click to sync now)`
+              : `Synchronized with GitHub: ${ghConfig.owner}/${ghConfig.repo} (${lastSyncTime ? `Last sync: ${lastSyncTime}` : 'Live'})`
+          }
+        >
+          <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-blue-600' : pendingSyncCount > 0 ? 'text-amber-600' : 'text-emerald-600'}`} />
+          <span className="hidden md:inline">
+            {isSyncing ? 'Syncing...' : pendingSyncCount > 0 ? `${pendingSyncCount} Needs Sync` : 'Synced with GitHub'}
+          </span>
+        </button>
 
         {/* GitHub Admin Mode Indicator Badge */}
         <button
@@ -141,14 +197,14 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           <span className="hidden md:inline">Support Creator</span>
         </button>
 
-        {/* GitHub Auto-Discovery */}
+        {/* GitHub Two-Way Sync / Discovery */}
         <button
           onClick={() => {
             playNavSound();
             onOpenGitHubSync();
           }}
           className="p-1.5 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/60 rounded-md transition-colors"
-          title="GitHub Auto-Discovery Sync"
+          title="GitHub Auto-Discovery & Two-Way Sync Settings"
           aria-label="GitHub Auto-Discovery"
         >
           <Github className="w-3.5 h-3.5" />

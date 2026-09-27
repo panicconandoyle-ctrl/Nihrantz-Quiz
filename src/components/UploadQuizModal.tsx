@@ -32,6 +32,7 @@ interface UploadQuizModalProps {
   onAddQuiz?: (targetFolderPath: string, newQuiz: QuizItem) => void;
   onGitHubCommitted?: () => void;
   onOpenAdminConfig?: () => void;
+  initialFile?: { name: string; content: string } | null;
 }
 
 export const UploadQuizModal: React.FC<UploadQuizModalProps> = ({
@@ -42,6 +43,7 @@ export const UploadQuizModal: React.FC<UploadQuizModalProps> = ({
   onAddQuiz,
   onGitHubCommitted,
   onOpenAdminConfig,
+  initialFile,
 }) => {
   const [tab, setTab] = useState<'upload' | 'code'>('upload');
   const [targetFolder, setTargetFolder] = useState<string>(currentPath || 'quizzes');
@@ -92,7 +94,14 @@ export const UploadQuizModal: React.FC<UploadQuizModalProps> = ({
       setTargetFolder('quizzes');
     }
     setCommitToGitHub(hasAdminToken());
-  }, [currentPath, isOpen]);
+
+    if (initialFile && isOpen) {
+      setHtmlContent(initialFile.content);
+      setFilename(initialFile.name);
+      setCommitMessage(`Add ${initialFile.name} quiz via Nihrantz Quiz Explorer`);
+      parseHtmlCode(initialFile.content, initialFile.name);
+    }
+  }, [currentPath, isOpen, initialFile]);
 
   // Clean up preview Blob URL
   useEffect(() => {

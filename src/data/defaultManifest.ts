@@ -2,7 +2,7 @@ import { QuizManifest, FolderNode, QuizItem } from '../types';
 
 export const defaultManifest: QuizManifest = {
   name: "Interactive HTML Quizzes Repository",
-  version: "1.2.0",
+  version: "1.3.0",
   lastUpdated: "2026-09-27",
   folders: [
     {
@@ -101,23 +101,65 @@ export const defaultManifest: QuizManifest = {
               description: "Test your geographic precision with national capitals across four continents."
             }
           ]
+        },
+        {
+          id: "up",
+          name: "up",
+          path: "quizzes/up",
+          folders: [],
+          quizzes: []
         }
       ],
-      "quizzes": [
+      quizzes: [
         {
-          "id": "sample-quiz",
-          "title": "Quick Trivia Challenge",
+          id: "immunology-ch5-t-cell",
+          title: "Immunology Ch. 5: T-Cell Mediated Immunity",
+          filename: "immunology_ch5_t_cell_mediated_immunity_quiz.html",
+          path: "quizzes/immunology_ch5_t_cell_mediated_immunity_quiz.html",
+          category: "Immunology",
+          topic: "T-Cell Immunity",
+          questionCount: 10,
+          estimatedMinutes: 8,
+          difficulty: "Advanced",
+          tags: ["immunology", "medicine", "t-cells", "clinical"],
+          dateModified: "2026-09-27",
+          size: "33.5 KB",
+          description: "Clinical assessment evaluating T-cell receptor signaling, MHC recognition, and cell-mediated immune responses.",
+          sha: "7dfaf81afdcb93c995ac062dd361c8bf90b7b53a",
+          syncStatus: "synced"
+        },
+        {
+          id: "clinical-assessment-immunology-ch4",
+          title: "Clinical Assessment - Immunology Ch. 4",
+          filename: "Untitled-1.html",
+          path: "quizzes/Untitled-1.html",
+          category: "Immunology",
+          topic: "Clinical Immunology",
+          questionCount: 10,
+          estimatedMinutes: 8,
+          difficulty: "Advanced",
+          tags: ["immunology", "clinical", "medicine", "assessment"],
+          dateModified: "2026-09-27",
+          size: "35.2 KB",
+          description: "Clinical chart examination testing humoral immunity, antibody structure, antigen-antibody interactions, and diagnostic assays.",
+          syncStatus: "pending_sync"
+        },
+        {
+          id: "sample-quiz",
+          title: "Quick Trivia Challenge",
           "filename": "sample_quiz.html",
-          "path": "quizzes/sample_quiz.html",
-          "category": "General",
-          "topic": "Trivia",
-          "questionCount": 5,
-          "estimatedMinutes": 3,
-          "difficulty": "Beginner",
-          "tags": ["trivia", "general", "science", "astronomy"],
-          "dateModified": "2026-09-25",
-          "size": "7.5 KB",
-          "description": "Multi-disciplinary speed run testing general knowledge, science, and history."
+          path: "quizzes/sample_quiz.html",
+          category: "General",
+          topic: "Trivia",
+          questionCount: 5,
+          estimatedMinutes: 3,
+          difficulty: "Beginner",
+          tags: ["trivia", "general", "science", "astronomy"],
+          dateModified: "2026-09-25",
+          size: "13.8 KB",
+          description: "Multi-disciplinary speed run testing general knowledge, science, and history.",
+          sha: "c705fcb9b47920ee2fb5dfd65c51a1c20c485d5a",
+          syncStatus: "synced"
         }
       ]
     }
@@ -140,8 +182,8 @@ export function findFolderByPath(root: FolderNode, targetPath: string): FolderNo
   if (cleanTarget === cleanRoot) return root;
 
   if (root.folders) {
-    for (const folder of root.folders) {
-      const found = findFolderByPath(folder, cleanTarget);
+    for (const sub of root.folders) {
+      const found = findFolderByPath(sub, cleanTarget);
       if (found) return found;
     }
   }

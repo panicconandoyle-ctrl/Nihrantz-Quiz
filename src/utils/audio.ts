@@ -90,6 +90,7 @@ export function playSuccessChime() {
 
 /**
  * Quiz Sound Effects: Bright, uplifting correct answer chime
+ * Crisp double bell chime: C6 (1046.5Hz) -> E6 (1318.5Hz) with sparkling harmonics
  */
 export function playCorrectSound() {
   if (!soundEnabled) return;
@@ -97,18 +98,17 @@ export function playCorrectSound() {
   if (!ctx) return;
   try {
     const now = ctx.currentTime;
-    // Pleasant major third / perfect fifth chime (G5 783.99Hz -> C6 1046.50Hz)
     const tones = [
-      { freq: 783.99, start: 0, dur: 0.18, vol: 0.08 },
-      { freq: 1046.50, start: 0.08, dur: 0.28, vol: 0.10 },
-      { freq: 1318.51, start: 0.16, dur: 0.35, vol: 0.06 }
+      { freq: 880.00, start: 0, dur: 0.16, vol: 0.12, type: 'triangle' as OscillatorType },
+      { freq: 1174.66, start: 0.07, dur: 0.25, vol: 0.15, type: 'triangle' as OscillatorType },
+      { freq: 1760.00, start: 0.14, dur: 0.35, vol: 0.10, type: 'sine' as OscillatorType }
     ];
 
     tones.forEach(t => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = t.freq;
+      osc.type = t.type;
+      osc.frequency.setValueAtTime(t.freq, now + t.start);
       osc.connect(gain);
       gain.connect(ctx.destination);
       gain.gain.setValueAtTime(0.001, now + t.start);
@@ -121,7 +121,8 @@ export function playCorrectSound() {
 }
 
 /**
- * Quiz Sound Effects: Friendly, non-jarring soft incorrect indicator
+ * Quiz Sound Effects: Distinct, unmistakable wrong answer indicator
+ * Low warm descending double-buzz (260Hz -> 180Hz)
  */
 export function playIncorrectSound() {
   if (!soundEnabled) return;
@@ -129,21 +130,33 @@ export function playIncorrectSound() {
   if (!ctx) return;
   try {
     const now = ctx.currentTime;
-    // Warm gentle downward pulse (329.63Hz E4 -> 261.63Hz C4)
-    [
-      { freq: 329.63, start: 0, dur: 0.12, vol: 0.07 },
-      { freq: 261.63, start: 0.10, dur: 0.22, vol: 0.08 }
-    ].forEach(t => {
+    // Two low descending tones
+    const tones = [
+      { freq1: 261.63, freq2: 220.00, start: 0, dur: 0.15, vol: 0.14 },
+      { freq1: 196.00, freq2: 155.56, start: 0.12, dur: 0.22, vol: 0.16 }
+    ];
+
+    tones.forEach(t => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(t.freq, now + t.start);
-      osc.frequency.exponentialRampToValueAtTime(t.freq * 0.95, now + t.start + t.dur);
-      osc.connect(gain);
+      osc.type = 'sawtooth';
+      
+      // Filter the sawtooth to keep it smooth and pleasant, not grating
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(600, now + t.start);
+
+      osc.frequency.setValueAtTime(t.freq1, now + t.start);
+      osc.frequency.exponentialRampToValueAtTime(t.freq2, now + t.start + t.dur);
+
+      osc.connect(filter);
+      filter.connect(gain);
       gain.connect(ctx.destination);
+
       gain.gain.setValueAtTime(0.001, now + t.start);
       gain.gain.exponentialRampToValueAtTime(t.vol, now + t.start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + t.start + t.dur);
+
       osc.start(now + t.start);
       osc.stop(now + t.start + t.dur);
     });
@@ -159,7 +172,6 @@ export function playVictoryFanfare() {
   if (!ctx) return;
   try {
     const now = ctx.currentTime;
-    // C5 - E5 - G5 - C6 triumph
     const notes = [
       { f: 523.25, t: 0, d: 0.12 },
       { f: 659.25, t: 0.12, d: 0.12 },
@@ -183,7 +195,7 @@ export function playVictoryFanfare() {
 }
 
 /**
- * Sound effect when an item is deleted (Windows trash / subtle paper crumple)
+ * Sound effect when an item is deleted
  */
 export function playDeleteSound() {
   if (!soundEnabled) return;
@@ -202,6 +214,52 @@ export function playDeleteSound() {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
     osc.start(now);
     osc.stop(now + 0.15);
+  } catch (e) {}
+}
+
+/**
+ * Sound effect when starting to drag a file/folder
+ */
+export function playDragSound() {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(450, now);
+    osc.frequency.exponentialRampToValueAtTime(650, now + 0.04);
+    gain.gain.setValueAtTime(0.03, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  } catch (e) {}
+}
+
+/**
+ * Sound effect when dropping a file/folder into a destination
+ */
+export function playDropSound() {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.10);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.10);
   } catch (e) {}
 }
 
@@ -227,4 +285,3 @@ export function playOptionClickSound() {
     osc.stop(now + 0.035);
   } catch (e) {}
 }
-

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Folder, 
   Play, 
@@ -9,11 +9,17 @@ import {
   FileCode, 
   CheckCircle2,
   FolderOpen,
-  Trash2
+  Trash2,
+  Github,
+  ArrowUpCircle,
+  RefreshCw,
+  FolderInput,
+  Upload,
+  GripVertical
 } from 'lucide-react';
 import { FolderNode, QuizItem, ViewMode } from '../types';
 import { countFolderQuizzes } from '../data/defaultManifest';
-import { playOpenSound, playNavSound } from '../utils/audio';
+import { playOpenSound, playNavSound, playDragSound, playDropSound } from '../utils/audio';
 
 interface ExplorerContentProps {
   currentFolder: FolderNode;
@@ -29,6 +35,11 @@ interface ExplorerContentProps {
   canManageItems: boolean;
   onRequestDeleteQuiz: (quiz: QuizItem) => void;
   onRequestDeleteFolder: (folder: FolderNode) => void;
+  onSyncQuizToGitHub?: (quiz: QuizItem) => void;
+  ghConfig?: { owner: string; repo: string; branch: string };
+  onDropOnFolder?: (source: { type: 'quiz' | 'folder'; quiz?: QuizItem; folder?: FolderNode }, targetFolderPath: string) => void;
+  onRequestMoveItem?: (target: { type: 'quiz' | 'folder'; quiz?: QuizItem; folder?: FolderNode }) => void;
+  onDropExternalFile?: (file: File) => void;
 }
 
 export const ExplorerContent: React.FC<ExplorerContentProps> = ({
@@ -45,10 +56,18 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
   canManageItems,
   onRequestDeleteQuiz,
   onRequestDeleteFolder,
+  onSyncQuizToGitHub,
+  ghConfig = { owner: 'panicconandoyle-ctrl', repo: 'Nihrantz-Quiz', branch: 'main' },
+  onDropOnFolder,
+  onRequestMoveItem,
+  onDropExternalFile,
 }) => {
   const totalItems = subfoldersToDisplay.length + quizzesToDisplay.length;
 
-  const [copiedPath, setCopiedPath] = React.useState<string | null>(null);
+  const [copiedPath, setCopiedPath] = useState<string | null>(null);
+  const [hoveredFolderPath, setHoveredFolderPath] = useState<string | null>(null);
+  const [isDraggingExternal, setIsDraggingExternal] = useState<boolean>(false);
+  const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
 
   const handleShareQuiz = (quiz: QuizItem, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -62,6 +81,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
       case 'science': return 'text-emerald-500';
+      case 'immunology': return 'text-rose-500';
       case 'history': return 'text-amber-500';
       case 'computer science': return 'text-indigo-500';
       case 'geography': return 'text-sky-500';
@@ -69,8 +89,123 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
     }
   };
 
+  const getGitHubFileUrl = (quiz: QuizItem) => {
+    if (quiz.gitHubUrl) return quiz.gitHubUrl;
+    return `https://github.com/${ghConfig.owner}/${ghConfig.repo}/blob/${ghConfig.branch || 'main'}/${quiz.path}`;
+  };
+
+  const getGitHubFolderUrl = (folder: FolderNode) => {
+    return `https://github.com/${ghConfig.owner}/${ghConfig.repo}/tree/${ghConfig.branch || 'main'}/${folder.path}`;
+  };
+
+  // Internal Drag & Drop handlers
+  const handleDragStartQuiz = (e: React.DragEvent, quiz: QuizItem) => {
+    e.dataTransfer.setData('application/json', JSON.stringify({ type: 'quiz', quiz }));
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingItemId(quiz.id);
+    playDragSound();
+  };
+
+  const handleDragStartFolder = (e: React.DragEvent, folder: FolderNode) => {
+    e.dataTransfer.setData('application/json', JSON.stringify({ type: 'folder', folder }));
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingItemId(folder.path);
+    playDragSound();
+  };
+
+  const handleDragEnd = () => {
+    setDraggingItemId(null);
+    setHoveredFolderPath(null);
+  };
+
+  const handleFolderDragOver = (e: React.DragEvent, folderPath: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (hoveredFolderPath !== folderPath) {
+      setHoveredFolderPath(folderPath);
+    }
+  };
+
+  const handleFolderDragLeave = (e: React.DragEvent, folderPath: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (hoveredFolderPath === folderPath) {
+      setHoveredFolderPath(null);
+    }
+  };
+
+  const handleFolderDrop = (e: React.DragEvent, targetFolderPath: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setHoveredFolderPath(null);
+    setDraggingItemId(null);
+
+    // Check if external file dropped onto a folder
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.name.endsWith('.html') && onDropExternalFile) {
+        playDropSound();
+        onDropExternalFile(file);
+      }
+      return;
+    }
+
+    try {
+      const dataStr = e.dataTransfer.getData('application/json');
+      if (!dataStr) return;
+      const data = JSON.parse(dataStr);
+      playDropSound();
+      if (onDropOnFolder) {
+        onDropOnFolder(data, targetFolderPath);
+      }
+    } catch (err) {}
+  };
+
+  // External Desktop File Drag Over Whole Viewport
+  const handleViewportDragOver = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes('Files')) {
+      e.preventDefault();
+      setIsDraggingExternal(true);
+    }
+  };
+
+  const handleViewportDragLeave = (e: React.DragEvent) => {
+    // Only deactivate if leaving viewport completely
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setIsDraggingExternal(false);
+  };
+
+  const handleViewportDrop = (e: React.DragEvent) => {
+    setIsDraggingExternal(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      const file = e.dataTransfer.files[0];
+      if (file.name.endsWith('.html') && onDropExternalFile) {
+        playDropSound();
+        onDropExternalFile(file);
+      }
+    }
+  };
+
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#191919] overflow-hidden select-none">
+    <div 
+      onDragOver={handleViewportDragOver}
+      onDragLeave={handleViewportDragLeave}
+      onDrop={handleViewportDrop}
+      className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#191919] overflow-hidden select-none relative"
+    >
+      {/* Desktop External File Drop Overlay */}
+      {isDraggingExternal && (
+        <div className="absolute inset-0 z-40 bg-blue-600/20 backdrop-blur-xs border-4 border-dashed border-blue-500 rounded-xl m-2 flex flex-col items-center justify-center text-blue-800 dark:text-blue-200 pointer-events-none animate-pulse">
+          <Upload className="w-14 h-14 text-blue-600 dark:text-blue-400 mb-3" />
+          <h3 className="text-base font-bold">Drop HTML Quiz Here</h3>
+          <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">
+            Upload directly into <span className="font-mono font-semibold">{currentFolder.path}/</span>
+          </p>
+        </div>
+      )}
+
       {/* Scrollable Viewport */}
       <div className="flex-1 overflow-y-auto p-4">
         {totalItems === 0 ? (
@@ -80,7 +215,9 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
             {searchQuery ? (
               <p className="text-xs text-neutral-500 mt-1">No items match "{searchQuery}". Try searching globally or clear your filter.</p>
             ) : (
-              <p className="text-xs text-neutral-500 mt-1">No subfolders or HTML quizzes located here.</p>
+              <p className="text-xs text-neutral-500 mt-1">
+                Drag and drop HTML quiz files here, or create a folder.
+              </p>
             )}
           </div>
         ) : viewMode === 'grid' ? (
@@ -89,39 +226,86 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
             {/* Subfolders Section */}
             {subfoldersToDisplay.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wider">
-                  Folders ({subfoldersToDisplay.length})
+                <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wider flex items-center justify-between">
+                  <span>Folders ({subfoldersToDisplay.length})</span>
+                  <span className="text-[10px] font-normal lowercase text-neutral-400">drag files into folders to move</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                   {subfoldersToDisplay.map((folder) => {
                     const count = countFolderQuizzes(folder);
+                    const isHovered = hoveredFolderPath === folder.path;
+                    const isDragging = draggingItemId === folder.path;
+
                     return (
                       <div
                         key={folder.path}
+                        draggable={true}
+                        onDragStart={(e) => handleDragStartFolder(e, folder)}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={(e) => handleFolderDragOver(e, folder.path)}
+                        onDragLeave={(e) => handleFolderDragLeave(e, folder.path)}
+                        onDrop={(e) => handleFolderDrop(e, folder.path)}
                         onClick={() => {
                           playNavSound();
                           onNavigatePath(folder.path);
                         }}
-                        className="group relative flex flex-col items-center p-3 rounded-lg border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700/60 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60 cursor-pointer transition-all text-center"
+                        className={`group relative flex flex-col items-center p-3 rounded-xl border cursor-pointer transition-all text-center ${
+                          isDragging
+                            ? 'opacity-40 border-dashed border-blue-400'
+                            : isHovered
+                            ? 'border-2 border-blue-500 bg-blue-100/70 dark:bg-blue-900/50 scale-105 shadow-md'
+                            : 'border-transparent hover:border-neutral-200 dark:hover:border-neutral-700/60 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
+                        }`}
+                        title={`Folder: ${folder.name} (Drag to move, or drop items here)`}
                       >
-                        {canManageItems && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRequestDeleteFolder(folder);
-                            }}
-                            className="absolute top-1.5 right-1.5 p-1 rounded-md text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 opacity-0 group-hover:opacity-100 transition-all"
-                            title={`Delete folder ${folder.name}`}
+                        {/* Action buttons (Move & Delete) */}
+                        <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all z-10">
+                          {/* Move Folder button */}
+                          {onRequestMoveItem && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRequestMoveItem({ type: 'folder', folder });
+                              }}
+                              className="p-1 rounded-md text-neutral-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                              title={`Move folder ${folder.name}`}
+                            >
+                              <FolderInput className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {/* Open folder on GitHub */}
+                          <a
+                            href={getGitHubFolderUrl(folder)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60"
+                            title={`View ${folder.name} on GitHub`}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+
+                          {canManageItems && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRequestDeleteFolder(folder);
+                              }}
+                              className="p-1 rounded-md text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                              title={`Delete folder ${folder.name}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+
                         <Folder className="w-12 h-12 text-amber-500 fill-amber-500 group-hover:scale-105 transition-transform drop-shadow-2xs mb-1.5" />
                         <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 truncate w-full">
                           {folder.name}
                         </span>
                         <span className="text-[11px] text-neutral-400 tabular-nums">
-                          {count} {count === 1 ? 'quiz' : 'quizzes'}
+                          {isHovered ? 'Drop to move here' : `${count} ${count === 1 ? 'quiz' : 'quizzes'}`}
                         </span>
                       </div>
                     );
@@ -133,32 +317,69 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
             {/* Quizzes Section */}
             {quizzesToDisplay.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wider">
-                  Interactive Quizzes ({quizzesToDisplay.length})
+                <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wider flex items-center justify-between">
+                  <span>Interactive Quizzes ({quizzesToDisplay.length})</span>
+                  <span className="text-[10px] font-normal text-neutral-400">drag & drop to move to folder</span>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
                   {quizzesToDisplay.map((quiz) => {
                     const isFav = favorites.includes(quiz.id);
                     const record = completedQuizzes[quiz.id];
+                    const isPendingSync = quiz.syncStatus === 'pending_sync';
+                    const isDragging = draggingItemId === quiz.id;
 
                     return (
                       <div
                         key={quiz.id}
+                        draggable={true}
+                        onDragStart={(e) => handleDragStartQuiz(e, quiz)}
+                        onDragEnd={handleDragEnd}
                         onClick={() => {
                           playOpenSound();
                           onOpenQuiz(quiz);
                         }}
-                        className="group relative flex flex-col justify-between p-4 rounded-xl border border-neutral-200/80 dark:border-neutral-800/80 bg-white dark:bg-[#202020] hover:border-blue-400/80 dark:hover:border-blue-500/80 hover:shadow-md transition-all cursor-pointer"
+                        className={`group relative flex flex-col justify-between p-4 rounded-xl border bg-white dark:bg-[#202020] hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${
+                          isDragging
+                            ? 'opacity-40 border-dashed border-blue-400'
+                            : isPendingSync
+                            ? 'border-amber-300 dark:border-amber-700/70 hover:border-amber-400'
+                            : 'border-neutral-200/80 dark:border-neutral-800/80 hover:border-blue-400/80 dark:hover:border-blue-500/80'
+                        }`}
+                        title="Drag to move this quiz into any folder"
                       >
                         <div>
-                          {/* Header: Icon + Category + Favorite */}
+                          {/* Header: Icon + Category + Sync Status Badge + Favorite */}
                           <div className="flex items-center justify-between mb-2.5">
-                            <div className="flex items-center gap-2">
-                              <FileCode className={`w-5 h-5 ${getCategoryColor(quiz.category)}`} />
-                              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-400 cursor-grab">
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </span>
+                              <FileCode className={`w-4 h-4 ${getCategoryColor(quiz.category)}`} />
+                              <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
                                 {quiz.category}
                               </span>
+
+                              {/* GitHub Sync Status Badge */}
+                              {isPendingSync ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60" title="Local quiz pending sync to GitHub repository">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                  Needs Sync
+                                </span>
+                              ) : (
+                                <a
+                                  href={getGitHubFileUrl(quiz)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                                  title={`Live on GitHub: ${quiz.sha ? `SHA ${quiz.sha.substring(0, 7)}` : 'main branch'}`}
+                                >
+                                  <Github className="w-2.5 h-2.5" />
+                                  <span>GitHub</span>
+                                </a>
+                              )}
                             </div>
+
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={(e) => {
@@ -183,17 +404,23 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                             {quiz.description || "Standalone interactive HTML quiz ready for execution."}
                           </p>
 
-                          {/* Zero-Pill Metadata Discipline: unboxed text with · separators */}
+                          {/* Metadata: unboxed text with · separators */}
                           <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 tabular-nums mb-3">
                             <span>{quiz.questionCount} Questions</span>
                             <span aria-hidden="true">·</span>
                             <span>{quiz.estimatedMinutes} min</span>
                             <span aria-hidden="true">·</span>
                             <span>{quiz.difficulty}</span>
+                            {quiz.size && (
+                              <>
+                                <span aria-hidden="true">·</span>
+                                <span>{quiz.size}</span>
+                              </>
+                            )}
                           </div>
                         </div>
 
-                        {/* Bottom Row: Completed status or Launch button */}
+                        {/* Bottom Row: Actions */}
                         <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between">
                           {record ? (
                             <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
@@ -201,12 +428,55 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                               <span className="tabular-nums">Best: {record.percentage}% ({record.score}/{record.total})</span>
                             </span>
                           ) : (
-                            <span className="text-[11px] text-neutral-400 font-mono">
+                            <span className="text-[11px] text-neutral-400 font-mono truncate max-w-[110px]">
                               {quiz.filename}
                             </span>
                           )}
 
                           <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100">
+                            {/* Move item button */}
+                            {onRequestMoveItem && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onRequestMoveItem({ type: 'quiz', quiz });
+                                }}
+                                className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                title={`Move quiz to another folder`}
+                              >
+                                <FolderInput className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
+                            {/* Push to GitHub button for pending quizzes */}
+                            {isPendingSync && onSyncQuizToGitHub && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSyncQuizToGitHub(quiz);
+                                }}
+                                className="p-1 hover:bg-amber-100 dark:hover:bg-amber-900/40 rounded text-amber-600 dark:text-amber-400 transition-colors flex items-center gap-1 text-[11px] font-semibold"
+                                title={`Push ${quiz.filename} to GitHub repository`}
+                              >
+                                <ArrowUpCircle className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Push</span>
+                              </button>
+                            )}
+
+                            {/* View file on GitHub */}
+                            {!isPendingSync && (
+                              <a
+                                href={getGitHubFileUrl(quiz)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+                                title="View source on GitHub"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+
                             {canManageItems && (
                               <button
                                 onClick={(e) => {
@@ -214,11 +484,12 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                                   onRequestDeleteQuiz(quiz);
                                 }}
                                 className="p-1 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
-                                title={`Delete quiz ${quiz.title}`}
+                                title={`Delete quiz ${quiz.title} permanently from GitHub`}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             )}
+
                             <button
                               onClick={(e) => handleShareQuiz(quiz, e)}
                               className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
@@ -226,6 +497,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                             >
                               <Share2 className="w-3.5 h-3.5" />
                             </button>
+
                             <span className="px-2.5 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 rounded-md flex items-center gap-1 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                               <Play className="w-3 h-3 fill-current" />
                               <span>Play</span>
@@ -246,6 +518,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
               <thead>
                 <tr className="bg-neutral-50 dark:bg-[#202020] text-neutral-500 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-800 select-none">
                   <th className="py-2 px-3 font-semibold">Name</th>
+                  <th className="py-2 px-3 font-semibold">GitHub Sync</th>
                   <th className="py-2 px-3 font-semibold">Category</th>
                   <th className="py-2 px-3 font-semibold text-right">Questions</th>
                   <th className="py-2 px-3 font-semibold text-right">Est. Time</th>
@@ -258,26 +531,61 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                 {/* Subfolder rows */}
                 {subfoldersToDisplay.map((folder) => {
                   const count = countFolderQuizzes(folder);
+                  const isHovered = hoveredFolderPath === folder.path;
+
                   return (
                     <tr
                       key={folder.path}
+                      draggable={true}
+                      onDragStart={(e) => handleDragStartFolder(e, folder)}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={(e) => handleFolderDragOver(e, folder.path)}
+                      onDragLeave={(e) => handleFolderDragLeave(e, folder.path)}
+                      onDrop={(e) => handleFolderDrop(e, folder.path)}
                       onClick={() => {
                         playNavSound();
                         onNavigatePath(folder.path);
                       }}
-                      className="hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60 cursor-pointer transition-colors group"
+                      className={`cursor-pointer transition-colors group ${
+                        isHovered 
+                          ? 'bg-blue-100 dark:bg-blue-900/60 font-bold' 
+                          : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
+                      }`}
                     >
                       <td className="py-2 px-3 flex items-center gap-2 font-medium text-neutral-800 dark:text-neutral-200">
+                        <GripVertical className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600" />
                         <Folder className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
                         <span>{folder.name}</span>
+                        {isHovered && <span className="text-[10px] text-blue-600 font-bold ml-1">(Drop to move here)</span>}
+                      </td>
+                      <td className="py-2 px-3">
+                        <a
+                          href={getGitHubFolderUrl(folder)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 text-[11px] text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                        >
+                          <Github className="w-3 h-3" />
+                          <span>repo folder</span>
+                        </a>
                       </td>
                       <td className="py-2 px-3 text-neutral-500">Folder</td>
                       <td className="py-2 px-3 text-right text-neutral-500 tabular-nums">{count} items</td>
                       <td className="py-2 px-3 text-right text-neutral-400">—</td>
                       <td className="py-2 px-3 text-neutral-400">—</td>
-                      <td className="py-2 px-3 text-neutral-400 tabular-nums">2026-09-20</td>
+                      <td className="py-2 px-3 text-neutral-400 tabular-nums">2026-09-27</td>
                       <td className="py-2 px-3 text-right">
                         <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {onRequestMoveItem && (
+                            <button
+                              onClick={() => onRequestMoveItem({ type: 'folder', folder })}
+                              className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                              title={`Move folder ${folder.name}`}
+                            >
+                              <FolderInput className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           {canManageItems && (
                             <button
                               onClick={() => onRequestDeleteFolder(folder)}
@@ -297,11 +605,14 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                 {/* Quiz rows */}
                 {quizzesToDisplay.map((quiz) => {
                   const isFav = favorites.includes(quiz.id);
-                  const record = completedQuizzes[quiz.id];
+                  const isPendingSync = quiz.syncStatus === 'pending_sync';
 
                   return (
                     <tr
                       key={quiz.id}
+                      draggable={true}
+                      onDragStart={(e) => handleDragStartQuiz(e, quiz)}
+                      onDragEnd={handleDragEnd}
                       onClick={() => {
                         playOpenSound();
                         onOpenQuiz(quiz);
@@ -310,6 +621,7 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                     >
                       <td className="py-2 px-3 font-medium text-neutral-900 dark:text-neutral-100">
                         <div className="flex items-center gap-2">
+                          <GripVertical className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 cursor-grab" />
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -325,6 +637,35 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                           </span>
                         </div>
                       </td>
+                      <td className="py-2 px-3">
+                        {isPendingSync ? (
+                          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300">
+                              ● Pending
+                            </span>
+                            {onSyncQuizToGitHub && (
+                              <button
+                                onClick={() => onSyncQuizToGitHub(quiz)}
+                                className="text-amber-600 hover:underline text-[11px] font-semibold"
+                              >
+                                Push
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <a
+                            href={getGitHubFileUrl(quiz)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline"
+                            title={quiz.sha ? `Git SHA: ${quiz.sha}` : 'Synced with GitHub'}
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Synced</span>
+                          </a>
+                        )}
+                      </td>
                       <td className="py-2 px-3 text-neutral-600 dark:text-neutral-300">{quiz.category}</td>
                       <td className="py-2 px-3 text-right tabular-nums text-neutral-600 dark:text-neutral-300">{quiz.questionCount} Qs</td>
                       <td className="py-2 px-3 text-right tabular-nums text-neutral-600 dark:text-neutral-300">{quiz.estimatedMinutes} min</td>
@@ -332,6 +673,26 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                       <td className="py-2 px-3 text-neutral-500 dark:text-neutral-400 tabular-nums">{quiz.dateModified}</td>
                       <td className="py-2 px-3 text-right">
                         <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {onRequestMoveItem && (
+                            <button
+                              onClick={() => onRequestMoveItem({ type: 'quiz', quiz })}
+                              className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                              title={`Move quiz to another folder`}
+                            >
+                              <FolderInput className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {!isPendingSync && (
+                            <a
+                              href={getGitHubFileUrl(quiz)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+                              title="Open on GitHub"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
                           {canManageItems && (
                             <button
                               onClick={() => onRequestDeleteQuiz(quiz)}
@@ -371,6 +732,15 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
           <span className="tabular-nums">{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
           <span className="hidden sm:inline">|</span>
           <span className="hidden sm:inline tabular-nums">{quizzesToDisplay.length} quizzes available</span>
+          <span className="hidden md:inline">|</span>
+          <span className="hidden md:inline text-neutral-500">
+            Drag items to move · Drop .html file to upload
+          </span>
+          <span className="hidden lg:inline">|</span>
+          <span className="hidden lg:inline text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-mono">
+            <Github className="w-3 h-3" />
+            <span>panicconandoyle-ctrl/Nihrantz-Quiz (main)</span>
+          </span>
         </div>
         <div className="flex items-center gap-3">
           <span>Path: <code className="font-mono text-[10px]">{currentFolder.path}</code></span>

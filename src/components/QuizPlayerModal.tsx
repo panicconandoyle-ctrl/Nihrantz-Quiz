@@ -13,7 +13,9 @@ import {
   Volume2,
   VolumeX,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Github,
+  ArrowUpCircle
 } from 'lucide-react';
 import { QuizItem } from '../types';
 import { 
@@ -31,12 +33,14 @@ interface QuizPlayerModalProps {
   quiz: QuizItem | null;
   onClose: () => void;
   onRecordScore: (quizId: string, score: number, total: number, percentage: number) => void;
+  onSyncQuizToGitHub?: (quiz: QuizItem) => void;
 }
 
 export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
   quiz,
   onClose,
   onRecordScore,
+  onSyncQuizToGitHub,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,21 +68,95 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
         rawText = await fetchQuizRawHtml(quiz, ghConfig);
       }
 
-      // Inject audio sound bridge script if not already present
+      // Inject audio sound bridge script that captures correct vs incorrect answers and clicks
       const audioBridgeScript = `
         <script>
         (function() {
-          // Listen for option and button clicks to trigger sound FX
+          var lastAnswerTime = 0;
+          function notifyAnswer(isCorrect) {
+            var now = Date.now();
+            if (now - lastAnswerTime < 250) return; // Debounce
+            lastAnswerTime = now;
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'quiz-answer', isCorrect: !!isCorrect }, '*');
+              }
+            } catch(err){}
+          }
+
+          // Intercept postMessage calls if quiz natively sends them
+          var originalPostMessage = window.postMessage;
+          window.postMessage = function(data, targetOrigin, transfer) {
+            if (data && typeof data === 'object' && data.type === 'quiz-answer') {
+              notifyAnswer(data.isCorrect);
+            }
+            if (originalPostMessage) {
+              return originalPostMessage.apply(this, arguments);
+            }
+          };
+
+          // Intercept click on option buttons and observe feedback classes/styles
           document.addEventListener('click', function(e) {
-            var btn = e.target.closest('button, .option-btn, [class*="option"], [class*="choice"], [role="button"], input[type="radio"]');
+            var btn = e.target.closest('button, .option-btn, [class*="option"], [class*="choice"], [role="button"], input[type="radio"], .btn');
             if (btn) {
               try {
                 if (window.parent && window.parent !== window) {
                   window.parent.postMessage({ type: 'quiz-click' }, '*');
                 }
               } catch(err){}
+
+              // Check after the quiz script runs its click handler
+              setTimeout(function() {
+                var cls = (btn.className || '') + ' ' + (btn.getAttribute('class') || '');
+                var isSelectedCorrect = cls.indexOf('selected-correct') !== -1 || (cls.indexOf('correct') !== -1 && cls.indexOf('incorrect') === -1);
+                var isSelectedIncorrect = cls.indexOf('selected-incorrect') !== -1 || cls.indexOf('incorrect') !== -1;
+
+                if (isSelectedCorrect) {
+                  notifyAnswer(true);
+                } else if (isSelectedIncorrect) {
+                  notifyAnswer(false);
+                }
+              }, 40);
             }
           }, true);
+
+          // MutationObserver to catch answer validation tags (like .tag-correct, .tag-incorrect in Clinical quiz)
+          try {
+            var observer = new MutationObserver(function(mutations) {
+              for (var i = 0; i < mutations.length; i++) {
+                var m = mutations[i];
+                if (m.type === 'attributes' && m.attributeName === 'class') {
+                  var targetCls = m.target.className || '';
+                  if (typeof targetCls === 'string') {
+                    if (targetCls.indexOf('selected-correct') !== -1 || targetCls.indexOf('tag-correct') !== -1) {
+                      notifyAnswer(true);
+                      return;
+                    } else if (targetCls.indexOf('selected-incorrect') !== -1 || targetCls.indexOf('tag-incorrect') !== -1) {
+                      notifyAnswer(false);
+                      return;
+                    }
+                  }
+                } else if (m.type === 'childList') {
+                  for (var j = 0; j < m.addedNodes.length; j++) {
+                    var node = m.addedNodes[j];
+                    if (node.nodeType === 1) {
+                      var nCls = node.className || '';
+                      if (typeof nCls === 'string') {
+                        if (nCls.indexOf('tag-correct') !== -1 || (nCls.indexOf('correct') !== -1 && nCls.indexOf('incorrect') === -1)) {
+                          notifyAnswer(true);
+                          return;
+                        } else if (nCls.indexOf('tag-incorrect') !== -1 || nCls.indexOf('incorrect') !== -1) {
+                          notifyAnswer(false);
+                          return;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            });
+            observer.observe(document.documentElement, { attributes: true, subtree: true, childList: true });
+          } catch(e){}
         })();
         </script>
       `;
@@ -139,20 +217,8 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
     }
   };
 
-  // Fullscreen change listener
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  if (!quiz) return null;
-
   const handleReload = () => {
     playNavSound();
-    setLatestScore(null);
     loadQuizContent();
   };
 
@@ -160,50 +226,66 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
     playNavSound();
     if (!document.fullscreenElement) {
       containerRef.current?.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {});
+      setIsFullscreen(false);
     }
   };
 
   const handleSharePermalink = () => {
+    if (!quiz) return;
     playNavSound();
     const url = new URL(window.location.href);
     url.searchParams.set('quiz', quiz.path);
     navigator.clipboard.writeText(url.toString());
     setCopiedShare(true);
-    setTimeout(() => setCopiedShare(false), 2200);
-  };
-
-  const handleDownloadHtml = () => {
-    playNavSound();
-    const content = renderedSrcDoc || quiz.htmlContent || '';
-    if (content) {
-      const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = quiz.filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+    setTimeout(() => setCopiedShare(false), 2000);
   };
 
   const handleOpenInNewTab = () => {
+    if (!quiz) return;
     playNavSound();
-    if (renderedSrcDoc) {
-      const blob = new Blob([renderedSrcDoc], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-    } else {
-      const targetUrl = quiz.rawUrl || `https://raw.githubusercontent.com/${ghConfig.owner}/${ghConfig.repo}/${ghConfig.branch || 'main'}/${quiz.path}`;
-      window.open(targetUrl, '_blank');
-    }
+    // Open direct raw or local URL
+    const targetUrl = quiz.rawUrl || `/${quiz.path}`;
+    window.open(targetUrl, '_blank');
   };
+
+  const handleDownloadHtml = () => {
+    if (!quiz || !renderedSrcDoc) return;
+    playNavSound();
+    const blob = new Blob([renderedSrcDoc], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = quiz.filename || 'quiz.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Keyboard shortcut listener (Esc to close, F11 for fullscreen, R for reload)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+        // Allow standard reload or capture
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  if (!quiz) return null;
+
+  const gitHubBlobUrl = quiz.gitHubUrl || `https://github.com/${ghConfig.owner}/${ghConfig.repo}/blob/${ghConfig.branch || 'main'}/${quiz.path}`;
+  const isPendingSync = quiz.syncStatus === 'pending_sync';
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex flex-col justify-between"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex flex-col justify-between"
     >
       {/* Top Player Action Bar */}
       <header className="h-12 bg-[#1f1f1f] border-b border-neutral-700/80 px-4 flex items-center justify-between text-neutral-100 select-none shrink-0 shadow-md">
@@ -229,9 +311,25 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
             <span className="text-[11px] text-neutral-400 hidden md:inline">
               ({quiz.category} · {quiz.questionCount} Questions)
             </span>
-            <span className="text-[10px] bg-blue-900/60 text-blue-300 border border-blue-700/50 px-1.5 py-0.5 rounded font-mono hidden sm:inline">
-              GitHub Live
-            </span>
+
+            {/* GitHub Live badge or Pending Sync badge */}
+            {isPendingSync ? (
+              <span className="text-[10px] bg-amber-900/60 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded font-mono hidden sm:inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                Local (Pending Sync)
+              </span>
+            ) : (
+              <a
+                href={gitHubBlobUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] bg-emerald-900/60 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded font-mono hidden sm:inline-flex items-center gap-1 hover:bg-emerald-800/80 transition-colors"
+                title="View commit source on GitHub"
+              >
+                <Github className="w-2.5 h-2.5" />
+                <span>GitHub Live</span>
+              </a>
+            )}
           </div>
         </div>
 
@@ -243,8 +341,35 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
           </div>
         )}
 
-        {/* Right: Controls (Download HTML, Share, Sound, Reload, Fullscreen, Open in Tab) */}
+        {/* Right: Controls (GitHub Link, Download HTML, Share, Sound, Reload, Fullscreen, Open in Tab) */}
         <div className="flex items-center gap-1.5">
+          {/* Push to GitHub button if pending */}
+          {isPendingSync && onSyncQuizToGitHub && (
+            <button
+              onClick={() => onSyncQuizToGitHub(quiz)}
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-md text-xs font-semibold transition-colors shadow-2xs"
+              title="Commit and push this quiz directly to GitHub repository"
+            >
+              <ArrowUpCircle className="w-3.5 h-3.5" />
+              <span>Push to GitHub</span>
+            </button>
+          )}
+
+          {/* View on GitHub button */}
+          {!isPendingSync && (
+            <a
+              href={gitHubBlobUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-md text-xs text-neutral-200 transition-colors border border-neutral-700"
+              title="View repository file source on GitHub"
+            >
+              <Github className="w-3.5 h-3.5 text-neutral-300" />
+              <span className="hidden sm:inline">GitHub</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+            </a>
+          )}
+
           {/* Download HTML */}
           <button
             onClick={handleDownloadHtml}
@@ -288,12 +413,12 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
             {isSound ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
           </button>
 
-          {/* Reload / Restart */}
+          {/* Reload / Sync from GitHub */}
           <button
             onClick={handleReload}
             className="p-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-md text-neutral-200 transition-colors border border-neutral-700"
-            title="Restart / Reload Quiz"
-            aria-label="Restart Quiz"
+            title="Re-fetch & Reload from GitHub"
+            aria-label="Reload Quiz"
           >
             <RotateCw className="w-4 h-4" />
           </button>
@@ -320,33 +445,38 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
         </div>
       </header>
 
-      {/* Sandboxed Interactive Quiz Viewport */}
-      <main className="flex-1 w-full h-[calc(100vh-3rem)] bg-[#0f172a] relative overflow-hidden">
+      {/* Main Sandbox Frame Container */}
+      <div className="flex-1 w-full bg-[#111] relative overflow-hidden flex items-center justify-center">
         {isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0f172a] text-neutral-300 z-20">
-            <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mb-3" />
-            <p className="text-sm font-semibold text-neutral-100">Loading quiz from GitHub...</p>
-            <p className="text-xs text-neutral-400 font-mono mt-1">{quiz.path}</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-900/90 text-white z-10">
+            <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mb-3" />
+            <p className="text-sm font-medium">Fetching quiz HTML from GitHub...</p>
+            <p className="text-xs text-neutral-400 mt-1 font-mono">
+              raw.githubusercontent.com/{ghConfig.owner}/{ghConfig.repo}/{ghConfig.branch || 'main'}/{quiz.path}
+            </p>
           </div>
         )}
 
-        {loadError && !isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0f172a] text-neutral-300 p-6 z-20 text-center">
-            <AlertTriangle className="w-10 h-10 text-rose-500 mb-3" />
-            <h3 className="text-base font-bold text-white mb-1">Failed to load quiz from GitHub</h3>
-            <p className="text-xs text-rose-300 font-mono mb-4 max-w-md">{loadError}</p>
+        {loadError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-900 p-6 text-center z-10">
+            <div className="w-12 h-12 rounded-full bg-rose-950/60 border border-rose-600/50 flex items-center justify-center text-rose-400 mb-3">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-semibold text-rose-300">Unable to load quiz from GitHub</h3>
+            <p className="text-xs text-neutral-400 max-w-md mt-1 mb-4 leading-relaxed">{loadError}</p>
             <div className="flex items-center gap-3">
               <button
                 onClick={handleReload}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
               >
-                Retry Fetch
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Retry GitHub Sync</span>
               </button>
               <button
-                onClick={handleOpenInNewTab}
-                className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg text-xs font-semibold"
+                onClick={onClose}
+                className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold rounded-lg transition-colors"
               >
-                Open Raw Link
+                Close
               </button>
             </div>
           </div>
@@ -357,11 +487,30 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
             ref={iframeRef}
             srcDoc={renderedSrcDoc}
             title={quiz.title}
-            sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-            className="w-full h-full border-none"
+            className="w-full h-full border-none bg-white shadow-2xl"
+            sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-modals"
+            allow="fullscreen; autoplay"
           />
         )}
-      </main>
+      </div>
+
+      {/* Bottom Information Sub-bar */}
+      <footer className="h-8 bg-[#181818] border-t border-neutral-800 px-4 flex items-center justify-between text-[11px] text-neutral-400 select-none shrink-0">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <span className="font-mono text-neutral-300 truncate">
+            {ghConfig.owner}/{ghConfig.repo} : {quiz.path}
+          </span>
+          {quiz.sha && (
+            <span className="text-[10px] text-neutral-500 font-mono hidden sm:inline">
+              (SHA: {quiz.sha.substring(0, 7)})
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-3 text-neutral-400 shrink-0">
+          <span className="hidden sm:inline">Stand-alone HTML Sandbox</span>
+          <span>Audio FX: {isSound ? 'ON' : 'OFF'}</span>
+        </div>
+      </footer>
     </div>
   );
 };

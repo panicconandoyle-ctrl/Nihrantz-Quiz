@@ -416,6 +416,167 @@ export async function fetchQuizRawHtml(quiz: QuizItem, config?: GitHubConfig): P
 }
 
 /**
+ * Move a quiz file on GitHub (commits to destination path, deletes from source path)
+ */
+export async function moveQuizOnGitHub(
+  quiz: QuizItem,
+  targetFolderPath: string,
+  config?: GitHubConfig
+): Promise<{ success: boolean; newPath?: string; error?: string }> {
+  const cfg = config || getStoredGithubConfig();
+  if (!cfg.token) {
+    return { success: false, error: 'GitHub Personal Access Token is required to move files on GitHub.' };
+  }
+
+  // 1. Fetch content of quiz
+  let content = quiz.htmlContent;
+  if (!content) {
+    try {
+      content = await fetchQuizRawHtml(quiz, cfg);
+    } catch (e) {
+      return { success: false, error: `Could not retrieve quiz content for ${quiz.filename}` };
+    }
+  }
+
+  const cleanDest = targetFolderPath.replace(/^\/+|\/+$/g, '');
+  const newPath = cleanDest ? `${cleanDest}/${quiz.filename}` : quiz.filename;
+
+  if (newPath === quiz.path) {
+    return { success: true, newPath };
+  }
+
+  // 2. Commit file to new location
+  const commitRes = await commitFileToGitHub(
+    cleanDest,
+    quiz.filename,
+    content,
+    `Move ${quiz.filename} to ${cleanDest} via Nihrantz Quiz Explorer`,
+    cfg
+  );
+
+  if (!commitRes.success) {
+    return { success: false, error: `Failed to write file to new location: ${commitRes.error}` };
+  }
+
+  // 3. Delete file from old location
+  const delRes = await deleteFileFromGitHub(
+    quiz.path,
+    quiz.sha,
+    `Remove old location after moving ${quiz.filename} to ${cleanDest}`,
+    cfg
+  );
+
+  if (!delRes.success) {
+    console.warn(`File created at ${newPath} but old file delete reported:`, delRes.error);
+  }
+
+  return { success: true, newPath };
+}
+
+/**
+ * Move an entire folder and all its contents on GitHub
+ */
+export async function moveFolderOnGitHub(
+  sourceFolderPath: string,
+  targetParentPath: string,
+  config?: GitHubConfig
+): Promise<{ success: boolean; error?: string; movedCount?: number }> {
+  const cfg = config || getStoredGithubConfig();
+  if (!cfg.token) {
+    return { success: false, error: 'GitHub Personal Access Token is required to move folders on GitHub.' };
+  }
+
+  const cleanSource = sourceFolderPath.replace(/^\/+|\/+$/g, '');
+  const cleanTargetParent = targetParentPath.replace(/^\/+|\/+$/g, '');
+  const folderName = cleanSource.split('/').pop() || 'folder';
+  const newFolderPath = cleanTargetParent ? `${cleanTargetParent}/${folderName}` : folderName;
+
+  if (cleanSource === newFolderPath) {
+    return { success: true, movedCount: 0 };
+  }
+
+  try {
+    // 1. Get git tree to locate all files under source folder
+    const treeRes = await fetch(
+      `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/git/trees/${cfg.branch || 'main'}?recursive=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${cfg.token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
+
+    if (!treeRes.ok) {
+      return { success: false, error: 'Failed to query git tree from GitHub.' };
+    }
+
+    const data = await treeRes.json();
+    const allEntries: GitTreeEntry[] = data.tree || [];
+    const sourceFiles = allEntries.filter((e) =>
+      e.type === 'blob' && (e.path === cleanSource || e.path.startsWith(`${cleanSource}/`))
+    );
+
+    if (sourceFiles.length === 0) {
+      // Create .gitkeep in new folder location
+      await commitFileToGitHub(
+        newFolderPath,
+        '.gitkeep',
+        `# Moved directory\n`,
+        `Move directory ${cleanSource} to ${newFolderPath}`,
+        cfg
+      );
+      return { success: true, movedCount: 0 };
+    }
+
+    // 2. For each file, fetch content, commit to new destination, and delete from old
+    let count = 0;
+    for (const file of sourceFiles) {
+      // Relative path within source folder
+      const relPath = file.path.substring(cleanSource.length).replace(/^\/+/, '');
+      const newFilePath = relPath ? `${newFolderPath}/${relPath}` : newFolderPath;
+      const newFileFolder = newFilePath.split('/').slice(0, -1).join('/') || 'quizzes';
+      const newFileName = newFilePath.split('/').pop() || 'file';
+
+      // Fetch blob content
+      const blobRes = await fetch(file.url, {
+        headers: {
+          Authorization: `Bearer ${cfg.token}`,
+          Accept: 'application/vnd.github.v3.raw',
+        },
+      });
+
+      if (!blobRes.ok) continue;
+      const fileContent = await blobRes.text();
+
+      // Commit to new path
+      await commitFileToGitHub(
+        newFileFolder,
+        newFileName,
+        fileContent,
+        `Move ${file.path} to ${newFilePath}`,
+        cfg
+      );
+
+      // Delete from old path
+      await deleteFileFromGitHub(
+        file.path,
+        file.sha,
+        `Delete old path ${file.path}`,
+        cfg
+      );
+
+      count++;
+    }
+
+    return { success: true, movedCount: count };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Error moving folder on GitHub';
+    return { success: false, error: msg };
+  }
+}
+
+/**
  * Tests connection to repository using provided credentials
  */
 export async function testGitHubConnection(config: GitHubConfig): Promise<{ valid: boolean; message: string; permissions?: string }> {
@@ -610,30 +771,132 @@ function buildTreeFromGitTreeEntries(entries: GitTreeEntry[], cfg: GitHubConfig)
 
       const categoryName = folderParts.length > 0 
         ? folderParts[0].charAt(0).toUpperCase() + folderParts[0].slice(1).replace(/_/g, ' ')
+        : filename.includes('immunology') || filename.includes('Untitled-1')
+        ? 'Immunology'
         : 'General';
-      const cleanTitle = filename.replace('.html', '').replace(/_/g, ' ');
+
+      let cleanTitle = filename.replace('.html', '').replace(/_/g, ' ');
+      if (filename === 'Untitled-1.html') {
+        cleanTitle = 'Clinical Assessment - Immunology Ch. 4';
+      } else if (filename === 'immunology_ch5_t_cell_mediated_immunity_quiz.html') {
+        cleanTitle = 'Immunology Ch. 5: T-Cell Mediated Immunity';
+      } else {
+        cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+      }
 
       targetFolder.quizzes = targetFolder.quizzes || [];
       targetFolder.quizzes.push({
         id: entry.sha || filename,
-        title: cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1),
+        title: cleanTitle,
         filename,
         path: entry.path,
         category: categoryName,
-        questionCount: 5,
-        estimatedMinutes: 4,
-        difficulty: 'Intermediate',
-        tags: ['github', categoryName.toLowerCase()],
+        questionCount: filename.includes('immunology') || filename.includes('Untitled-1') ? 10 : 5,
+        estimatedMinutes: filename.includes('immunology') || filename.includes('Untitled-1') ? 8 : 4,
+        difficulty: filename.includes('immunology') || filename.includes('Untitled-1') ? 'Advanced' : 'Intermediate',
+        tags: ['github', categoryName.toLowerCase(), 'synced'],
         dateModified: new Date().toISOString().split('T')[0],
         size: entry.size ? `${(entry.size / 1024).toFixed(1)} KB` : '4.5 KB',
         author: cfg.owner,
         rawUrl: `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch || 'main'}/${entry.path}`,
+        gitHubUrl: `https://github.com/${cfg.owner}/${cfg.repo}/blob/${cfg.branch || 'main'}/${entry.path}`,
         sha: entry.sha,
+        syncStatus: 'synced',
       });
     }
   }
 
   return root;
+}
+
+/**
+ * Fetch the latest commit on the GitHub repository branch
+ */
+export async function fetchLatestGitHubCommit(config?: GitHubConfig): Promise<{
+  sha: string;
+  message: string;
+  date: string;
+  author: string;
+} | null> {
+  const cfg = config || getStoredGithubConfig();
+  try {
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github.v3+json',
+    };
+    if (cfg.token) {
+      headers.Authorization = `Bearer ${cfg.token}`;
+    }
+    const res = await fetch(
+      `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/commits/${cfg.branch || 'main'}`,
+      { headers }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return {
+      sha: data.sha?.substring(0, 7) || '',
+      message: data.commit?.message?.split('\n')[0] || '',
+      date: data.commit?.author?.date || new Date().toISOString(),
+      author: data.commit?.author?.name || data.author?.login || cfg.owner,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Synchronize a local quiz file directly to GitHub
+ */
+export async function syncLocalQuizToGitHub(
+  quiz: QuizItem,
+  config?: GitHubConfig
+): Promise<{ success: boolean; error?: string; commitUrl?: string; sha?: string }> {
+  const cfg = config || getStoredGithubConfig();
+  if (!cfg.token) {
+    return {
+      success: false,
+      error: 'GitHub Personal Access Token (PAT with repo scope) is required to push changes to GitHub.',
+    };
+  }
+
+  // Obtain content
+  let content = quiz.htmlContent;
+  if (!content) {
+    try {
+      const candidatePaths = [
+        `/${quiz.path}`,
+        `/${quiz.filename}`,
+        `/quizzes/${quiz.filename}`,
+      ];
+      for (const p of candidatePaths) {
+        try {
+          const res = await fetch(p);
+          if (res.ok) {
+            content = await res.text();
+            if (content && content.trim().length > 0) break;
+          }
+        } catch (e) {}
+      }
+    } catch (e) {}
+  }
+
+  if (!content) {
+    return {
+      success: false,
+      error: `Could not read local content for ${quiz.path} to sync to GitHub.`,
+    };
+  }
+
+  const folderParts = quiz.path.split('/');
+  folderParts.pop(); // remove filename
+  const folderPath = folderParts.join('/') || 'quizzes';
+
+  return await commitFileToGitHub(
+    folderPath,
+    quiz.filename,
+    content,
+    `Sync ${quiz.filename} to GitHub via Nihrantz Quiz Explorer`,
+    cfg
+  );
 }
 
 function ensureFolderExists(root: FolderNode, parts: string[]): FolderNode {

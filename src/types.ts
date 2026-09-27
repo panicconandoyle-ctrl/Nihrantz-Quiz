@@ -18,6 +18,9 @@ export interface QuizItem {
   isUploaded?: boolean;
   rawUrl?: string;
   sha?: string;
+  gitHubUrl?: string;
+  syncStatus?: 'synced' | 'pending_sync' | 'local_only';
+  syncError?: string;
 }
 
 export interface FolderNode {
@@ -26,6 +29,8 @@ export interface FolderNode {
   path: string;
   folders: FolderNode[];
   quizzes: QuizItem[];
+  gitHubUrl?: string;
+  syncStatus?: 'synced' | 'pending_sync';
 }
 
 export interface QuizManifest {

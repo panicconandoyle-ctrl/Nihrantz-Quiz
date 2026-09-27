@@ -17,13 +17,17 @@ import { NewFolderModal } from './components/NewFolderModal';
 import { OwnerLoginModal } from './components/OwnerLoginModal';
 import { AdminConfigModal } from './components/AdminConfigModal';
 import { DeleteConfirmModal, DeleteItemTarget } from './components/DeleteConfirmModal';
+import { MoveItemModal, MoveTarget } from './components/MoveItemModal';
 import { 
   GitHubConfig, 
   getStoredGithubConfig, 
   hasAdminToken, 
   fetchGitHubQuizTree,
   deleteFileFromGitHub,
-  deleteFolderFromGitHub
+  deleteFolderFromGitHub,
+  syncLocalQuizToGitHub,
+  moveQuizOnGitHub,
+  moveFolderOnGitHub
 } from './services/githubService';
 import { 
   QuizManifest, 
@@ -43,7 +47,8 @@ import {
   isSoundEnabled, 
   setSoundEnabled, 
   playNavSound,
-  playSuccessChime
+  playSuccessChime,
+  playDropSound
 } from './utils/audio';
 
 export default function App() {
@@ -91,6 +96,11 @@ export default function App() {
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
+  // Move Management
+  const [moveTarget, setMoveTarget] = useState<MoveTarget | null>(null);
+  const [showMoveModal, setShowMoveModal] = useState<boolean>(false);
+  const [droppedDesktopFile, setDroppedDesktopFile] = useState<{ name: string; content: string } | null>(null);
+
   // GitHub Admin Mode & Configuration
   const [isAdminActive, setIsAdminActive] = useState<boolean>(() => hasAdminToken());
   const [showAdminModal, setShowAdminModal] = useState<boolean>(false);
@@ -101,64 +111,116 @@ export default function App() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   // Dynamic GitHub Sync State
-  const [isDynamicMode, setIsDynamicMode] = useState<boolean>(false);
+  const [isDynamicMode, setIsDynamicMode] = useState<boolean>(true);
   const [githubRepoInfo, setGithubRepoInfo] = useState<{ owner: string; repo: string }>(() => {
     const cfg = getStoredGithubConfig();
     return { owner: cfg.owner, repo: cfg.repo };
   });
 
-  // Dynamic Repository Fetching: Reads from GitHub REST API (Public or Authenticated)
+  // Dynamic Repository Fetching: Reads from GitHub REST API
   const [isLoadingRepo, setIsLoadingRepo] = useState<boolean>(true);
+  const [lastSyncTime, setLastSyncTime] = useState<string>('');
+  const [syncToast, setSyncToast] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
-  const loadRepositoryData = useCallback(async () => {
-    setIsLoadingRepo(true);
+  // Identify all quizzes that are pending sync to GitHub
+  const allCurrentQuizzes = useMemo(() => {
+    return getAllQuizzes(rootFolder);
+  }, [rootFolder]);
+
+  const pendingSyncQuizzes = useMemo(() => {
+    return allCurrentQuizzes.filter(q => q.syncStatus === 'pending_sync');
+  }, [allCurrentQuizzes]);
+
+  const loadRepositoryData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoadingRepo(true);
     const currentCfg = getStoredGithubConfig();
     setGhConfig(currentCfg);
     setGithubRepoInfo({ owner: currentCfg.owner, repo: currentCfg.repo });
     setIsAdminActive(hasAdminToken());
 
-    // Attempt to fetch live repository tree from GitHub REST API
+    // 1. Fetch live repository tree directly from GitHub REST API
+    let gitHubRoot: FolderNode | null = null;
     if (currentCfg.owner && currentCfg.repo) {
       try {
         const ghResult = await fetchGitHubQuizTree(currentCfg);
-        if (ghResult.success && ghResult.rootFolder && (ghResult.rootFolder.folders.length > 0 || ghResult.rootFolder.quizzes.length > 0)) {
-          const liveManifest: QuizManifest = {
-            name: `${currentCfg.owner}/${currentCfg.repo} Quizzes`,
-            version: 'GitHub Live',
-            lastUpdated: new Date().toISOString().split('T')[0],
-            folders: [ghResult.rootFolder],
-          };
-          setManifest(liveManifest);
-          setIsLoadingRepo(false);
-          return;
+        if (ghResult.success && ghResult.rootFolder) {
+          gitHubRoot = ghResult.rootFolder;
         }
       } catch (e) {
-        console.warn('GitHub live fetch failed, trying local manifest:', e);
+        console.warn('GitHub live fetch error:', e);
       }
     }
 
-    // Fallback: Fetch local quizzes.json
+    // 2. Fetch local manifest to discover any local quizzes not yet pushed to GitHub
+    let localManifest = defaultManifest;
     try {
       const res = await fetch('/quizzes.json');
       if (res.ok) {
         const data = await res.json();
         if (data && data.folders) {
-          setManifest(data);
-          setIsLoadingRepo(false);
-          return;
+          localManifest = data;
         }
       }
     } catch (e) {}
 
-    // Ultimate fallback: embedded defaultManifest
-    setManifest(defaultManifest);
-    setIsLoadingRepo(false);
+    const localQuizzes = getAllQuizzes(localManifest.folders[0] || defaultManifest.folders[0]);
+
+    // 3. Merge: If we have GitHub tree, merge any local quizzes not present in remote
+    if (gitHubRoot) {
+      const remoteQuizzes = getAllQuizzes(gitHubRoot);
+      const remotePaths = new Set(remoteQuizzes.map(q => q.path.toLowerCase()));
+
+      for (const lq of localQuizzes) {
+        if (!remotePaths.has(lq.path.toLowerCase())) {
+          // Local quiz needs sync to GitHub! Find or create target folder in gitHubRoot
+          const folderParts = lq.path.split('/');
+          folderParts.pop(); // remove filename
+          const targetPath = folderParts.join('/') || 'quizzes';
+
+          let targetFolder = findFolderByPath(gitHubRoot, targetPath);
+          if (!targetFolder) {
+            targetFolder = gitHubRoot;
+          }
+
+          targetFolder.quizzes = targetFolder.quizzes || [];
+          targetFolder.quizzes.push({
+            ...lq,
+            syncStatus: 'pending_sync',
+            isUploaded: true,
+          });
+        }
+      }
+
+      const mergedManifest: QuizManifest = {
+        name: `${currentCfg.owner}/${currentCfg.repo} Quizzes`,
+        version: 'GitHub Live Synchronized',
+        lastUpdated: new Date().toISOString().split('T')[0],
+        folders: [gitHubRoot],
+      };
+
+      setManifest(mergedManifest);
+      setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      if (!isSilent) setIsLoadingRepo(false);
+      return;
+    }
+
+    // Fallback: If GitHub network unavailable, use local manifest
+    setManifest(localManifest);
+    setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    if (!isSilent) setIsLoadingRepo(false);
   }, []);
 
-  // Load preferences from localStorage on mount and purge quiz/folder storage
+  // Periodic Auto-Sync from GitHub (checks for updates every 45s)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      loadRepositoryData(true);
+    }, 45000);
+    return () => clearInterval(timer);
+  }, [loadRepositoryData]);
+
+  // Initial load
   useEffect(() => {
     try {
-      // Purge all browser storage for quizzes and folders as required
       localStorage.removeItem('winquiz_uploaded_quizzes');
       localStorage.removeItem('winquiz_custom_folders');
       localStorage.removeItem('winquiz_deleted_items');
@@ -186,6 +248,153 @@ export default function App() {
 
     loadRepositoryData();
   }, [loadRepositoryData]);
+
+  // Push a single local quiz to GitHub
+  const handleSyncQuizToGitHub = async (quiz: QuizItem) => {
+    if (!isAdminActive) {
+      setLoginActionReason('GitHub Personal Access Token (PAT with repo scope) is required to push files to the repository.');
+      setShowAdminModal(true);
+      return;
+    }
+
+    setIsLoadingRepo(true);
+    setSyncToast({ type: 'info', text: `Pushing ${quiz.filename} to GitHub repository...` });
+    playNavSound();
+
+    const res = await syncLocalQuizToGitHub(quiz, ghConfig);
+    setIsLoadingRepo(false);
+
+    if (res.success) {
+      playSuccessChime();
+      setSyncToast({
+        type: 'success',
+        text: `Successfully synchronized ${quiz.filename} to ${ghConfig.owner}/${ghConfig.repo}!`,
+      });
+      await loadRepositoryData();
+    } else {
+      setSyncToast({
+        type: 'error',
+        text: `Sync to GitHub failed: ${res.error || 'Unknown error'}`,
+      });
+    }
+
+    setTimeout(() => setSyncToast(null), 4000);
+  };
+
+  // Push all pending local quizzes to GitHub
+  const handleSyncAllToGitHub = async () => {
+    if (!isAdminActive) {
+      setLoginActionReason('GitHub Personal Access Token is required to push pending items to GitHub.');
+      setShowAdminModal(true);
+      return;
+    }
+
+    if (pendingSyncQuizzes.length === 0) {
+      setSyncToast({ type: 'info', text: 'All quizzes are already synchronized with GitHub.' });
+      setTimeout(() => setSyncToast(null), 3000);
+      return;
+    }
+
+    setIsLoadingRepo(true);
+    setSyncToast({ type: 'info', text: `Pushing ${pendingSyncQuizzes.length} quiz(zes) to GitHub repository...` });
+    playNavSound();
+
+    let successCount = 0;
+    for (const q of pendingSyncQuizzes) {
+      const res = await syncLocalQuizToGitHub(q, ghConfig);
+      if (res.success) successCount++;
+    }
+
+    setIsLoadingRepo(false);
+    playSuccessChime();
+    setSyncToast({
+      type: 'success',
+      text: `Successfully synchronized ${successCount} of ${pendingSyncQuizzes.length} quiz(zes) to GitHub!`,
+    });
+    await loadRepositoryData();
+    setTimeout(() => setSyncToast(null), 4000);
+  };
+
+  // Manual Trigger Sync from GitHub
+  const handleTriggerSync = async () => {
+    playNavSound();
+    setSyncToast({ type: 'info', text: `Synchronizing from GitHub repository ${ghConfig.owner}/${ghConfig.repo}...` });
+    await loadRepositoryData();
+    playSuccessChime();
+    setSyncToast({
+      type: 'success',
+      text: `Live sync completed with GitHub: ${allCurrentQuizzes.length} quizzes loaded!`,
+    });
+    setTimeout(() => setSyncToast(null), 3000);
+  };
+
+  // Execute Move Operation (Files or Folders)
+  const handleConfirmMove = async (
+    target: MoveTarget,
+    destinationFolderPath: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    setIsLoadingRepo(true);
+    const itemName = target.type === 'quiz' ? target.quiz?.title : target.folder?.name;
+    setSyncToast({ type: 'info', text: `Moving ${itemName} to ${destinationFolderPath}...` });
+
+    if (target.type === 'quiz' && target.quiz) {
+      if (isAdminActive) {
+        const ghRes = await moveQuizOnGitHub(target.quiz, destinationFolderPath, ghConfig);
+        if (!ghRes.success) {
+          setIsLoadingRepo(false);
+          return { success: false, error: ghRes.error };
+        }
+      }
+    } else if (target.type === 'folder' && target.folder) {
+      if (isAdminActive) {
+        const ghRes = await moveFolderOnGitHub(target.folder.path, destinationFolderPath, ghConfig);
+        if (!ghRes.success) {
+          setIsLoadingRepo(false);
+          return { success: false, error: ghRes.error };
+        }
+      }
+    }
+
+    await loadRepositoryData();
+    playDropSound();
+    setSyncToast({
+      type: 'success',
+      text: `Successfully moved ${itemName} to ${destinationFolderPath}!`,
+    });
+    setTimeout(() => setSyncToast(null), 3500);
+
+    return { success: true };
+  };
+
+  // Handle Drag and Drop of items onto a folder
+  const handleDropOnFolder = async (
+    source: { type: 'quiz' | 'folder'; quiz?: QuizItem; folder?: FolderNode },
+    targetFolderPath: string
+  ) => {
+    if (source.type === 'quiz' && source.quiz) {
+      // Check if dropped onto same parent folder
+      const currentParent = source.quiz.path.split('/').slice(0, -1).join('/') || 'quizzes';
+      if (currentParent === targetFolderPath) return;
+      await handleConfirmMove({ type: 'quiz', quiz: source.quiz }, targetFolderPath);
+    } else if (source.type === 'folder' && source.folder) {
+      if (source.folder.path === targetFolderPath || targetFolderPath.startsWith(source.folder.path + '/')) return;
+      await handleConfirmMove({ type: 'folder', folder: source.folder }, targetFolderPath);
+    }
+  };
+
+  // Handle External Desktop File Drag and Drop into viewport
+  const handleDropExternalFile = (file: File) => {
+    if (!file.name.endsWith('.html')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      if (content) {
+        setDroppedDesktopFile({ name: file.name, content });
+        setShowUploadModal(true);
+      }
+    };
+    reader.readAsText(file);
+  };
 
   // Sync theme changes with DOM
   const handleToggleTheme = () => {
@@ -231,7 +440,6 @@ export default function App() {
     if (cleanPath === currentPath) return;
 
     setCurrentPath(cleanPath);
-    // Push to history
     const updatedHistory = navHistory.slice(0, historyIndex + 1);
     updatedHistory.push(cleanPath);
     setNavHistory(updatedHistory);
@@ -268,16 +476,6 @@ export default function App() {
     const parts = currentPath.split('/');
     parts.pop();
     handleNavigatePath(parts.join('/'));
-  };
-
-  // Refresh current folder
-  const handleRefresh = () => {
-    fetch('/quizzes.json')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.folders) setManifest(data);
-      })
-      .catch(() => {});
   };
 
   // Favorites toggle
@@ -328,6 +526,7 @@ export default function App() {
   // Authentication Request Gatekeepers
   const handleRequestUpload = () => {
     if (isOwnerLoggedIn || isAdminActive) {
+      setDroppedDesktopFile(null);
       setShowUploadModal(true);
     } else {
       setLoginActionReason('Admin authorization (GitHub token) or Owner login is required to upload new HTML quizzes.');
@@ -383,18 +582,18 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  // Handle quiz committed to GitHub: refresh repository data directly from GitHub
+  // Handle quiz committed to GitHub
   const handleQuizCommitted = async () => {
     await loadRepositoryData();
   };
 
-  // Handle folder created on GitHub: refresh repository data and navigate to new folder
+  // Handle folder created on GitHub
   const handleFolderCreated = async (newFolderPath: string) => {
     await loadRepositoryData();
     handleNavigatePath(newFolderPath);
   };
 
-  // Item Deletion Handlers (Owner/Admin authenticated)
+  // Item Deletion Handlers
   const handleRequestDeleteQuiz = (quiz: QuizItem) => {
     if (!isOwnerLoggedIn && !isAdminActive) {
       setLoginActionReason('Owner login or GitHub Admin credentials required to delete quizzes.');
@@ -460,58 +659,20 @@ export default function App() {
   const handleApplyDynamicTree = async (owner: string, repo: string): Promise<boolean> => {
     try {
       setGithubRepoInfo({ owner, repo });
-      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/quizzes`;
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        throw new Error(`GitHub API returned status ${response.status}`);
+      const currentCfg = { ...ghConfig, owner, repo };
+      setGhConfig(currentCfg);
+      const ghResult = await fetchGitHubQuizTree(currentCfg);
+      if (ghResult.success && ghResult.rootFolder) {
+        setManifest({
+          name: `${owner}/${repo} Quizzes`,
+          version: "GitHub Live Synchronized",
+          lastUpdated: new Date().toISOString().split('T')[0],
+          folders: [ghResult.rootFolder]
+        });
+        setIsDynamicMode(true);
+        return true;
       }
-      const data = await response.json();
-      if (!Array.isArray(data)) return false;
-
-      // Build folder tree dynamically from GitHub public contents
-      const dynamicFolder: FolderNode = {
-        id: 'root-quizzes',
-        name: 'quizzes',
-        path: 'quizzes',
-        folders: [],
-        quizzes: []
-      };
-
-      for (const item of data) {
-        if (item.type === 'dir') {
-          dynamicFolder.folders.push({
-            id: item.name,
-            name: item.name,
-            path: `quizzes/${item.name}`,
-            folders: [],
-            quizzes: []
-          });
-        } else if (item.name.endsWith('.html')) {
-          const cleanTitle = item.name.replace('.html', '').replace(/_/g, ' ');
-          dynamicFolder.quizzes.push({
-            id: item.name,
-            title: cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1),
-            filename: item.name,
-            path: `quizzes/${item.name}`,
-            category: 'Dynamic GitHub',
-            questionCount: 5,
-            estimatedMinutes: 3,
-            difficulty: 'Intermediate',
-            tags: ['github', 'dynamic'],
-            dateModified: new Date().toISOString().split('T')[0],
-            size: `${(item.size / 1024).toFixed(1)} KB`
-          });
-        }
-      }
-
-      setManifest({
-        name: `${owner}/${repo} Quizzes`,
-        version: "Dynamic API",
-        lastUpdated: new Date().toISOString().split('T')[0],
-        folders: [dynamicFolder]
-      });
-      setIsDynamicMode(true);
-      return true;
+      return false;
     } catch (e) {
       console.warn("GitHub API error, using default manifest:", e);
       return false;
@@ -583,7 +744,20 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans">
-      {/* 1. Windows 11 Title Bar */}
+      {/* Toast Notification */}
+      {syncToast && (
+        <div className={`fixed top-12 right-4 z-50 px-4 py-2 rounded-lg shadow-xl text-xs font-medium flex items-center gap-2 border transition-all animate-bounce ${
+          syncToast.type === 'success' 
+            ? 'bg-emerald-600 text-white border-emerald-500' 
+            : syncToast.type === 'error'
+            ? 'bg-rose-600 text-white border-rose-500'
+            : 'bg-blue-600 text-white border-blue-500'
+        }`}>
+          <span>{syncToast.text}</span>
+        </div>
+      )}
+
+      {/* 1. Windows 11 Title Bar with GitHub Live Synchronized status */}
       <TitleBar
         currentPath={currentPath}
         isDark={isDark}
@@ -602,9 +776,14 @@ export default function App() {
         onLogoutOwner={handleLogoutOwner}
         isAdminActive={isAdminActive}
         onOpenAdminConfig={() => setShowAdminModal(true)}
+        ghConfig={ghConfig}
+        isSyncing={isLoadingRepo}
+        lastSyncTime={lastSyncTime}
+        pendingSyncCount={pendingSyncQuizzes.length}
+        onTriggerSync={handleTriggerSync}
       />
 
-      {/* 2. Ribbon & Command / Breadcrumb Bar */}
+      {/* 2. Ribbon & Command / Breadcrumb Bar with GitHub Sync tools */}
       <CommandBar
         currentPath={currentPath}
         canGoBack={historyIndex > 0}
@@ -612,7 +791,7 @@ export default function App() {
         onGoBack={handleGoBack}
         onGoForward={handleGoForward}
         onGoUp={handleGoUp}
-        onRefresh={loadRepositoryData}
+        onRefresh={handleTriggerSync}
         onNavigatePath={handleNavigatePath}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -629,6 +808,10 @@ export default function App() {
         isOwnerLoggedIn={isOwnerLoggedIn}
         isAdminActive={isAdminActive}
         onOpenAdminConfig={() => setShowAdminModal(true)}
+        ghConfig={ghConfig}
+        isSyncing={isLoadingRepo}
+        pendingSyncCount={pendingSyncQuizzes.length}
+        onSyncAllToGitHub={handleSyncAllToGitHub}
       />
 
       {/* 3. Main Workspace: Sidebar + Explorer Content */}
@@ -641,6 +824,7 @@ export default function App() {
           recentQuizzes={recentCompletedQuizObjects}
           isOpen={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
+          onDropOnFolder={handleDropOnFolder}
         />
 
         <ExplorerContent
@@ -657,15 +841,24 @@ export default function App() {
           canManageItems={isOwnerLoggedIn || isAdminActive}
           onRequestDeleteQuiz={handleRequestDeleteQuiz}
           onRequestDeleteFolder={handleRequestDeleteFolder}
+          onSyncQuizToGitHub={handleSyncQuizToGitHub}
+          ghConfig={ghConfig}
+          onDropOnFolder={handleDropOnFolder}
+          onRequestMoveItem={(target) => {
+            setMoveTarget(target);
+            setShowMoveModal(true);
+          }}
+          onDropExternalFile={handleDropExternalFile}
         />
       </div>
 
-      {/* 4. Interactive HTML Quiz Player Modal */}
+      {/* 4. Interactive HTML Quiz Player Modal with distinct correct/incorrect sound effects */}
       {activeQuiz && (
         <QuizPlayerModal
           quiz={activeQuiz}
           onClose={() => setActiveQuiz(null)}
           onRecordScore={handleRecordScore}
+          onSyncQuizToGitHub={handleSyncQuizToGitHub}
         />
       )}
 
@@ -675,7 +868,7 @@ export default function App() {
         onClose={() => setShowDonation(false)}
       />
 
-      {/* 6. GitHub Auto-Discovery Modal */}
+      {/* 6. GitHub Two-Way Sync Modal */}
       <GitHubSyncModal
         isOpen={showGitHubSync}
         onClose={() => setShowGitHubSync(false)}
@@ -685,6 +878,12 @@ export default function App() {
         onToggleDynamicMode={(enabled) => {
           setIsDynamicMode(enabled);
           if (!enabled) loadRepositoryData();
+        }}
+        pendingQuizzes={pendingSyncQuizzes}
+        onSyncAllToGitHub={handleSyncAllToGitHub}
+        onOpenAdminConfig={() => {
+          setShowGitHubSync(false);
+          setShowAdminModal(true);
         }}
       />
 
@@ -697,7 +896,10 @@ export default function App() {
       {/* 8. Upload & Add HTML Quiz Modal */}
       <UploadQuizModal
         isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
+        onClose={() => {
+          setShowUploadModal(false);
+          setDroppedDesktopFile(null);
+        }}
         rootFolder={rootFolder}
         currentPath={currentPath}
         onGitHubCommitted={handleQuizCommitted}
@@ -705,6 +907,7 @@ export default function App() {
           setShowUploadModal(false);
           setShowAdminModal(true);
         }}
+        initialFile={droppedDesktopFile}
       />
 
       {/* 9. Create New Folder Modal */}
@@ -755,6 +958,18 @@ export default function App() {
           setIsDeleteModalOpen(false);
           setShowAdminModal(true);
         }}
+      />
+
+      {/* 13. Move File or Folder Modal */}
+      <MoveItemModal
+        isOpen={showMoveModal}
+        onClose={() => {
+          setShowMoveModal(false);
+          setMoveTarget(null);
+        }}
+        target={moveTarget}
+        rootFolder={rootFolder}
+        onConfirmMove={handleConfirmMove}
       />
     </div>
   );

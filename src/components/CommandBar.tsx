@@ -17,7 +17,11 @@ import {
   Upload,
   FolderPlus,
   Download,
-  Lock
+  Lock,
+  Github,
+  ExternalLink,
+  RefreshCw,
+  ArrowUpCircle
 } from 'lucide-react';
 import { ViewMode, SortField, SortDirection } from '../types';
 import { playNavSound } from '../utils/audio';
@@ -46,6 +50,10 @@ interface CommandBarProps {
   isOwnerLoggedIn: boolean;
   isAdminActive: boolean;
   onOpenAdminConfig: () => void;
+  ghConfig: { owner: string; repo: string; branch: string };
+  isSyncing?: boolean;
+  pendingSyncCount?: number;
+  onSyncAllToGitHub?: () => void;
 }
 
 export const CommandBar: React.FC<CommandBarProps> = ({
@@ -70,6 +78,10 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   isOwnerLoggedIn,
   isAdminActive,
   onOpenAdminConfig,
+  ghConfig,
+  isSyncing = false,
+  pendingSyncCount = 0,
+  onSyncAllToGitHub,
 }) => {
   const [copiedPath, setCopiedPath] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -83,6 +95,8 @@ export const CommandBar: React.FC<CommandBarProps> = ({
     setTimeout(() => setCopiedPath(false), 2000);
   };
 
+  const folderGitHubUrl = `https://github.com/${ghConfig.owner}/${ghConfig.repo}/tree/${ghConfig.branch || 'main'}/${currentPath}`;
+
   return (
     <div className="bg-[#f9f9f9] dark:bg-[#252525] border-b border-neutral-200 dark:border-neutral-800 px-3 py-1.5 flex flex-col md:flex-row items-stretch md:items-center gap-2 select-none text-xs">
       {/* Top / Left: Navigation controls + Address Bar */}
@@ -92,7 +106,6 @@ export const CommandBar: React.FC<CommandBarProps> = ({
           <button
             onClick={() => {
               playNavSound();
-              // Back handled by parent
             }}
             disabled={!canGoBack}
             className={`p-1.5 rounded-md transition-colors ${
@@ -134,16 +147,22 @@ export const CommandBar: React.FC<CommandBarProps> = ({
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
 
+          {/* Sync / Refresh from GitHub Button */}
           <button
             onClick={() => {
               playNavSound();
               onRefresh();
             }}
-            className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-700/60 text-neutral-700 dark:text-neutral-200 rounded-md transition-colors"
-            title="Refresh folder contents"
-            aria-label="Refresh"
+            disabled={isSyncing}
+            className={`p-1.5 rounded-md transition-colors flex items-center gap-1 ${
+              isSyncing
+                ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/40 cursor-wait'
+                : 'hover:bg-neutral-200 dark:hover:bg-neutral-700/60 text-neutral-700 dark:text-neutral-200'
+            }`}
+            title="Synchronize live from GitHub (pull latest commits & quizzes)"
+            aria-label="Sync from GitHub"
           >
-            <RotateCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
@@ -186,9 +205,22 @@ export const CommandBar: React.FC<CommandBarProps> = ({
             })}
           </div>
 
+          {/* Open Current Folder in GitHub */}
+          <a
+            href={folderGitHubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 shrink-0 transition-colors ml-1 flex items-center gap-0.5"
+            title={`View ${currentPath} folder on GitHub`}
+          >
+            <Github className="w-3 h-3" />
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
+
           <button
             onClick={handleCopyPath}
-            className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 shrink-0 transition-colors ml-1"
+            className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 shrink-0 transition-colors ml-0.5"
             title="Copy path to clipboard"
             aria-label="Copy Path"
           >
@@ -199,6 +231,21 @@ export const CommandBar: React.FC<CommandBarProps> = ({
 
       {/* Center/Right: Action Buttons + Search Box + View Switcher + Sort */}
       <div className="flex items-center gap-1.5 shrink-0 justify-between md:justify-end flex-wrap">
+        {/* Sync to GitHub Button (Shown if there are pending items) */}
+        {pendingSyncCount > 0 && onSyncAllToGitHub && (
+          <button
+            onClick={() => {
+              playNavSound();
+              onSyncAllToGitHub();
+            }}
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-md font-semibold text-xs transition-colors shadow-2xs h-8 animate-pulse"
+            title={`${pendingSyncCount} local quiz(zes) pending sync to GitHub (Click to push now)`}
+          >
+            <ArrowUpCircle className="w-3.5 h-3.5" />
+            <span>Sync to GitHub ({pendingSyncCount})</span>
+          </button>
+        )}
+
         {/* Windows 11 Ribbon Action Buttons */}
         <div className="flex items-center gap-1">
           {/* Admin / Public Status Badge */}
@@ -227,7 +274,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
                   onOpenUpload();
                 }}
                 className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold text-xs transition-colors shadow-2xs h-8"
-                title="Upload HTML Quiz file or commit directly to GitHub repository"
+                title="Upload HTML Quiz file and commit directly to GitHub repository"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Upload Quiz</span>
@@ -239,7 +286,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
                   onOpenNewFolder();
                 }}
                 className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-[#1f1f1f] border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 rounded-md font-medium text-xs transition-colors h-8"
-                title="Create a new subfolder in current directory"
+                title="Create a new subfolder permanently in GitHub"
               >
                 <FolderPlus className="w-3.5 h-3.5 text-amber-500" />
                 <span className="hidden sm:inline">New Folder</span>
@@ -261,7 +308,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
         </div>
 
         {/* Search Box */}
-        <div className="relative flex items-center bg-white dark:bg-[#1f1f1f] border border-neutral-200 dark:border-neutral-700 rounded-md px-2.5 py-1 text-neutral-700 dark:text-neutral-200 shadow-2xs h-8 w-full md:w-56 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+        <div className="relative flex items-center bg-white dark:bg-[#1f1f1f] border border-neutral-200 dark:border-neutral-700 rounded-md px-2.5 py-1 text-neutral-700 dark:text-neutral-200 shadow-2xs h-8 w-full md:w-52 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
           <Search className="w-3.5 h-3.5 text-neutral-400 shrink-0 mr-1.5" />
           <input
             type="text"
