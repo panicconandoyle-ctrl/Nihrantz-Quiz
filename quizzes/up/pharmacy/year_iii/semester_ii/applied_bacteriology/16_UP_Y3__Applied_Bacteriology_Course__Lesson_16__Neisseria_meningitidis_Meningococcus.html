@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 16: Neisseria meningitidis Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Progress */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #c8d1ff;
+      color: #4255ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .meta-counts {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #e6e9f2;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    /* Question Overview Modal / Grid */
+    .grid-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .grid-card.active {
+      display: block;
+    }
+
+    .grid-card h3 {
+      font-size: 0.9rem;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-btn {
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      border-color: #b8c4ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.current {
+      border: 2px solid #4255ff;
+      font-weight: bold;
+      box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.18);
+    }
+
+    /* Main Question Card */
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .q-number-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .question-stem {
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:hover:not(:disabled) {
+      border-color: #4255ff;
+      background: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .opt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #646f90;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 3px;
+    }
+
+    .opt-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* Feedback styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-tile.correct .opt-badge {
+      background: #18ae79;
+      color: #ffffff;
+    }
+    .option-tile.correct .opt-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-tile.incorrect .opt-badge {
+      background: #ff6871;
+      color: #ffffff;
+    }
+    .option-tile.incorrect .opt-tag {
+      display: inline-block;
+      background: #b31d27;
+      color: #ffffff;
+    }
+
+    /* Explanation Card */
+    .rationale-card {
+      margin-top: 20px;
+      background: #fbfcfe;
+      border: 1px solid #e0e5f2;
+      border-left: 4px solid #4255ff;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #2e3856;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-nav.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Scorecard / Results View */
+    .scorecard {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .scorecard.active {
+      display: block;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4255ff;
+      margin: 0 auto 20px;
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+    }
+
+    .score-breakdown {
+      font-size: 1rem;
+      color: #646f90;
+      margin-bottom: 24px;
+    }
+
+    .score-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 110px;
+    }
+
+    .stat-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .stat-val.correct { color: #0e6948; }
+    .stat-val.incorrect { color: #b31d27; }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: #646f90;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Footer & Branding */
+    .footer-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 0.88rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #2e3856;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      border: 1px solid #e0e5f2;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header / Progress Bar -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Lesson 16: Neisseria meningitidis Comprehensive Quiz</h1>
+          <p>Applied Bacteriology Course &bull; 30 High-Yield Test Questions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-toggle-grid" id="toggleGridBtn" onclick="toggleGrid()">View List</button>
+          <div class="meta-counts" id="metaCounter">1 / 30</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Question Overview Grid -->
+    <div class="grid-card" id="gridCard">
+      <h3>Question Navigator</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div class="quiz-card" id="quizCard">
+      <span class="q-number-tag" id="qNumberTag">Question 1</span>
+      <div class="question-stem" id="questionStem">Loading question...</div>
+      
+      <div class="options-group" id="optionsGroup"></div>
+
+      <div class="rationale-card" id="rationaleCard">
+        <div class="rationale-title">Explanation & Rationale</div>
+        <div class="rationale-text" id="rationaleText"></div>
+      </div>
+
+      <div class="nav-controls">
+        <button class="btn-nav" id="prevBtn" onclick="navigate(-1)">Previous</button>
+        <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard Interface -->
+    <div class="scorecard" id="scorecard">
+      <div class="score-circle" id="scoreCircle">0%</div>
+      <h2 class="score-title" id="scoreTitle">Exam Completed!</h2>
+      <p class="score-breakdown" id="scoreBreakdown">You answered 0 out of 30 questions correctly.</p>
+      
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val correct" id="statCorrect">0</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val incorrect" id="statIncorrect">0</div>
+          <div class="stat-lbl">Incorrect</div>
+        </div>
+      </div>
+
+      <button class="btn-nav primary" style="padding: 12px 28px;" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer & Attribution -->
+    <div class="footer-card">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+        <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+        <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the microscopic morphology and Gram reaction of Neisseria meningitidis?",
+        options: [
+          "Gram-positive lancet-shaped diplococci arranged in chains",
+          "Gram-negative diplococci with adjacent sides flattened, showing a classic 'coffee-bean' shape",
+          "Gram-negative pleomorphic rods with bipolar metachromatic granules",
+          "Acid-fast bacilli exhibiting branching filamentous cords"
+        ],
+        correct: 1,
+        explanation: "Neisseria meningitidis is a Gram-negative diplococcus (~1 µm in diameter) with adjacent flattened sides, characteristically resembling coffee beans or kidney beans."
+      },
+      {
+        q: "Which major structural virulence factor is present in Neisseria meningitidis but completely absent in Neisseria gonorrhoeae?",
+        options: [
+          "Pili (fimbriae)",
+          "Polysaccharide capsule",
+          "Outer membrane lipooligosaccharide (LOS)",
+          "Porin proteins"
+        ],
+        correct: 1,
+        explanation: "N. meningitidis possesses an antiphagocytic polysaccharide capsule that defines its serogroups and protects it during bacteremia. N. gonorrhoeae does not produce a capsule."
+      },
+      {
+        q: "How are Neisseria meningitidis and Neisseria gonorrhoeae distinguished by carbohydrate acid production?",
+        options: [
+          "N. meningitidis produces acid from glucose and maltose, while N. gonorrhoeae produces acid from glucose only",
+          "N. meningitidis ferments maltose only, while N. gonorrhoeae ferments lactose only",
+          "N. meningitidis ferments sucrose and lactose, while N. gonorrhoeae ferments glucose",
+          "N. meningitidis produces gas from glucose, while N. gonorrhoeae produces acid without gas"
+        ],
+        correct: 0,
+        explanation: "Both pathogenic Neisseria ferment sugars without producing gas: N. meningitidis is positive for Glucose and Maltose (Meningococcus = Maltose + Glucose), whereas N. gonorrhoeae utilizes Glucose only."
+      },
+      {
+        q: "On what antigenic component is the classification of Neisseria meningitidis serogroups based?",
+        options: [
+          "Outer membrane opacity proteins (Opa)",
+          "Flagellar H antigens",
+          "Antigenic specificity of the polysaccharide capsule",
+          "Lipooligosaccharide core heptose structures"
+        ],
+        correct: 2,
+        explanation: "Meningococcal serogroups (e.g., A, B, C, W-135, Y) are classified based on the unique chemical composition and immunochemical specificity of their polysaccharide capsules."
+      },
+      {
+        q: "What atmospheric conditions promote optimal in vitro recovery and colony growth of Neisseria meningitidis?",
+        options: [
+          "Strict anaerobic atmosphere with zero dissolved oxygen",
+          "Aerobic incubation supplemented with 5–10% CO₂ (capnophilic) at 35–37°C in a humid environment",
+          "Microaerophilic environment at 45°C without humidity",
+          "Cold-room refrigeration at 4°C under ambient room light"
+        ],
+        correct: 1,
+        explanation: "N. meningitidis is fastidious and capnophilic, requiring enriched culture media (blood or chocolate agar), 5–10% CO₂, humidity, and body temperature (35–37°C)."
+      },
+      {
+        q: "What is the natural reservoir and primary carriage site of Neisseria meningitidis in the human population?",
+        options: [
+          "Lower gastrointestinal tract of cattle and swine",
+          "Nasopharynx of humans, carried asymptomatically in approximately 10% of healthy individuals",
+          "Soil and freshwater sediments in tropical river valleys",
+          "Anterior skin folds of immunocompromised hospital patients"
+        ],
+        correct: 1,
+        explanation: "Humans are the sole natural hosts. The meningococcus colonizes the nasopharyngeal mucosa as an asymptomatic commensal in roughly 10% of healthy individuals, who serve as the transmission reservoir."
+      },
+      {
+        q: "By which primary route is Neisseria meningitidis transmitted between human hosts?",
+        options: [
+          "Ingestion of contaminated food or unpasteurized dairy products",
+          "Inhalation of aerosolized respiratory droplets and close salivary contact",
+          "Direct percutaneous inoculation from contaminated surgical blades",
+          "Bites from blood-feeding arthropod vectors"
+        ],
+        correct: 1,
+        explanation: "Transmission occurs through the inhalation of large-droplet aerosolized respiratory tract secretions or direct contact with saliva (coughing, sneezing, kissing, or sharing eating utensils)."
+      },
+      {
+        q: "In which seasonal pattern and epidemiological setting does meningococcal transmission peak most dramatically?",
+        options: [
+          "Warm, highly humid summer months among solitary agricultural workers",
+          "Dry, cold months of the year in crowded congregate settings (schools, university dormitories, military barracks)",
+          "Late autumn exclusively following sea floods",
+          "Spring thaw in sparsely populated rural alpine areas"
+        ],
+        correct: 1,
+        explanation: "Meningococcal disease incidence peaks in cold, dry months and spreads rapidly in crowded congregate settings like military barracks, college dormitories, and boarding schools."
+      },
+      {
+        q: "Which host immune deficiency confers an extraordinarily high risk for recurrent, fulminant systemic meningococcal infections?",
+        options: [
+          "Deficiencies in late terminal complement components (C5–C9)",
+          "Selective absence of salivary amylase",
+          "Isolated deficiency of circulating IgE antibodies",
+          "Congenital lactase deficiency"
+        ],
+        correct: 0,
+        explanation: "The terminal complement pathway (membrane attack complex, MAC, C5b–C9) is essential for bactericidal lysis of Neisseria. Individuals with deficiencies in C5, C6, C7, C8, or C9 have up to a 10,000-fold higher risk of systemic meningococcal disease."
+      },
+      {
+        q: "Which meningococcal serogroups are classically responsible for devastating, large-scale epidemic waves in the 'Meningitis Belt' of sub-Saharan Africa?",
+        options: [
+          "Serogroups B and C",
+          "Serogroups A and W-135",
+          "Serogroups X and Z exclusively",
+          "Serogroups D and K"
+        ],
+        correct: 1,
+        explanation: "Serogroup A (and increasingly W-135) has historically caused massive recurrent seasonal epidemics across the African Meningitis Belt."
+      },
+      {
+        q: "What initial structural appendage mediates the adherence of Neisseria meningitidis to non-ciliated microvilli in the human nasopharynx?",
+        options: [
+          "Lipid A acyl chains",
+          "Pili (fimbriae)",
+          "Peritrichous flagella",
+          "Terminal endospores"
+        ],
+        correct: 1,
+        explanation: "Initial attachment of meningococci to the apical microvilli of non-ciliated nasopharyngeal epithelial cells is mediated by proteinaceous surface pili."
+      },
+      {
+        q: "By what pathway does Neisseria meningitidis cross the epithelial barrier after nasopharyngeal colonization?",
+        options: [
+          "Bacteria are internalized within membrane-bound endocytic vacuoles, transcytose intact through the cytoplasm, and exit into the submucosa",
+          "Bacterial neurotoxins dissolve the basolateral membrane within minutes",
+          "Active amoeboid motility allows them to crawl through nuclear pores",
+          "Enzymatic liquefaction of host bone tissue by hyaluronidase"
+        ],
+        correct: 0,
+        explanation: "Meningococci enter mucosal cells via receptor-mediated endocytosis, are transported across the cytoplasm inside membrane-bound vacuoles, and undergo exocytosis into the submucosal vascular bed."
+      },
+      {
+        q: "Which bacterial component of Neisseria meningitidis is primarily responsible for triggering endothelial injury, petechial hemorrhages, DIC, and septic shock?",
+        options: [
+          "Tetanospasmin-like neurotoxin",
+          "Outer membrane Lipooligosaccharide (LOS) endotoxin",
+          "Capsular sialic acid polymers",
+          "Extracellular lecithinase"
+        ],
+        correct: 1,
+        explanation: "Meningococcal outer membrane lipooligosaccharide (LOS) sheds in large amounts during intravascular replication. Its lipid A moiety triggers massive inflammatory cytokine release (TNF-α, IL-1), leading to diffuse endothelial necrosis, vasculitis, DIC, and cardiovascular collapse."
+      },
+      {
+        q: "How does the polysaccharide capsule of Neisseria meningitidis protect the organism during systemic intravascular dissemination?",
+        options: [
+          "It inhibits phagocytosis by polymorphonuclear leukocytes and blocks complement-mediated bactericidal killing",
+          "It actively ferments serum albumin into glucose",
+          "It secretes penicillinase directly into the vascular lumen",
+          "It prevents the binding of rifampin to bacterial RNA polymerase"
+        ],
+        correct: 0,
+        explanation: "The meningococcal capsule creates a protective barrier that physically hinders opsonization, prevents phagocytosis by circulating neutrophils, and blocks insertion of the complement membrane attack complex."
+      },
+      {
+        q: "What mechanism of 'molecular mimicry' enables Neisseria meningitidis Serogroup B to evade host immune detection?",
+        options: [
+          "Its polysaccharide capsule is chemically identical to polysialic acid found on human neural cell adhesion molecules (NCAM)",
+          "Its outer membrane porins are identical to human hemoglobin beta-chains",
+          "Its pili structurally mirror human keratin fibers",
+          "Its peptidoglycan mimics host collagen fibers"
+        ],
+        correct: 0,
+        explanation: "The Serogroup B capsule is composed of alpha-2,8-linked polysialic acid, which is structurally identical to sialic acid residues on human fetal and adult brain tissues (NCAM). The host immune system recognizes it as 'self', making it poorly immunogenic."
+      },
+      {
+        q: "How does the incorporation of host-derived sialic acid into meningococcal LOS enhance bacterial immune survival?",
+        options: [
+          "It directly converts LOS into a coagulase enzyme",
+          "It binds host Serum Factor H, which downregulates alternative complement pathway activation on the bacterial surface",
+          "It causes immediate lysis of host erythrocytes",
+          "It neutralizes third-generation cephalosporins upon contact"
+        ],
+        correct: 1,
+        explanation: "By sialylating its LOS side chains, N. meningitidis recruits host Factor H—a natural negative regulator of the alternative complement cascade—downregulating complement deposition and protecting the bacterium from lysis."
+      },
+      {
+        q: "What is the triad of clinical signs classically suggestive of acute meningococcal meningitis?",
+        options: [
+          "Severe headache, high fever, and meningeal irritation signs (stiff neck / nuchal rigidity, photophobia)",
+          "Ascending flaccid paralysis, dry mouth, and ptosis",
+          "Profuse watery rice-water diarrhea, hypothermia, and muscle cramps",
+          "Migratory polyarthralgia, jaundice, and right upper quadrant tenderness"
+        ],
+        correct: 0,
+        explanation: "Acute bacterial meningitis classically presents with a sudden onset of high fever, severe headache, and meningeal irritation signs including nuchal rigidity (stiff neck), photophobia, and altered mental status."
+      },
+      {
+        q: "What type of skin eruption classically heralds the onset of severe meningococcemia?",
+        options: [
+          "Pruritic wheals that resolve within 30 minutes",
+          "Petechial rash (small, pinpoint red/purple macules) that rapidly coalesces into large ecchymotic or purpuric hemorrhagic lesions",
+          "Diffuse honey-colored crusted erosions confined to the face",
+          "Target-like erythematous plaques with central vesicular clearing"
+        ],
+        correct: 1,
+        explanation: "Meningococcemia manifests with a characteristic petechial rash on the trunk and lower extremities that rapidly progresses into extensive ecchymoses, purpura fulminans, and cutaneous gangrene due to microvascular thrombosis."
+      },
+      {
+        q: "What catastrophic syndrome is characterized by fulminant meningococcal septic shock, massive DIC, and bilateral hemorrhagic necrosis of the adrenal glands?",
+        options: [
+          "Guillain-Barré syndrome",
+          "Waterhouse-Friderichsen syndrome",
+          "Lemierre's syndrome",
+          "Stevens-Johnson syndrome"
+        ],
+        correct: 1,
+        explanation: "Waterhouse-Friderichsen syndrome is fulminant meningococcemia characterized by peripheral vascular collapse, shock, widespread petechiae/purpura, DIC, and bilateral hemorrhagic destruction of the adrenal cortex."
+      },
+      {
+        q: "What is the characteristic finding on direct Gram staining of centrifuged cerebrospinal fluid (CSF) in acute meningococcal meningitis?",
+        options: [
+          "Gram-positive lancet-shaped diplococci surrounded by clear halos",
+          "Gram-negative diplococci with adjacent flattened sides located intracellularly within polymorphonuclear leukocytes (PMNs)",
+          "Slender Gram-negative curved rods with darting motility",
+          "Acid-fast beaded rods arranged in parallel bundles"
+        ],
+        correct: 1,
+        explanation: "Centrifuged CSF sediment typically demonstrates Gram-negative 'coffee-bean' diplococci within the cytoplasm of invading neutrophils (PMNs), as well as extracellularly."
+      },
+      {
+        q: "Why must CSF and blood specimens suspected of containing Neisseria meningitidis NEVER be refrigerated prior to culture?",
+        options: [
+          "Refrigeration activates bacterial DNAse, destroying all diagnostic genes",
+          "N. meningitidis is fastidious and extremely sensitive to cold temperatures and drying, which causes rapid loss of viability",
+          "Cold temperatures cause Gram-negative bacteria to convert irreversibly into Gram-positive cocci",
+          "Cooling triggers explosive release of toxic gases that fracture collection vials"
+        ],
+        correct: 1,
+        explanation: "Meningococci are delicate, autolysin-rich bacteria that rapidly die when chilled or subjected to drying. Specimens must be kept at room temperature or 35–37°C and transported promptly to the laboratory."
+      },
+      {
+        q: "What is the standard empiric antimicrobial therapy initiated immediately when acute meningococcal meningitis is clinically suspected?",
+        options: [
+          "Intravenous 3rd-generation cephalosporins (e.g., Ceftriaxone or Cefotaxime)",
+          "Oral amoxicillin for 5 days",
+          "Intravenous gentamicin monotherapy",
+          "Topical polymyxin B irrigation"
+        ],
+        correct: 0,
+        explanation: "Empiric treatment must be instituted without delay using high-dose intravenous 3rd-generation cephalosporins (Ceftriaxone or Cefotaxime) due to their reliable bactericidal activity and penetration into inflamed CSF."
+      },
+      {
+        q: "Once laboratory antimicrobial susceptibility confirms that a clinical isolate of N. meningitidis is penicillin-susceptible, what historically effective agent can be utilized?",
+        options: [
+          "Intravenous Penicillin G",
+          "Oral Erythromycin base",
+          "Intramuscular Spectinomycin",
+          "Oral Clindamycin"
+        ],
+        correct: 0,
+        explanation: "Penicillin G remains highly active against most strains of N. meningitidis and can be used to complete definitive therapy once laboratory confirmation rules out resistant strains."
+      },
+      {
+        q: "Who among the following individuals meets the criteria for receiving post-exposure chemoprophylaxis after exposure to an index case of meningococcal disease?",
+        options: [
+          "Casual acquaintances who walked in the same outdoor park 3 days prior",
+          "Household contacts, room-mates, and healthcare workers with direct mucosal exposure to oral secretions (e.g., during intubation)",
+          "Individuals who sat in the same lecture hall 2 weeks earlier",
+          "Postal workers handling mail from the patient's town"
+        ],
+        correct: 1,
+        explanation: "Chemoprophylaxis is indicated for close contacts at high risk of secondary transmission, including household members, dormitory roommates, daycare contacts, and healthcare staff directly exposed to respiratory secretions."
+      },
+      {
+        q: "Which antimicrobial regimen is standardly administered as chemoprophylaxis for close contacts of a patient with meningococcal disease?",
+        options: [
+          "Oral Rifampin (or a single dose of oral Ciprofloxacin or intramuscular Ceftriaxone)",
+          "A 14-day course of intravenous vancomycin",
+          "Oral metronidazole for 10 days",
+          "Topical silver sulfadiazine cream"
+        ],
+        correct: 0,
+        explanation: "Eradication of nasopharyngeal carriage in contacts is achieved using oral Rifampin (administered over 2 days), a single oral dose of Ciprofloxacin, or a single intramuscular injection of Ceftriaxone."
+      },
+      {
+        q: "Why was developing a traditional capsular polysaccharide vaccine against Serogroup B Neisseria meningitidis historically unfeasible?",
+        options: [
+          "The Serogroup B capsule is unstable and hydrolyzes in water within seconds",
+          "The Serogroup B polysaccharide is poorly immunogenic and poses a risk of eliciting autoantibodies against human neural tissue",
+          "Serogroup B strains do not produce any capsule when isolated from humans",
+          "Serogroup B capsular polysaccharide permanently inactivates human T-cell receptors"
+        ],
+        correct: 1,
+        explanation: "Because the Group B capsular polysaccharide mimics human neural polysialic acid, it triggers immune tolerance (poor immunogenicity) and carries a potential danger of inducing autoantibodies against human neural tissue."
+      },
+      {
+        q: "Current quadrivalent meningococcal conjugate vaccines provide protective immunity against which four serogroups?",
+        options: [
+          "Serogroups A, B, C, and D",
+          "Serogroups A, C, Y, and W-135",
+          "Serogroups B, C, X, and Z",
+          "Serogroups E, F, G, and H"
+        ],
+        correct: 1,
+        explanation: "Standard quadrivalent conjugate vaccines (MenACWY) contain capsular polysaccharides from serogroups A, C, Y, and W-135 conjugated to an immunogenic carrier protein."
+      },
+      {
+        q: "Why are infants protected against systemic meningococcal disease during the first 6 months of life?",
+        options: [
+          "Infant stomach acid has a pH of 0.5, which kills all inhaled bacteria",
+          "Passive transfer of maternal IgG antibodies across the placenta and through breastfeeding",
+          "Infant erythrocytes lack transferrin receptors required by bacteria",
+          "The blood-brain barrier is completely impermeable to all proteins in neonates"
+        ],
+        correct: 1,
+        explanation: "Transplacentally acquired maternal bactericidal IgG antibodies and antibodies transferred via breastfeeding confer passive humoral protection to neonates during the first 6 months of life."
+      },
+      {
+        q: "What type of colonies do virulent Neisseria meningitidis form on chocolate agar after 18–24 hours of incubation?",
+        options: [
+          "Large, dry, wrinkled colonies with bright red prodigiosin pigment",
+          "Small (1–2 mm), round, convex, smooth, translucent-to-gray, non-pigmented colonies",
+          "Black colonies with heavy sulfur halos",
+          "Spreading swarms covering the whole agar plate"
+        ],
+        correct: 1,
+        explanation: "Meningococcal colonies on enriched agar are typically 1–2 mm in diameter, round, convex, smooth, translucent to grayish, and non-pigmented, often appearing glistening or mucoid due to capsule expression."
+      },
+      {
+        q: "What pulmonary clinical manifestation can be caused by Neisseria meningitidis, especially associated with serogroups Y and W-135?",
+        options: [
+          "Cavitary apical tuberculosis",
+          "Bronchopneumonia, often presenting in patients with underlying chronic pulmonary disease",
+          "Severe laryngeal croup with membrane formation",
+          "Primary pulmonary alveolar proteinosis"
+        ],
+        correct: 1,
+        explanation: "Serogroups Y and W-135 are recognized causes of acute bronchopneumonia, particularly in older adults or individuals with underlying chronic respiratory conditions."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function init() {
+      buildGrid();
+      loadQuestion(0);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById("questionGrid");
+      grid.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `gridBtn_${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function toggleGrid() {
+      const gridCard = document.getElementById("gridCard");
+      const toggleBtn = document.getElementById("toggleGridBtn");
+      if (gridCard.classList.contains("active")) {
+        gridCard.classList.remove("active");
+        toggleBtn.textContent = "View List";
+      } else {
+        gridCard.classList.add("active");
+        toggleBtn.textContent = "Hide List";
+      }
+    }
+
+    function jumpToQuestion(index) {
+      currentQ = index;
+      loadQuestion(currentQ);
+      document.getElementById("quizCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function loadQuestion(index) {
+      currentQ = index;
+      const data = quizData[index];
+      const answered = userAnswers[index] !== null;
+
+      // Update Header & Counters
+      document.getElementById("qNumberTag").textContent = `Question ${index + 1} of ${quizData.length}`;
+      document.getElementById("metaCounter").textContent = `${index + 1} / ${quizData.length}`;
+      
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      const progressPct = (totalAnswered / quizData.length) * 100;
+      document.getElementById("progressBar").style.width = `${progressPct}%`;
+
+      // Update Question text
+      document.getElementById("questionStem").textContent = data.q;
+
+      // Render Options
+      const optionsGroup = document.getElementById("optionsGroup");
+      optionsGroup.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      data.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-tile";
+        btn.disabled = answered;
+
+        let tagText = "";
+        if (answered) {
+          if (optIdx === data.correct) {
+            btn.classList.add("correct");
+            tagText = "CORRECT";
+          } else if (optIdx === userAnswers[index]) {
+            btn.classList.add("incorrect");
+            tagText = "INCORRECT";
+          }
+        }
+
+        btn.innerHTML = `
+          <span class="opt-badge">${letters[optIdx]}</span>
+          <span class="opt-text">${optText}</span>
+          ${tagText ? `<span class="opt-tag">${tagText}</span>` : ""}
+        `;
+
+        if (!answered) {
+          btn.onclick = () => selectOption(optIdx);
+        }
+
+        optionsGroup.appendChild(btn);
+      });
+
+      // Rationale Box
+      const rationaleCard = document.getElementById("rationaleCard");
+      const rationaleText = document.getElementById("rationaleText");
+      if (answered) {
+        rationaleText.textContent = data.explanation;
+        rationaleCard.classList.add("show");
+      } else {
+        rationaleCard.classList.remove("show");
+      }
+
+      // Update Nav Buttons
+      document.getElementById("prevBtn").disabled = index === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      if (index === quizData.length - 1) {
+        nextBtn.textContent = "Finish & Review";
+      } else {
+        nextBtn.textContent = "Next";
+      }
+
+      // Update Grid Buttons state
+      updateGridUI();
+    }
+
+    function selectOption(selectedIdx) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = selectedIdx;
+      loadQuestion(currentQ);
+    }
+
+    function updateGridUI() {
+      quizData.forEach((_, idx) => {
+        const btn = document.getElementById(`gridBtn_${idx}`);
+        if (!btn) return;
+        btn.className = "grid-btn";
+        if (userAnswers[idx] !== null) {
+          btn.classList.add("answered");
+        }
+        if (idx === currentQ) {
+          btn.classList.add("current");
+        }
+      });
+    }
+
+    function navigate(delta) {
+      const nextIndex = currentQ + delta;
+      if (nextIndex >= 0 && nextIndex < quizData.length) {
+        loadQuestion(nextIndex);
+      } else if (nextIndex >= quizData.length) {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("gridCard").classList.remove("active");
+      document.getElementById("toggleGridBtn").style.display = "none";
+      
+      const scorecard = document.getElementById("scorecard");
+      scorecard.classList.add("active");
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) correctCount++;
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("scoreCircle").textContent = `${percentage}%`;
+      document.getElementById("scoreBreakdown").textContent = `You correctly answered ${correctCount} of ${quizData.length} questions.`;
+      document.getElementById("statCorrect").textContent = correctCount;
+      document.getElementById("statIncorrect").textContent = incorrectCount;
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("metaCounter").textContent = `${quizData.length} / ${quizData.length}`;
+
+      if (percentage >= 80) {
+        document.getElementById("scoreTitle").textContent = "Outstanding Performance!";
+      } else if (percentage >= 60) {
+        document.getElementById("scoreTitle").textContent = "Good Effort - Review Notes!";
+      } else {
+        document.getElementById("scoreTitle").textContent = "Keep Practicing Bacteriology!";
+      }
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById("scorecard").classList.remove("active");
+      document.getElementById("quizCard").style.display = "block";
+      document.getElementById("toggleGridBtn").style.display = "inline-block";
+      document.getElementById("toggleGridBtn").textContent = "View List";
+      loadQuestion(0);
+    }
+
+    // Initialize application on load
+    window.onload = init;
+  </script>
+</body>
+</html>
