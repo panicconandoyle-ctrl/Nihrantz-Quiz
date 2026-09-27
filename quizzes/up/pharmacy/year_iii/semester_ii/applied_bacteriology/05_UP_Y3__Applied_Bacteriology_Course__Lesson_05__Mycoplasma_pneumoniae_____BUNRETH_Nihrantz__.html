@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology: Mycoplasma pneumoniae - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Applied Bacteriology — Lesson 05: Mycoplasma pneumoniae</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Lesson 05 content
+  const quizData = [
+    {
+      q: "What unique structural feature fundamentally distinguishes Mycoplasma pneumoniae from typical bacteria like Streptococcus pneumoniae?",
+      options: [
+        "Presence of a thick, waxy mycolic acid wall",
+        "Complete absence of a peptidoglycan cell wall",
+        "Presence of a rigid silica exoskeleton",
+        "A double-layered chitin outer membrane"
+      ],
+      correct: 1,
+      explanation: "Mycoplasma species completely lack a peptidoglycan cell wall and are bounded solely by a sterol-containing trilaminar plasma membrane, making them naturally pleomorphic and insensitive to cell-wall inhibitors."
+    },
+    {
+      q: "What is the physical size of Mycoplasma pneumoniae, and what notable laboratory property results from this dimension?",
+      options: [
+        "Diameter ~10 µm; easily visible under low-power stereomicroscopy",
+        "Diameter ≈ 0.1 to 0.2 µm; capable of passing through standard bacterial membrane filters",
+        "Length ~50 µm; sedimenting instantly in water",
+        "Diameter ~5 µm; staining darkly with crystal violet"
+      ],
+      correct: 1,
+      explanation: "Measuring only ~0.1–0.2 µm in diameter, Mycoplasma species are among the smallest free-living microorganisms known and can pass through some standard 0.45 µm membrane filters."
+    },
+    {
+      q: "Why is Mycoplasma pneumoniae completely resistant to beta-lactam antibiotics (e.g., penicillins, cephalosporins)?",
+      options: [
+        "It hyperproduces class A beta-lactamase enzymes",
+        "Beta-lactams target transpeptidation during peptidoglycan cell wall synthesis, which Mycoplasma entirely lacks",
+        "It pumps beta-lactams out using multidrug ABC transporters within 1 second",
+        "Its outer capsule enzymatically degrades the beta-lactam ring into glucose"
+      ],
+      correct: 1,
+      explanation: "Beta-lactam antibiotics act by inhibiting transpeptidase enzymes that cross-link peptidoglycan in the bacterial cell wall. Because Mycoplasma species lack a cell wall, they are intrinsically and universally resistant to all beta-lactams."
+    },
+    {
+      q: "How does Mycoplasma pneumoniae appear upon routine diagnostic Gram staining of sputum or pharyngeal secretions?",
+      options: [
+        "Gram-positive purple cocci in lancet-shaped pairs",
+        "Gram-indeterminate or non-colorable, because there is no peptidoglycan wall to bind or retain crystal violet or safranin",
+        "Bright pink, acid-fast branching filaments",
+        "Thick, Gram-negative diplococci with green halos"
+      ],
+      correct: 1,
+      explanation: "Lacking peptidoglycan, Mycoplasma does not retain crystal violet or counterstains properly, rendering it invisible or 'Gram-indeterminate' on standard light microscopy."
+    },
+    {
+      q: "What essential nutrient must be incorporated into specialized artificial media to support the membrane integrity and growth of Mycoplasma species?",
+      options: [
+        "Cellulose fibers",
+        "Exogenous sterols (such as cholesterol)",
+        "Inorganic sulfur crystals",
+        "Lactose crystals"
+      ],
+      correct: 1,
+      explanation: "Unlike other bacteria that synthesize their own rigid cell walls, Mycoplasma species incorporate exogenous sterols (like cholesterol from serum) into their plasma membranes to provide osmotic stability and mechanical strength."
+    },
+    {
+      q: "What does the historical acronym 'PPLO' stand for in PPLO agar, the specialized medium used for culturing Mycoplasma?",
+      options: [
+        "Polymerase-Protein-Linked Organisms",
+        "Pleuropneumonia-Like Organisms",
+        "Periplasmic-Phospholipase-Lipid Organisms",
+        "Pharyngeal-Pulmonary-Lobar Outbreaks"
+      ],
+      correct: 1,
+      explanation: "PPLO stands for Pleuropneumonia-Like Organisms, a historical term derived from the agent of bovine pleuropneumonia (Mycoplasma mycoides)."
+    },
+    {
+      q: "Why is Penicillin G deliberately supplemented into diagnostic PPLO agar formulations when attempting to cultivate Mycoplasma pneumoniae?",
+      options: [
+        "It serves as the primary carbon and energy source for Mycoplasma",
+        "It selectively inhibits the growth of contaminating normal respiratory flora without affecting wall-less Mycoplasma",
+        "It stabilizes Mycoplasma DNA against thermal denaturation",
+        "It hydrolyzes agar to maintain optimal liquid consistency"
+      ],
+      correct: 1,
+      explanation: "Because Mycoplasma lacks a cell wall, it is completely immune to penicillin. Adding Penicillin G selectively suppresses contaminating Gram-positive bacteria present in respiratory samples."
+    },
+    {
+      q: "What characteristic morphological pattern is classically observed when colonies of Mycoplasma species are viewed under low-power microscopy on solid PPLO agar?",
+      options: [
+        "Medusa-head colonies with irregular jagged borders",
+        "'Fried-egg' appearance, consisting of a dense, dark central core embedded in the agar surrounded by a translucent, flat periphery",
+        "Mucoid, dripping colonies with a metallic green sheen",
+        "Swarming concentric rings spreading across the plate"
+      ],
+      correct: 1,
+      explanation: "Mycoplasma colonies are tiny and characteristically display a 'fried-egg' appearance due to the central portion growing downward into the agar medium while the periphery spreads flatly across the surface."
+    },
+    {
+      q: "What is the primary anatomical niche colonized by Mycoplasma pneumoniae in the human host?",
+      options: [
+        "Renal collecting tubules",
+        "The ciliated mucosal epithelium of the trachea and bronchi",
+        "Vascular endothelial cells of the coronary arteries",
+        "Deep osteocytes of the femur"
+      ],
+      correct: 1,
+      explanation: "M. pneumoniae is a mucosal pathogen that selectively colonizes the luminal surface of the ciliated respiratory epithelium lining the trachea and bronchial tree."
+    },
+    {
+      q: "How is Mycoplasma pneumoniae transmitted from person to person?",
+      options: [
+        "Ingestion of unpasteurized milk and soft cheeses",
+        "Inhalation of airborne respiratory droplets during close contact, coughing, or sneezing",
+        "Bite of an infected Ixodes tick in wooded environments",
+        "Direct transdermal entry through water-macerated skin"
+      ],
+      correct: 1,
+      explanation: "Transmission occurs directly from person to person via respiratory droplets expelled during coughing; close, crowded environments (schools, dormitories, military barracks) foster efficient spread."
+    },
+    {
+      q: "What is the typical incubation period of Mycoplasma pneumoniae infection before clinical symptoms begin?",
+      options: [
+        "12 to 24 hours",
+        "2 to 3 weeks (range 1–4 weeks)",
+        "3 to 6 months",
+        "4 to 5 days strictly"
+      ],
+      correct: 1,
+      explanation: "M. pneumoniae has an unusually long incubation period of 2 to 3 weeks (1–4 weeks), leading to insidious, slow-moving community and household outbreaks."
+    },
+    {
+      q: "Why is clinical pneumonia caused by Mycoplasma pneumoniae commonly referred to as 'atypical' or 'walking' pneumonia?",
+      options: [
+        "Patients are completely paralyzed and unable to move their legs",
+        "Symptoms have an insidious onset with prominent dry cough, low-grade fever, and headache, where the patient often remains ambulatory despite significant radiographic infiltrates",
+        "It only occurs in patients who walk through tropical wetlands",
+        "The chest X-ray shows complete absence of lung tissue"
+      ],
+      correct: 1,
+      explanation: "'Walking pneumonia' describes an atypical pneumonia where clinical illness is mild to moderate—patients remain out of bed and ambulatory despite constitutional symptoms and patchy infiltrates on chest radiography that often look far worse than the patient appears."
+    },
+    {
+      q: "Which major demographic age group experiences the highest documented incidence of Mycoplasma pneumoniae respiratory infections?",
+      options: [
+        "Neonates under 28 days of age",
+        "School-aged children and adolescents (5 to 15 years old)",
+        "Adults over 85 years of age exclusively",
+        "Premature infants in neonatal ICUs"
+      ],
+      correct: 1,
+      explanation: "M. pneumoniae is the leading cause of community-acquired pneumonia in school-aged children and young adults aged 5 to 15 years, accounting for up to 40% of cases in this cohort."
+    },
+    {
+      q: "What is the primary surface adhesin protein that mediates Mycoplasma pneumoniae attachment to host respiratory epithelial cells?",
+      options: [
+        "Internalin A (InlA)",
+        "P1 adhesin (located on a specialized tip attachment organelle)",
+        "ActA protein",
+        "Listeriolysin O"
+      ],
+      correct: 1,
+      explanation: "The P1 adhesin is a major 170-kDa surface virulence protein concentrated at the tip-attachment organelle; it mediates high-affinity binding to sialic acid-containing oligosaccharide receptors on ciliated epithelial cells."
+    },
+    {
+      q: "Which cellular receptor on ciliated respiratory enterocytes is bound by the Mycoplasma pneumoniae tip organelle?",
+      options: [
+        "Heparin-binding EGF-like growth factor (HB-EGF)",
+        "Sialic acid-containing oligosaccharide receptors",
+        "CD4 glycoprotein",
+        "Complement receptor 1 (CR1/CD35)"
+      ],
+      correct: 1,
+      explanation: "The specialized attachment organelle binds specifically to sialic acid residues present on glycoprotein and glycolipid receptors of host ciliated cells."
+    },
+    {
+      q: "What functional impairment occurs in the respiratory epithelium following cytoadherence of Mycoplasma pneumoniae?",
+      options: [
+        "Immediate rapid hyper-acceleration of ciliary beating",
+        "Ciliostasis (paralysis of ciliary movement) and subsequent destruction of the mucociliary escalator",
+        "Instant squamous metaplasia into osteoblasts",
+        "Overproduction of pulmonary surfactant leading to pulmonary edema"
+      ],
+      correct: 1,
+      explanation: "Adherence leads to ciliostasis (ciliary paralysis), loss of cilia, and sloughing of epithelial cells, destroying normal mucociliary clearance and resulting in a persistent, intractable non-productive cough."
+    },
+    {
+      q: "Which toxic metabolite produced by Mycoplasma pneumoniae directly inflicts local oxidative damage and membrane injury on host respiratory cells?",
+      options: [
+        "Hydrogen peroxide (H2O2) and superoxide radicals",
+        "Botulinum neurotoxin",
+        "Diphtheria Fragment A",
+        "Endotoxin lipopolysaccharide"
+      ],
+      correct: 0,
+      explanation: "M. pneumoniae produces endogenous hydrogen peroxide (H2O2) and reactive oxygen species, which inhibit host catalase and cause localized oxidative lysis of epithelial membranes."
+    },
+    {
+      q: "What unique bacterial exotoxin is produced by M. pneumoniae that displays ribosylating and vacuolating activity, contributing to pulmonary inflammation?",
+      options: [
+        "Listeriolysin O (LLO)",
+        "Community-Acquired Respiratory Distress Syndrome (CARDS) toxin",
+        "Pertussis toxin",
+        "Cholera enterotoxin"
+      ],
+      correct: 1,
+      explanation: "CARDS toxin (Community-Acquired Respiratory Distress Syndrome toxin) is an ADP-ribosylating and vacuolating toxin produced by M. pneumoniae that plays an instrumental role in pulmonary inflammation and airway hyperreactivity."
+    },
+    {
+      q: "Which characteristic dermatological complication, featuring concentric 'target' or 'iris' lesions, can be triggered by M. pneumoniae infection?",
+      options: [
+        "Acrodermatitis chronica atrophicans",
+        "Erythema multiforme (and in severe cases, Stevens-Johnson Syndrome)",
+        "Erysipelas with orange-peel texture",
+        "Granulomatosis infantiseptica"
+      ],
+      correct: 1,
+      explanation: "M. pneumoniae is one of the most recognized infectious triggers of Erythema Multiforme (target lesions) and severe mucocutaneous reactions like Stevens-Johnson Syndrome (SJS)."
+    },
+    {
+      q: "What is the biological basis of the 'Cold Agglutinins' phenomenon observed in 50–70% of patients with acute Mycoplasma pneumoniae pneumonia?",
+      options: [
+        "Bacterial endoflagella binding to albumin in cold weather",
+        "Production of polyclonal IgM autoantibodies directed against the I antigen on human erythrocytes, which agglutinate red blood cells at 4°C",
+        "Precipitation of bacterial DNA in peripheral finger capillary loops",
+        "Direct chemical lysis of hemoglobin by CARDS toxin"
+      ],
+      correct: 1,
+      explanation: "M. pneumoniae alters erythrocyte I antigens, stimulating the production of cross-reactive polyclonal IgM autoantibodies (cold agglutinins) that reversibly bind and clump human red blood cells at low temperatures (0–4°C)."
+    },
+    {
+      q: "Why is the Cold Agglutinins test considered a supportive screening clue rather than a definitive diagnostic test for Mycoplasma pneumoniae?",
+      options: [
+        "Cold agglutinins only agglutinate bacterial colonies on agar",
+        "It lacks specificity; cold agglutinins also occur in Epstein-Barr virus (EBV) mononucleosis, cytomegalovirus, influenza, lymphomas, and autoimmune diseases",
+        "Cold agglutinins remain elevated for more than 50 years after birth",
+        "The test requires 6 months to perform in reference laboratories"
+      ],
+      correct: 1,
+      explanation: "Cold agglutinins are non-specific polyclonal IgM autoantibodies. False positives occur frequently in infectious mononucleosis, viral hepatitis, adenovirus, and hematologic malignancies."
+    },
+    {
+      q: "What diagnostic methodology is recognized as the current clinical method of choice for the rapid, sensitive, and specific detection of M. pneumoniae in acute respiratory illness?",
+      options: [
+        "Routine culture on blood agar",
+        "Polymerase Chain Reaction (PCR) / Nucleic Acid Amplification Testing (NAAT) from a pharyngeal swab",
+        "Ziehl-Neelsen acid-fast staining",
+        "Dark-field microscopy of peripheral blood"
+      ],
+      correct: 1,
+      explanation: "PCR/NAAT is the gold standard in acute clinical settings, providing results within hours with high diagnostic sensitivity and specificity, overcoming the 2–6 week delay of traditional culture."
+    },
+    {
+      q: "When evaluating specific serology for M. pneumoniae using paired acute and convalescent sera, what finding confirms a definitive diagnosis of recent infection?",
+      options: [
+        "An unchanged low IgG titer across 6 months",
+        "A four-fold (4×) or greater rise in specific IgG antibody titer between acute and convalescent sera collected 2 to 4 weeks apart (or a positive specific IgM titer)",
+        "Complete disappearance of all circulating serum immunoglobulins",
+        "Conversion from IgG to IgD within 24 hours"
+      ],
+      correct: 1,
+      explanation: "Serological confirmation requires either demonstrating a specific IgM antibody response or documenting a diagnostic four-fold (or greater) rise in IgG antibody titers between acute-phase serum and convalescent-phase serum collected 2–4 weeks later."
+    },
+    {
+      q: "What is the recommended first-line antimicrobial class for treating Mycoplasma pneumoniae in pediatric patients and young adults?",
+      options: [
+        "Third-generation cephalosporins (e.g., Ceftriaxone)",
+        "Macrolides (e.g., Azithromycin, Clarithromycin)",
+        "Aminopenicillins (e.g., Amoxicillin)",
+        "Monobactams (e.g., Aztreonam)"
+      ],
+      correct: 1,
+      explanation: "Macrolides (such as Azithromycin or Clarithromycin) act on the 50S bacterial ribosomal subunit, penetrate respiratory tissues deeply, have an established pediatric safety record, and serve as the first-line empirical choice."
+    },
+    {
+      q: "What molecular mechanism is responsible for the increasing rates of clinical treatment failure and macrolide resistance in Mycoplasma pneumoniae, particularly in Asia?",
+      options: [
+        "Acquisition of an enzyme that synthesizes a thick peptidoglycan cell wall",
+        "Point mutations in domain V of the 23S ribosomal RNA gene, decreasing macrolide binding affinity",
+        "Secretion of beta-lactamase enzymes into alveolar fluid",
+        "Loss of the P1 adhesin tip structure"
+      ],
+      correct: 1,
+      explanation: "Macrolide resistance is mediated by single-nucleotide point mutations (such as A2063G or A2064G) in domain V of the 23S rRNA component of the 50S ribosomal subunit, preventing macrolides from binding."
+    },
+    {
+      q: "Why are tetracyclines (such as Doxycycline) generally contraindicated for use in children under 8 years of age when treating atypical pneumonia?",
+      options: [
+        "They cause sudden irreversible blindness",
+        "They bind calcium, depositing in developing teeth and bones, leading to permanent tooth discoloration (yellow-gray-brown enamel) and enamel hypoplasia",
+        "They cause hyperacute allergic bull neck within 10 minutes",
+        "They degrade host immunoglobulin Fc receptors"
+      ],
+      correct: 1,
+      explanation: "Tetracyclines chelate divalent calcium ions and incorporate into actively mineralizing tissues, carrying a risk of permanent dental staining and enamel hypoplasia in children under 8 years of age."
+    },
+    {
+      q: "Why are fluoroquinolones (such as Levofloxacin or Moxifloxacin) typically reserved for adult patients rather than young children?",
+      options: [
+        "Fluoroquinolones cause severe cartilage damage and arthropathy in weight-bearing joints of developing juvenile animal models",
+        "Fluoroquinolones stimulate immediate peptidoglycan synthesis in Mycoplasma",
+        "Fluoroquinolones are strictly insoluble in human blood",
+        "Fluoroquinolones destroy all white blood cells permanently"
+      ],
+      correct: 0,
+      explanation: "Fluoroquinolones are generally avoided in pediatric and adolescent patients due to documented risks of articular cartilage lesions and arthropathy in juvenile animal toxicology studies, reserving them primarily for adult refractory cases."
+    },
+    {
+      q: "Which genital Mycoplasma species is an established pathogen responsible for non-gonococcal urethritis (NGU) in men and cervicitis/PID in women?",
+      options: [
+        "Mycoplasma genitalium",
+        "Mycoplasma pneumoniae",
+        "Mycoplasma mycoides",
+        "Mycoplasma gallisepticum"
+      ],
+      correct: 0,
+      explanation: "Mycoplasma genitalium is a recognized cause of sexually transmitted infections, producing acute and persistent non-gonococcal urethritis (NGU) in men and cervicitis, endometritis, and pelvic inflammatory disease (PID) in women."
+    },
+    {
+      q: "What distinct antibiotic resistance pattern characterizes Mycoplasma hominis compared to Mycoplasma pneumoniae?",
+      options: [
+        "M. hominis is naturally resistant to macrolides (such as erythromycin and azithromycin), requiring treatment with tetracyclines or clindamycin",
+        "M. hominis is completely killed by low doses of Amoxicillin",
+        "M. hominis is susceptible only to Vancomycin",
+        "M. hominis is destroyed by Penicillin G on PPLO agar"
+      ],
+      correct: 0,
+      explanation: "Mycoplasma hominis possesses an intrinsic base-pair substitution in its 23S rRNA that confers natural resistance to 14- and 15-membered macrolides (erythromycin, azithromycin); it remains susceptible to tetracyclines and clindamycin."
+    },
+    {
+      q: "Why is caution required before prescribing antibiotics when Mycoplasma hominis is detected in a vaginal or urethral swab from an asymptomatic individual?",
+      options: [
+        "M. hominis turns into Mycoplasma pneumoniae upon antibiotic exposure",
+        "M. hominis is a common commensal organism colonizing the lower urogenital tract of healthy adults; detection does not equate to active clinical disease without symptoms",
+        "Treatment induces permanent sterility in all asymptomatic carriers",
+        "Asymptomatic carriage always clears within 2 minutes without medication"
+      ],
+      correct: 1,
+      explanation: "Mycoplasma hominis (and Ureaplasma species) frequently colonize the genital mucosa of healthy, sexually active adults as harmless commensal flora; diagnostic detection in an asymptomatic patient represents colonization that does not warrant antimicrobial therapy."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize Quiz
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
