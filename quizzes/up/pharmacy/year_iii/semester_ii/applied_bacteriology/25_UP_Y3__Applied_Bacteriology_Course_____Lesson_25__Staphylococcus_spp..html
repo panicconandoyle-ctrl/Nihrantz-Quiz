@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 25: Streptococcus spp. Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 25: Streptococcus spp.</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the primary biochemical test that definitively distinguishes Streptococcus from Staphylococcus?",
+        options: [
+          "Oxidase test",
+          "Catalase test: Streptococcus is catalase-negative (-), while Staphylococcus is catalase-positive (+)",
+          "Coagulase test",
+          "Indole test"
+        ],
+        correct: 1,
+        explanation: "The catalase test is the frontline diagnostic discriminator between the two major Gram-positive cocci genera: Streptococcus is catalase-negative (no bubbles when mixed with hydrogen peroxide), whereas Staphylococcus is catalase-positive."
+      },
+      {
+        q: "What cellular morphology and typical arrangement characterize members of the genus Streptococcus under light microscopy?",
+        options: [
+          "Gram-positive cocci dividing in multiple planes to form irregular grape-like clusters",
+          "Gram-positive spherical or ovoid cocci dividing in a single plane, arranged in pairs (diplococci) or chains",
+          "Gram-negative pleomorphic rods arranged in palisades",
+          "Gram-positive large spore-forming rods in bamboo cane patterns"
+        ],
+        correct: 1,
+        explanation: "Streptococci are Gram-positive cocci (often slightly ovoid) that divide strictly along a single plane, tending to remain adherent to form characteristic pairs (diplococci) or chains."
+      },
+      {
+        q: "How is Alpha (α) hemolysis on sheep blood agar defined, and what produces the characteristic greenish discoloration?",
+        options: [
+          "Complete lysis of red blood cells producing a totally transparent clear zone",
+          "Partial or incomplete lysis of red blood cells with reduction of hemoglobin to greenish methemoglobin",
+          "Absence of any hemolytic activity with no color change in the agar",
+          "Blackening of the agar due to hydrogen sulfide gas deposition"
+        ],
+        correct: 1,
+        explanation: "Alpha (α) hemolysis is incomplete/partial hemolysis characterized by a greenish or brownish halo around colonies, caused by the chemical reduction of hemoglobin to methemoglobin."
+      },
+      {
+        q: "Which specific bacterial species serves as the classical representative of Lancefield Group A beta-hemolytic Streptococcus?",
+        options: [
+          "Streptococcus agalactiae",
+          "Streptococcus pyogenes",
+          "Streptococcus pneumoniae",
+          "Streptococcus mutans"
+        ],
+        correct: 1,
+        explanation: "Streptococcus pyogenes is the defining member of Lancefield Group A Streptococcus (GAS), exhibiting complete (beta) hemolysis on blood agar."
+      },
+      {
+        q: "On what biochemical component of the bacterial cell is Rebecca Lancefield's serological classification system based?",
+        options: [
+          "Capsular poly-D-glutamic acid",
+          "Cell wall carbohydrate antigens (C-substance)",
+          "Outer membrane lipopolysaccharide O-antigen",
+          "Heat-labile flagellar H-antigens"
+        ],
+        correct: 1,
+        explanation: "The Lancefield serological classification groups beta-hemolytic streptococci into Groups A through V based on the antigenic composition of their cell-wall carbohydrate antigens (known as C-substance)."
+      },
+      {
+        q: "What unique chemical substance forms the antiphagocytic capsule of Streptococcus pyogenes, conferring 'molecular mimicry'?",
+        options: [
+          "Hyaluronic acid, which is chemically identical to human ground substance and thus non-immunogenic",
+          "Polyribosylribitol phosphate (PRP)",
+          "Sialic acid linked to peptidoglycan",
+          "Dextran polymer derived from dietary sucrose"
+        ],
+        correct: 0,
+        explanation: "The capsule of S. pyogenes is composed of hyaluronic acid. Because hyaluronic acid is identical to the polysaccharide found in human connective tissue, the host immune system does not recognize it as foreign (molecular mimicry), rendering it non-immunogenic and antiphagocytic."
+      },
+      {
+        q: "What is the major surface-anchored virulence factor of Streptococcus pyogenes that inhibits phagocytosis by inactivating complement factor C3b?",
+        options: [
+          "M protein",
+          "Protein A",
+          "Streptolysin S",
+          "Pneumolysin"
+        ],
+        correct: 0,
+        explanation: "M protein is the chief virulence factor of GAS. It extends from the cell surface, binds fibrinogen and serum factor H, and inactivates complement factor C3b, thereby preventing opsonization and phagocytosis."
+      },
+      {
+        q: "How do Streptolysin O (SLO) and Streptolysin S (SLS) differ regarding oxygen stability and antigenicity?",
+        options: [
+          "SLO is oxygen-stable and non-antigenic, whereas SLS is oxygen-labile and induces high antibody titers",
+          "SLO is oxygen-labile and highly antigenic (stimulating ASO antibodies), whereas SLS is oxygen-stable and non-antigenic",
+          "Both hemolysins are entirely non-immunogenic and destroyed by room air",
+          "Both hemolysins function as superantigens causing scarlet fever rash"
+        ],
+        correct: 1,
+        explanation: "Streptolysin O (SLO) is oxygen-labile and highly immunogenic; neutralizing Anti-Streptolysin O (ASO) antibodies develop and can be measured clinically. Streptolysin S (SLS) is oxygen-stable, non-immunogenic, and responsible for the clear beta-hemolysis observed on aerobic agar surfaces."
+      },
+      {
+        q: "Which toxins produced by Streptococcus pyogenes act as superantigens, mediating the fever and rash of Scarlet Fever and triggering Streptococcal Toxic Shock Syndrome (STSS)?",
+        options: [
+          "Streptococcal pyrogenic exotoxins (SpeA, SpeB, SpeC)",
+          "Endotoxin A and B subunits",
+          "Cholera-like enterotoxins",
+          "Alpha toxin lecithinases"
+        ],
+        correct: 0,
+        explanation: "Streptococcal pyrogenic exotoxins (SpeA, SpeB, SpeC)—formerly erythrogenic toxins—are bacteriophage-encoded superantigens that bridge MHC class II and T-cell receptors non-specifically, provoking massive cytokine release, scarlet fever rash, and toxic shock."
+      },
+      {
+        q: "What is the biological function of Streptokinase produced by Streptococcus pyogenes?",
+        options: [
+          "Cleaving host secretory IgA molecules",
+          "Converting host plasminogen into plasmin, which dissolves fibrin clots and promotes bacterial dissemination",
+          "Hydrolyzing hyaluronic acid in human cartilage",
+          "Clotting citrated human plasma to form protective abscess walls"
+        ],
+        correct: 1,
+        explanation: "Streptokinase binds host plasminogen and enzymatically converts it into active plasmin. Plasmin digests fibrin clots, breaking down barriers and enabling the rapid spread of S. pyogenes through tissues."
+      },
+      {
+        q: "Which enzyme produced by S. pyogenes is historically known as the 'spreading factor' because it hydrolyzes the ground substance of connective tissue?",
+        options: [
+          "Hyaluronidase",
+          "DNase B",
+          "Coagulase",
+          "Gelatinase"
+        ],
+        correct: 0,
+        explanation: "Hyaluronidase degrades hyaluronic acid in host intercellular connective tissue ground substance, earning its reputation as the classical 'spreading factor' that accelerates bacterial invasion."
+      },
+      {
+        q: "Which superficial skin infection caused by Streptococcus pyogenes is characterized by fragile vesicles that rupture to form classic 'honey-colored' crusts?",
+        options: [
+          "Erysipelas",
+          "Impetigo (pyoderma)",
+          "Necrotizing fasciitis",
+          "Scarlet fever"
+        ],
+        correct: 1,
+        explanation: "Impetigo (streptococcal pyoderma) presents as superficial intraepidermal vesicles that quickly break down into thick, amber or honey-colored adherent crusts, common around the mouth and nose of young children."
+      },
+      {
+        q: "How does Erysipelas clinically differ from classic Cellulitis?",
+        options: [
+          "Erysipelas involves deeper muscle fascia without skin erythema",
+          "Erysipelas is a more superficial cutaneous infection with distinct, sharply demarcated, raised fiery-red borders, most commonly on the face or lower legs",
+          "Erysipelas is completely painless and produces blue-black eschars",
+          "Erysipelas only occurs on the palms of the hands and soles of the feet"
+        ],
+        correct: 1,
+        explanation: "Erysipelas is an acute superficial dermal/upper-subcutaneous infection with prominent lymphatic involvement, characterized by a bright red, edematous plaque with sharply demarcated, elevated margins."
+      },
+      {
+        q: "What is the life-threatening, deep soft-tissue infection caused by S. pyogenes colloquially termed 'flesh-eating disease' that requires immediate surgical debridement?",
+        options: [
+          "Necrotizing fasciitis",
+          "Erythema nodosum",
+          "Folliculitis",
+          "Condyloma lata"
+        ],
+        correct: 0,
+        explanation: "Necrotizing fasciitis is a fulminant infection tracking rapidly along deep fascial planes, causing extensive microvascular thrombosis, tissue necrosis, and bullae formation. It constitutes a surgical emergency."
+      },
+      {
+        q: "What is the underlying pathophysiological mechanism of Acute Rheumatic Fever (ARF) following S. pyogenes infection?",
+        options: [
+          "Direct bacterial invasion of heart valves during secondary bacteremia",
+          "Molecular mimicry, wherein antibodies generated against streptococcal M protein cross-react with host myocardial and valvular antigens",
+          "Secretion of a potent neurotoxin that paralyzes heart conduction",
+          "Immune-complex entrapment in pulmonary alveoli"
+        ],
+        correct: 1,
+        explanation: "Acute Rheumatic Fever is a post-infectious autoimmune sequela driven by molecular mimicry: host antibodies raised against streptococcal M protein epitopes cross-react with structurally homologous self-proteins (e.g., cardiac myosin and valvular endothelium)."
+      },
+      {
+        q: "Regarding clinical history, which antecedent S. pyogenes infection can precipitate Acute Rheumatic Fever (ARF)?",
+        options: [
+          "Only streptococcal pharyngitis (strep throat), never cutaneous infections (impetigo)",
+          "Only skin infections (impetigo/cellulitis), never throat infections",
+          "Both pharyngitis and impetigo with equal frequency",
+          "Strictly asymptomatic gastrointestinal carriage"
+        ],
+        correct: 0,
+        explanation: "A high-yield clinical fact: Acute Rheumatic Fever develops ONLY after streptococcal pharyngitis (upper respiratory tract infection), NEVER after cutaneous streptococcal infections (impetigo)."
+      },
+      {
+        q: "Which antecedent S. pyogenes infections can trigger post-streptococcal Acute Glomerulonephritis (PSGN)?",
+        options: [
+          "Strictly pharyngitis only",
+          "Strictly impetigo only",
+          "Both streptococcal pharyngitis AND cutaneous infections (impetigo)",
+          "Exclusively neonatal meningitis"
+        ],
+        correct: 2,
+        explanation: "Unlike rheumatic fever, Acute Glomerulonephritis (AGN) can develop following EITHER streptococcal pharyngitis OR cutaneous streptococcal skin infections (impetigo/pyoderma)."
+      },
+      {
+        q: "Which laboratory test reliably differentiates Streptococcus pyogenes (Group A) from other beta-hemolytic streptococci on blood agar?",
+        options: [
+          "Sensitivity to a low-concentration Bacitracin disc (0.04 units) and a positive PYR test",
+          "Resistance to Bacitracin and a positive CAMP test",
+          "Sensitivity to Optochin and bile solubility",
+          "Production of copious gas in glucose broth"
+        ],
+        correct: 0,
+        explanation: "S. pyogenes is presumptively identified by its exquisite susceptibility to Bacitracin (producing a zone of inhibition around a 0.04-unit disc) and by a positive PYR (pyrrolidonyl arylamidase) test."
+      },
+      {
+        q: "What is the antimicrobial drug of choice for treating Streptococcus pyogenes infections?",
+        options: [
+          "Ciprofloxacin",
+          "Penicillin (Penicillin V, Penicillin G, or Amoxicillin)",
+          "Vancomycin monotherapy",
+          "Gentamicin alone"
+        ],
+        correct: 1,
+        explanation: "Penicillin remains the drug of choice because S. pyogenes has remained universally and exquisitely susceptible to penicillin without documented development of penicillin resistance."
+      },
+      {
+        q: "Why is continuous, long-term penicillin prophylaxis prescribed to patients with a documented history of Acute Rheumatic Fever?",
+        options: [
+          "To cure latent viral meningitis",
+          "To prevent recurrent S. pyogenes pharyngitis, which could trigger recurrent autoimmune attacks and worsen Rheumatic Heart Disease",
+          "To stimulate host antibody production against Factor V",
+          "To prevent dental caries caused by S. mutans"
+        ],
+        correct: 1,
+        explanation: "Patients who recover from ARF have an extraordinarily high risk of recurrent rheumatic attacks upon re-exposure to GAS pharyngitis. Long-term secondary penicillin prophylaxis prevents reinfection and progressive valvular damage."
+      },
+      {
+        q: "What is the normal anatomical habitat and maternal carriage site of Streptococcus agalactiae (Group B Streptococcus / GBS)?",
+        options: [
+          "Deep hair follicles of the scalp",
+          "Lower gastrointestinal and female genital tracts (vaginal flora)",
+          "Biliary tree of young children",
+          "External auditory canal"
+        ],
+        correct: 1,
+        explanation: "Streptococcus agalactiae is part of the normal commensal microbiota of the female lower genital tract (vagina) and gastrointestinal tract in 15% to 35% of healthy women."
+      },
+      {
+        q: "What severe clinical conditions does Streptococcus agalactiae primarily cause in neonates infected during vaginal delivery?",
+        options: [
+          "Neonatal sepsis, pneumonia, and purulent meningitis",
+          "Congenital cataracts and sensorineural deafness",
+          "Acute glomerulonephritis and rheumatic carditis",
+          "Necrotizing pancreatitis"
+        ],
+        correct: 0,
+        explanation: "GBS is the leading bacterial cause of neonatal morbidity and mortality, presenting as early-onset sepsis/pneumonia within the first week of life or late-onset meningitis between 1 week and 3 months of age."
+      },
+      {
+        q: "Which two laboratory reactions are characteristic positive identification markers for Group B Streptococcus (S. agalactiae)?",
+        options: [
+          "Positive Hippurate hydrolysis and positive CAMP test",
+          "Positive Bacitracin sensitivity and positive PYR test",
+          "Positive Optochin sensitivity and bile solubility",
+          "Negative catalase and negative Lancefield grouping"
+        ],
+        correct: 0,
+        explanation: "S. agalactiae hydrolyzes sodium hippurate to benzoic acid and glycine (hippurate positive) and produces the CAMP factor, which acts synergistically with staphylococcal beta-lysin to form an arrowhead zone of enhanced hemolysis (CAMP positive)."
+      },
+      {
+        q: "What routine clinical prevention protocol is standardly implemented to protect newborns from Group B Streptococcal disease?",
+        options: [
+          "Universal newborn immunization at 2 hours of life with live attenuated GBS",
+          "Screening pregnant women at 35–37 weeks gestation with vaginal-rectal swabs, followed by intrapartum antibiotic prophylaxis (IV Penicillin) during labor for colonized mothers",
+          "Prophylactic complete tonsillectomy of pregnant women",
+          "Avoiding all oral dairy intake during pregnancy"
+        ],
+        correct: 1,
+        explanation: "Antenatal universal screening via vaginal/rectal culture at 35–37 weeks gestation identifies colonized mothers, who then receive intrapartum IV penicillin (or ampicillin) during labor to prevent vertical transmission."
+      },
+      {
+        q: "What classic morphology and arrangement under Gram stain define Streptococcus pneumoniae (Pneumococcus)?",
+        options: [
+          "Gram-positive lancet-shaped diplococci (pointed pairs)",
+          "Gram-negative kidney-bean shaped diplococci",
+          "Gram-positive cocci in irregular tetrads and cubical packets",
+          "Gram-negative pleomorphic coccobacilli requiring Factor X and V"
+        ],
+        correct: 0,
+        explanation: "S. pneumoniae appears characteristically as Gram-positive, lancet-shaped (bullet-shaped) cocci arranged in pairs (diplococci), often displaying an unstained halo representing its polysaccharide capsule."
+      },
+      {
+        q: "Which two definitive laboratory tests differentiate Streptococcus pneumoniae from the alpha-hemolytic Viridans group streptococci?",
+        options: [
+          "S. pneumoniae is Optochin sensitive and Bile soluble, whereas Viridans streptococci are Optochin resistant and Bile insoluble",
+          "S. pneumoniae is Bacitracin sensitive and PYR positive, while Viridans is negative",
+          "S. pneumoniae produces clear beta-hemolysis, while Viridans produces gamma-hemolysis",
+          "S. pneumoniae is catalase positive, while Viridans is catalase negative"
+        ],
+        correct: 0,
+        explanation: "S. pneumoniae is inhibited by an Optochin (ethylhydrocupreine hydrochloride) disc (zone >14 mm) and lyses rapidly in the presence of bile salts (bile solubility positive). In contrast, Viridans group streptococci are Optochin resistant and bile insoluble."
+      },
+      {
+        q: "What is the Quellung reaction used in the serological identification of Streptococcus pneumoniae?",
+        options: [
+          "Lysis of the cell wall when exposed to sodium deoxycholate",
+          "Apparent swelling (increased refractility) of the polysaccharide capsule upon addition of type-specific anticapsular antibodies",
+          "Precipitation of bile salts around green colonies",
+          "Color change of agar from red to yellow"
+        ],
+        correct: 1,
+        explanation: "In the Quellung (capsular swelling) reaction, mixing pneumococci with polyvalent or type-specific anticapsular antisera alters the optical refractivity of the capsule, causing it to appear sharply swollen under the microscope."
+      },
+      {
+        q: "How does Streptococcus mutans contribute to the initiation of dental caries (tooth cavities)?",
+        options: [
+          "By synthesizing insoluble dextran (glucan) slime from dietary sucrose, adhering to enamel and fermenting sugars into enamel-demineralizing lactic acid",
+          "By directly secreting alkaline protease enzymes that dissolve bone marrow",
+          "By injecting lethal exotoxins into alveolar bone",
+          "By converting host saliva into bile salts"
+        ],
+        correct: 0,
+        explanation: "S. mutans synthesizes sticky, insoluble glucans/dextrans from dietary sucrose via glucosyltransferase, forming dental plaque. It then ferments refined carbohydrates into lactic acid, dropping the local pH and demineralizing dental enamel."
+      },
+      {
+        q: "What serious cardiovascular complication can be caused by Viridans streptococci (such as S. sanguinis or S. mitis) following dental procedures?",
+        options: [
+          "Acute myocardial infarction from coronary vasospasm",
+          "Subacute bacterial endocarditis (SBE) on pre-damaged or prosthetic heart valves",
+          "Aortic aneurysm due to vasa vasorum destruction",
+          "Pericardial constriction from calcium deposition"
+        ],
+        correct: 1,
+        explanation: "Transient bacteremia following dental manipulation allows oral Viridans streptococci to enter the bloodstream. Using surface dextrans, they adhere to platelet-fibrin vegetations on previously injured or prosthetic heart valves, causing subacute bacterial endocarditis."
+      },
+      {
+        q: "What clinical investigation is mandatory when Streptococcus bovis (Group D) is isolated from blood cultures or in a patient with endocarditis?",
+        options: [
+          "Immediate colonoscopy to screen for underlying colorectal cancer, polyps, or occult GI malignancy",
+          "Diagnostic bronchoscopy to rule out aspergillosis",
+          "Lumbar puncture to exclude neurosyphilis",
+          "Slit-lamp examination for corneal ulceration"
+        ],
+        correct: 0,
+        explanation: "Streptococcus bovis (S. gallolyticus) bacteremia and endocarditis have a strong, proven clinical association with gastrointestinal neoplasms, particularly colorectal adenomas and carcinomas. A full colonoscopy is strongly indicated."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
