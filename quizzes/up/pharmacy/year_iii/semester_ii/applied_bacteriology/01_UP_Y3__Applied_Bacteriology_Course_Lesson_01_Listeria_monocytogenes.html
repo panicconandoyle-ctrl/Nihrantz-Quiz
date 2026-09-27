@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology: Listeria monocytogenes - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Applied Bacteriology — Lesson 01: Listeria monocytogenes</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Lesson 01 content
+  const quizData = [
+    {
+      q: "Under Gram staining and microscopic examination, how is Listeria monocytogenes morphologically characterized?",
+      options: [
+        "Gram-negative diplococcus",
+        "Small Gram-positive short rod (coccobacillus)",
+        "Spore-forming Gram-positive long filamentous rod",
+        "Gram-negative comma-shaped bacillus"
+      ],
+      correct: 1,
+      explanation: "Listeria monocytogenes is a small, non-spore-forming Gram-positive bacillus or coccobacillus with a thick peptidoglycan wall that stains purple."
+    },
+    {
+      q: "What characteristic motility pattern does Listeria monocytogenes exhibit at 20°C, and what occurs at human body temperature (37°C)?",
+      options: [
+        "Gliding motility at 37°C; non-motile at 20°C",
+        "Tumbling motility via flagella at 20°C; downregulation of flagella and non-motile at 37°C",
+        "Darting polar motility at both 20°C and 37°C",
+        "Swarming motility exclusively at 37°C on agar"
+      ],
+      correct: 1,
+      explanation: "L. monocytogenes expresses peritrichous flagella producing tumbling motility at lower ambient temperatures (20–25°C), but shuts down flagellar synthesis at human body temperature (37°C)."
+    },
+    {
+      q: "Which biochemical test result rapidly differentiates Listeria monocytogenes from catalase-negative Gram-positive organisms such as Streptococcus and Enterococcus?",
+      options: [
+        "Oxidase negative",
+        "Catalase positive",
+        "Urease positive",
+        "Coagulase positive"
+      ],
+      correct: 1,
+      explanation: "L. monocytogenes is catalase-positive (converts H2O2 to water and oxygen bubbles), easily distinguishing it from catalase-negative streptococci and enterococci."
+    },
+    {
+      q: "Why is the 'psychrotolerant' nature of Listeria monocytogenes of paramount importance to the food processing and refrigeration industry?",
+      options: [
+        "It forms heat-resistant endospores only when stored at freezing temperatures",
+        "It can survive and multiply slowly even at cold refrigeration temperatures (+4°C), allowing bacterial counts to reach dangerous levels over time",
+        "It secretes botulinum neurotoxin specifically at temperatures below 0°C",
+        "Cold temperatures immediately kill competing lactobacilli while inducing listerial sporulation"
+      ],
+      correct: 1,
+      explanation: "L. monocytogenes is psychrotolerant; standard commercial refrigeration (+4°C) merely slows its replication rather than halting it, creating hazardous bacterial loads in ready-to-eat foods during long shelf lives."
+    },
+    {
+      q: "Which category of food products represents the highest risk vehicle for foodborne listeriosis outbreaks?",
+      options: [
+        "Canned acidic fruits (pH < 3.5)",
+        "Unpasteurized soft cheeses (e.g., Brie, Camembert), cold deli meats, and smoked fish",
+        "Freshly baked dry breads and crackers",
+        "Ultra-pasteurized shelf-stable boxed milk"
+      ],
+      correct: 1,
+      explanation: "Soft cheeses made from raw milk, refrigerated ready-to-eat deli meats, and cold-smoked seafood are classic vehicles because they support cold growth and are consumed without subsequent cooking."
+    },
+    {
+      q: "What is the primary master transcriptional regulator that orchestrates the activation of virulence genes when Listeria monocytogenes enters a mammalian host?",
+      options: [
+        "Spo0A",
+        "PrfA",
+        "AgrA",
+        "Fur"
+      ],
+      correct: 1,
+      explanation: "PrfA (Positive Regulatory Factor A) is the master virulence switch. In response to host temperature (37°C) and metabolic cues, PrfA switches to an activated state (PrfA*) that drives expression of the virulence regulon."
+    },
+    {
+      q: "Which surface virulence factors are primarily responsible for inducing the receptor-mediated endocytosis of Listeria into non-phagocytic cells like enterocytes?",
+      options: [
+        "Internalins (InlA and InlB)",
+        "Listeriolysin O (LLO)",
+        "Actin assembly-inducing protein (ActA)",
+        "Hexose-6-phosphate transporter (Hpt)"
+      ],
+      correct: 0,
+      explanation: "InlA (which binds human E-cadherin) and InlB (which binds the Met tyrosine kinase receptor) induce host cell signaling that triggers non-phagocytic cells to engulf the bacterium."
+    },
+    {
+      q: "What is the precise molecular function of Listeriolysin O (LLO) during the intracellular life cycle of Listeria monocytogenes?",
+      options: [
+        "Polymerizing host monomeric G-actin into filamentous F-actin tails",
+        "Pore-forming cholesterol-dependent cytolysin that disrupts the phagosomal membrane, allowing bacterial escape into the cytoplasm",
+        "Transporting glucose-6-phosphate across the bacterial cell envelope",
+        "Directly inhibiting ribosomal protein synthesis"
+      ],
+      correct: 1,
+      explanation: "LLO is a cholesterol-dependent pore-forming hemolysin activated by the acidic pH of the phagosome. It perforates the phagosomal vacuole, allowing the bacterium to escape into the nutrient-rich cytosol before lysosomal fusion."
+    },
+    {
+      q: "In addition to LLO, which enzymes assist Listeria in degrading the primary phagosomal membrane and the secondary double-membrane vacuole during cell-to-cell spread?",
+      options: [
+        "Phospholipases (PI-PLC and PC-PLC)",
+        "Superoxide dismutase and catalase",
+        "Hyaluronidase and collagenase",
+        "Endotoxin A and coagulase"
+      ],
+      correct: 0,
+      explanation: "PI-PLC (phosphatidylinositol-specific phospholipase C) and PC-PLC (phosphatidylcholine-specific phospholipase C) hydrolyze membrane phospholipids, cooperating with LLO to rupture phagosomal membranes."
+    },
+    {
+      q: "Which bacterial surface protein hijacks host cell actin polymerization machinery to propel Listeria monocytogenes through the host cytosol and into neighboring cells?",
+      options: [
+        "InlA",
+        "ActA",
+        "PrfA",
+        "Hpt"
+      ],
+      correct: 1,
+      explanation: "ActA (Actin assembly-inducing protein) localizes to one pole of the bacterium and recruits the host Arp2/3 complex, assembling an actin 'comet tail' that propels the bacterium directly into adjacent cells without extracellular exposure."
+    },
+    {
+      q: "How does the nutrient transporter Hpt (hexose-6-phosphate transporter) support Listeria monocytogenes intracellular survival?",
+      options: [
+        "It pumps toxic antibiotics out of the bacterial periplasm",
+        "It imports phosphorylated hexose sugars from the host cytoplasm to fuel rapid intracellular replication",
+        "It transports LLO monomers across the bacterial outer membrane",
+        "It exports bacterial DNA into the host cell nucleus"
+      ],
+      correct: 1,
+      explanation: "Once in the host cell cytoplasm, Listeria uses Hpt to scavenge host-derived hexose phosphates (such as glucose-6-phosphate) as an efficient carbon and energy source."
+    },
+    {
+      q: "Which three serotypes of Listeria monocytogenes account for greater than 95% of all documented clinical human infections?",
+      options: [
+        "Serotypes 1/2a, 1/2b, and 4b",
+        "Serotypes O157, O104, and O111",
+        "Serotypes A, B, and C",
+        "Serotypes K1, K2, and K5"
+      ],
+      correct: 0,
+      explanation: "Although several listerial serotypes exist based on somatic (O) and flagellar (H) antigens, serotypes 1/2a, 1/2b, and 4b cause over 95% of human clinical cases."
+    },
+    {
+      q: "How does listeriosis typically present in healthy pregnant women, and what is the severe potential risk to the fetus?",
+      options: [
+        "Severe fulminant hemorrhagic colitis; no fetal risk",
+        "Mild flu-like illness (fever, myalgia, fatigue); high risk of chorioamnionitis, spontaneous abortion, stillbirth, or premature delivery",
+        "Acute ascending paralysis; infant born with permanent limb malformations",
+        "Asymptomatic bacteremia; guaranteed maternal liver failure"
+      ],
+      correct: 1,
+      explanation: "In pregnant women, listeriosis manifests as a mild, nonspecific febrile flu-like illness, but hematogenous transplacental dissemination can cause miscarriage, intrauterine fetal demise, or severe neonatal infection."
+    },
+    {
+      q: "What is 'granulomatosis infantiseptica' in the context of early-onset neonatal listeriosis?",
+      options: [
+        "A benign rash that self-resolves within 24 hours of delivery",
+        "A severe intrauterine infection presenting at or shortly after birth with septicemia and disseminated microabscesses/granulomas across multiple organs",
+        "A localized chronic middle ear infection acquired through breast milk",
+        "A neonatal hemolytic jaundice caused by maternal anti-Rh antibodies"
+      ],
+      correct: 1,
+      explanation: "Granulomatosis infantiseptica is the hallmark of early-onset neonatal listeriosis acquired in utero, characterized by overwhelming sepsis and widespread microabscesses and granulomas in fetal organs (liver, lungs, spleen)."
+    },
+    {
+      q: "How is late-onset neonatal listeriosis typically acquired, and how does it most commonly manifest clinically?",
+      options: [
+        "Acquired transplacentally during the first trimester; manifests as cleft palate",
+        "Acquired during passage through an infected birth canal or postnatally; manifests predominantly as purulent meningitis after the first week of life",
+        "Acquired via airborne droplet inhalation in nurseries; manifests as interstitial pneumonia",
+        "Acquired through cutaneous inoculation; manifests as necrotizing fasciitis"
+      ],
+      correct: 1,
+      explanation: "Late-onset disease occurs 1 to several weeks after birth, typically acquired during delivery through an colonized birth canal or nosocomial contacts, presenting predominantly as neonatal meningitis."
+    },
+    {
+      q: "In elderly and immunocompromised patients, Listeria monocytogenes shows a unique neurotropism for which anatomical structure, causing rhombencephalitis?",
+      options: [
+        "Cerebral cortex frontal lobes",
+        "Brainstem and cerebellum",
+        "Anterior horn cells of the spinal cord",
+        "Choroid plexus exclusively"
+      ],
+      correct: 1,
+      explanation: "L. monocytogenes has a predilection for the brainstem (rhombencephalitis) and cerebellum, often presenting with ataxia, cranial nerve palsies, altered mental status, and subacute meningitis."
+    },
+    {
+      q: "Why are humoral (antibody-mediated) immune responses ineffective at eliminating Listeria monocytogenes once an infection is established?",
+      options: [
+        "Listeria secretes an enzyme that hydrolyzes all circulating immunoglobulins within seconds",
+        "Listeria resides and spreads directly from cell to cell within the intracellular compartment, remaining shielded from circulating antibodies and complement",
+        "Listeria capsular polysaccharides block all Fab binding sites",
+        "Antibodies against Listeria fail to fix the C1q complement subunit"
+      ],
+      correct: 1,
+      explanation: "Because L. monocytogenes spreads directly from cell to cell via ActA-driven actin polymerization without exiting into the extracellular environment, it remains inaccessible to circulating neutralizing antibodies."
+    },
+    {
+      q: "Which immunological arm is absolutely critical for protective host defense and clearance of Listeria monocytogenes?",
+      options: [
+        "IgE-mediated mast cell degranulation",
+        "Cell-mediated immunity involving CD4+ Th1 macrophage activation and CD8+ CTL-mediated lysis of infected cells",
+        "Classical complement cascade Membrane Attack Complex (MAC) assembly",
+        "Polyreactive IgM secretion by peritoneal B-1 cells"
+      ],
+      correct: 1,
+      explanation: "Host clearance depends entirely on cell-mediated immunity: CD4+ Th1 cells secrete IFN-γ to activate macrophage microbicidal killing, while CD8+ CTLs lyse infected cells to expose bacteria to activated phagocytes."
+    },
+    {
+      q: "What constitutes the definitive gold standard for confirming a diagnosis of invasive Listeria monocytogenes infection?",
+      options: [
+        "Isolation and culture of the bacterium from normally sterile body fluids (blood, CSF, or amniotic fluid/placenta)",
+        "Serum agglutination titers against listerial O antigens",
+        "Stool wet mount demonstrating motile bacilli",
+        "Skin prick testing with purified listeriolysin O antigen"
+      ],
+      correct: 0,
+      explanation: "Definitive diagnosis requires culturing and isolating the organism from normally sterile sites such as blood, cerebrospinal fluid (CSF), placenta, or amniotic fluid."
+    },
+    {
+      q: "Why is serological antibody testing (e.g., detecting anti-LLO antibodies) NOT routinely recommended for the clinical diagnosis of acute listeriosis?",
+      options: [
+        "LLO is chemically identical to human albumin and triggers no antibodies",
+        "Antibody tests lack sensitivity, cross-react with other hemolysins, and prior antibiotic administration markedly blunts antibody responses",
+        "Serology takes only 3 minutes and is too rapid for clinical validation",
+        "Listeria suppresses all host B cell DNA synthesis irreversibly"
+      ],
+      correct: 1,
+      explanation: "Anti-LLO serology is poorly standardized, cross-reacts with other Gram-positive cytolysins (e.g., streptolysin O), and antibiotic therapy administered early in suspected sepsis suppresses antibody titers, generating false-negative results."
+    },
+    {
+      q: "What is the standard first-line antimicrobial regimen for treating severe, invasive Listeria monocytogenes infections (such as meningitis or bacteremia)?",
+      options: [
+        "Ceftriaxone alone",
+        "Ampicillin or amoxicillin (aminopenicillin), frequently combined with Gentamicin for synergy",
+        "Vancomycin plus Ciprofloxacin",
+        "Oral Erythromycin monotherapy"
+      ],
+      correct: 1,
+      explanation: "High-dose intravenous ampicillin (or amoxicillin) is the drug of choice. Gentamicin is added synergistically because cell wall inhibition by the penicillin enhances aminoglycoside penetration into the bacterium."
+    },
+    {
+      q: "Which widely used empiric class of antibiotics for bacterial meningitis is notoriously INEFFECTIVE against Listeria monocytogenes due to inherent intrinsic resistance?",
+      options: [
+        "Aminopenicillins",
+        "Third-generation cephalosporins (e.g., Ceftriaxone, Cefotaxime)",
+        "Aminoglycosides",
+        "Folate synthesis inhibitors (Cotrimoxazole)"
+      ],
+      correct: 1,
+      explanation: "Listeria species are naturally and intrinsically resistant to third-generation cephalosporins (like ceftriaxone) due to low-affinity penicillin-binding proteins (PBPs). Using ceftriaxone alone for Listeria meningitis leads to treatment failure."
+    },
+    {
+      q: "For a patient with invasive listeriosis who has a documented severe anaphylactic allergy to penicillin, which alternative antibiotic regimen is preferred?",
+      options: [
+        "Trimethoprim-sulfamethoxazole (TMP-SMX / Cotrimoxazole)",
+        "Cefepime monotherapy",
+        "Aztreonam",
+        "Oral Clindamycin"
+      ],
+      correct: 0,
+      explanation: "Trimethoprim-sulfamethoxazole (TMP-SMX/Cotrimoxazole) has excellent bactericidal activity and CNS penetration and is the first-line alternative for penicillin-allergic patients."
+    },
+    {
+      q: "Which molecular epidemiological typing method provides the highest resolution for linking human clinical cases to contaminated food processing plants during outbreak investigations?",
+      options: [
+        "Light microscopy Gram stain count",
+        "Whole-Genome Sequencing (WGS) and Pulsed-Field Gel Electrophoresis (PFGE)",
+        "ABO blood typing of the patient",
+        "Paper chromatography of bacterial lipids"
+      ],
+      correct: 1,
+      explanation: "Modern public health agencies (e.g., CDC) rely on Whole-Genome Sequencing (WGS) and PFGE to match the genomic fingerprint of patient isolates with environmental and food isolates with sub-strain precision."
+    },
+    {
+      q: "According to public health guidelines, how should high-risk individuals (such as pregnant women) prepare ready-to-eat deli meats to eliminate Listeria risk?",
+      options: [
+        "Freezing the meat for 30 minutes before eating cold",
+        "Reheating deli meats and frankfurters until steaming hot (internal temperature of 165°F / 74°C) before consumption",
+        "Washing cold cuts thoroughly under cold tap water",
+        "Adding extra vinegar and salt directly to the packaged cold meat"
+      ],
+      correct: 1,
+      explanation: "Because Listeria can grow in refrigerators, ready-to-eat deli meats, cold cuts, and hot dogs must be reheated until steaming hot to thermal-kill any contaminating bacteria before ingestion by pregnant or immunocompromised individuals."
+    },
+    {
+      q: "Which scientific taxonomic family and phylum (division) does the genus Listeria belong to?",
+      options: [
+        "Family Enterobacteriaceae, Phylum Pseudomonadota",
+        "Family Listeriaceae, Phylum Firmicutes (Bacillota)",
+        "Family Mycobacteriaceae, Phylum Actinomycetota",
+        "Family Micrococcaceae, Phylum Bacteroidota"
+      ],
+      correct: 1,
+      explanation: "Taxonomically, Listeria belongs to the genus Listeria, family Listeriaceae, order Bacillales, class Bacilli, and phylum Firmicutes (Bacillota)."
+    },
+    {
+      q: "What is the historical origin of the genus name 'Listeria' and the specific species epithet 'monocytogenes'?",
+      options: [
+        "Named after Joseph Lister (pioneer of antiseptic surgery); 'monocytogenes' refers to its ability to induce a marked increase in circulating monocytes in experimental hosts",
+        "Named after the town of Lister, Germany; 'monocytogenes' refers to having a single flagellum",
+        "Named after a French dairy farmer; 'monocytogenes' indicates that it ferments only one sugar monomer",
+        "Named after the microscope manufacturer Lister; 'monocytogenes' refers to single circular colonies"
+      ],
+      correct: 0,
+      explanation: "The genus was named in honor of British surgeon Sir Joseph Lister. The species epithet 'monocytogenes' reflects its noted capacity to provoke a striking monocytosis (elevation of monocytes) in infected laboratory animals."
+    },
+    {
+      q: "How does the environmental presence of Listeria monocytogenes as a saprophyte in soil and water impact the food production chain?",
+      options: [
+        "It only enters food if animals are visibly sick and dying",
+        "It is ubiquitous in agricultural environments, persists on processing equipment surfaces via biofilms, and repeatedly contaminates raw agricultural commodities",
+        "It can only survive inside living earthworms and cannot contact plants",
+        "It is strictly an obligate human parasite that cannot survive in soil"
+      ],
+      correct: 1,
+      explanation: "As a ubiquitous environmental saprophyte in wet soil, decaying vegetation, water, and animal feces, Listeria easily enters food processing environments and adheres to stainless steel equipment, creating persistent contamination niches."
+    },
+    {
+      q: "When Listeria monocytogenes is ingested in contaminated food, which human receptor does internalin A (InlA) bind to on intestinal epithelial cells to mediate entry?",
+      options: [
+        "E-cadherin",
+        "Met (Hepatocyte Growth Factor receptor)",
+        "CD4 receptor",
+        "Sialic acid residues"
+      ],
+      correct: 0,
+      explanation: "Internalin A (InlA) binds with high specificity to human E-cadherin expressed at the adherens junctions of polarized enterocytes, initiating receptor-mediated endocytosis."
+    },
+    {
+      q: "What happens when an immunocompetent, non-pregnant adult ingests a moderate dose of Listeria monocytogenes?",
+      options: [
+        "They almost invariably develop fatal brainstem encephalitis within 12 hours",
+        "They typically remain completely asymptomatic or develop a mild, self-limited febrile gastroenteritis that resolves without invasive complications",
+        "They develop permanent bilateral cranial nerve palsies without fever",
+        "They permanently shed the bacteria in urine for decades without gut involvement"
+      ],
+      correct: 1,
+      explanation: "In healthy immunocompetent hosts, the cell-mediated immune system rapidly contains the infection, resulting either in no symptoms or a brief, self-limited episode of watery diarrhea and fever without systemic or neurological invasion."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
