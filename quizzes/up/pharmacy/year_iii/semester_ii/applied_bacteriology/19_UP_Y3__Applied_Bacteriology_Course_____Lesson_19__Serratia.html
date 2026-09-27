@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 19: Yersinia spp. Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 19: Yersinia spp.</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What characteristic staining pattern is famously exhibited by Yersinia species on direct microscopic examination, giving it a 'safety pin' appearance?",
+        options: [
+          "Uniform dark purple Gram-positive rod",
+          "Bipolar staining, where the poles stain much darker than the clear center",
+          "Spore-specific malachite green central staining",
+          "Acid-fast beaded branching pattern"
+        ],
+        correct: 1,
+        explanation: "Yersinia species are Gram-negative bacilli or coccobacilli that exhibit classic bipolar staining (the two ends absorb stain heavily while the center remains pale), creating a distinctive 'safety pin' or paperclip morphology under the microscope."
+      },
+      {
+        q: "To which major bacterial family does the genus Yersinia belong, reflecting its biochemical traits of fermenting glucose and reducing nitrates to nitrites?",
+        options: [
+          "Pseudomonadaceae",
+          "Enterobacteriaceae",
+          "Bacillaceae",
+          "Chlamydiaceae"
+        ],
+        correct: 1,
+        explanation: "Yersinia belongs to the family Enterobacteriaceae. As typical family members, they are Gram-negative facultative anaerobes that are oxidase negative, catalase positive, ferment glucose, and reduce nitrates to nitrites."
+      },
+      {
+        q: "How does the motility of Yersinia pestis differ from that of Yersinia enterocolitica and Yersinia pseudotuberculosis?",
+        options: [
+          "Y. pestis is highly motile at 37°C, while other species are non-motile",
+          "Y. pestis is non-motile at all temperatures (25°C and 37°C), whereas the other two species are motile at 25°C but non-motile at 37°C",
+          "Y. pestis possesses peritrichous flagella only at room temperature",
+          "All Yersinia species are actively motile at human body temperature (37°C)"
+        ],
+        correct: 1,
+        explanation: "Temperature-dependent motility is a key diagnostic discriminator: Y. enterocolitica and Y. pseudotuberculosis synthesize flagella and are motile at room temperature (25°C), but become non-motile at 37°C. Y. pestis is non-motile at all temperatures."
+      },
+      {
+        q: "What is the optimal in vitro growth temperature range for Yersinia species?",
+        options: [
+          "37°C to 42°C",
+          "25°C to 28°C (room temperature)",
+          "50°C to 65°C",
+          "Strictly 0°C to 4°C"
+        ],
+        correct: 1,
+        explanation: "Yersinia species grow optimally at 25°C to 28°C (room temperature). Although they can grow at 37°C inside the human host, their replication on laboratory media is noticeably slower at 37°C."
+      },
+      {
+        q: "Which arthropod vector is primarily responsible for transmitting Yersinia pestis between rodent reservoirs and humans?",
+        options: [
+          "Ixodes ticks",
+          "Xenopsylla cheopis (rat flea)",
+          "Pediculus humanus (body louse)",
+          "Anopheles mosquitoes"
+        ],
+        correct: 1,
+        explanation: "The Oriental rat flea, Xenopsylla cheopis, is the classic biological vector that transmits Yersinia pestis from infected urban or sylvatic rodents to accidental human hosts."
+      },
+      {
+        q: "What is the primary animal reservoir for Yersinia pestis in endemic nature?",
+        options: [
+          "Domestic pigs and swine",
+          "Wild and urban rodents (rats, ground squirrels, prairie dogs)",
+          "Parrots and waterfowl",
+          "Grazing ruminants such as sheep and goats"
+        ],
+        correct: 1,
+        explanation: "Wild and domestic rodents (such as rats, chipmunks, and prairie dogs) represent the natural animal reservoir maintaining Y. pestis in sylvatic and urban plague cycles."
+      },
+      {
+        q: "Which major domestic animal is recognized as a primary reservoir and food-borne source for human Yersinia enterocolitica infections?",
+        options: [
+          "Pigs (swine)",
+          "Dairy cattle",
+          "Horses",
+          "Chickens"
+        ],
+        correct: 0,
+        explanation: "Pigs are the major asymptomatic reservoir of Yersinia enterocolitica. Humans frequently acquire enterocolitis through the ingestion of undercooked pork or cross-contaminated food products."
+      },
+      {
+        q: "Which historical plague pandemic, occurring in the 6th century AD during the reign of the Byzantine Empire, claimed over 100 million lives across the Mediterranean?",
+        options: [
+          "The Black Death",
+          "The Plague of Justinian",
+          "The Third Pandemic of 1894",
+          "The Great Pox of London"
+        ],
+        correct: 1,
+        explanation: "The First Pandemic, known as the Plague of Justinian (541–542 AD and recurrent waves over 50 years), decimated the Byzantine Empire and Mediterranean basin, resulting in an estimated >100 million deaths."
+      },
+      {
+        q: "Who discovered and isolated the causative bacterium of the plague in Hong Kong during the Third Pandemic in 1894?",
+        options: [
+          "Alexandre Yersin",
+          "Robert Koch",
+          "Kiyoshi Shiga",
+          "Louis Pasteur"
+        ],
+        correct: 0,
+        explanation: "Franco-Swiss physician and bacteriologist Alexandre Yersin isolated the plague bacillus in Hong Kong in 1894; the genus Yersinia was subsequently named in his honor."
+      },
+      {
+        q: "What is the classical hallmark lesion of Bubonic Plague, and what anatomical structure does it represent?",
+        options: [
+          "A diffuse petechial rash covering the soles and palms",
+          "A 'Bubo'—an intensely painful, swollen, inflamed satellite lymph node (e.g., femoral, inguinal, axillary, or cervical)",
+          "A coal-black necrotic ulcer surrounded by gelatinous edema",
+          "Multiple pus-filled boils along peripheral nerve roots"
+        ],
+        correct: 1,
+        explanation: "Bubonic plague is characterized by the formation of a 'bubo'—an acutely swollen, exquisitely painful, and inflamed regional lymph node draining the flea bite site (commonly femoral, inguinal, or axillary)."
+      },
+      {
+        q: "What is the primary mode of transmission of Primary Pulmonary (Pneumonic) Plague ('Pneumopeste')?",
+        options: [
+          "Direct skin contact with flea feces rubbed into an abrasion",
+          "Inhalation of infectious respiratory droplets/aerosols from a coughing patient or animal",
+          "Ingestion of unpasteurized milk from infected sheep",
+          "Transplacental transmission during the second trimester"
+        ],
+        correct: 1,
+        explanation: "Primary pneumonic plague is transmitted directly from person to person via inhalation of aerosolized respiratory droplets expelled by patients with active pulmonary plague."
+      },
+      {
+        q: "Why is Primary Pneumonic Plague considered an extreme biosecurity and clinical emergency compared to Bubonic Plague?",
+        options: [
+          "It has a long incubation period of over 6 months",
+          "It has an extremely short incubation period (hours to 2 days), is rapidly fatal within 2–4 days without early treatment, and is highly contagious person-to-person",
+          "It causes no fever or respiratory symptoms until after death",
+          "It is completely resistant to all known chemical disinfectants"
+        ],
+        correct: 1,
+        explanation: "Pneumonic plague has an incubation period of mere hours to 2 days, triggers rapid hemorrhagic bronchopneumonia, is almost 100% fatal within 2 to 4 days if untreated, and spreads explosively via airborne droplets."
+      },
+      {
+        q: "What is the estimated mortality rate of untreated Bubonic Plague?",
+        options: [
+          "Less than 5%",
+          "Around 20%",
+          "Greater than 70%",
+          "Strictly 0% as it is always self-limiting"
+        ],
+        correct: 2,
+        explanation: "Without prompt antimicrobial therapy, bubonic plague progresses to septicemia, endotoxic shock, and multi-organ failure, carrying a mortality rate exceeding 70%."
+      },
+      {
+        q: "Which clinical condition caused by Yersinia pseudotuberculosis and Y. enterocolitica characteristically mimics acute appendicitis in children and young adults?",
+        options: [
+          "Pseudomembranous colitis",
+          "Mesenteric adenitis (lymphadenitis)",
+          "Acute hemorrhagic pancreatitis",
+          "Fitz-Hugh-Curtis syndrome"
+        ],
+        correct: 1,
+        explanation: "Yersinia enterocolitica and Y. pseudotuberculosis invade the ileal mucosa and localize in mesenteric lymph nodes, producing mesenteric adenitis with right lower quadrant pain, fever, and leukocytosis that closely mimics acute appendicitis."
+      },
+      {
+        q: "Which selective culture medium is specifically formulated for the isolation of Yersinia enterocolitica from clinical stool samples?",
+        options: [
+          "CIN (Cefsulodin-Irgasan-Novobiocin) Agar",
+          "Bile-Esculin-Azide Agar",
+          "Thayer-Martin Chocolate Agar",
+          "Lowenstein-Jensen Medium"
+        ],
+        correct: 0,
+        explanation: "CIN agar (Cefsulodin-Irgasan-Novobiocin) is the specialized selective and differential medium used to isolate Yersinia species, effectively suppressing normal fecal flora."
+      },
+      {
+        q: "How do typical Yersinia enterocolitica colonies appear after 24–48 hours of incubation on CIN agar?",
+        options: [
+          "Colorless colonies surrounded by a broad zone of green discoloration",
+          "Distinctive 'Bull's Eye' colonies featuring a dark red center surrounded by a translucent border",
+          "Uniformly jet-black colonies due to intense H2S generation",
+          "Bright yellow mucoid colonies with fruity odors"
+        ],
+        correct: 1,
+        explanation: "On CIN agar, mannitol fermentation causes neutral red absorption, giving Y. enterocolitica colonies a classic 'bull's eye' appearance—a deep red center with a clear, translucent perimeter."
+      },
+      {
+        q: "What is the urease reaction of Yersinia enterocolitica and Yersinia pseudotuberculosis?",
+        options: [
+          "Urease positive (+)",
+          "Urease negative (-)",
+          "Variable depending on atmospheric oxygen concentration",
+          "Rapid gelatinase positive but urease inert"
+        ],
+        correct: 0,
+        explanation: "Both Y. enterocolitica and Y. pseudotuberculosis are urease positive (rapidly hydrolyzing urea to ammonia, turning phenol red pink/magenta), which aids in differentiating them from Y. pestis, which is urease negative."
+      },
+      {
+        q: "What underlying metabolic or systemic condition predisposes patients to severe, invasive Yersinia enterocolitica septicemia?",
+        options: [
+          "Iron overload states (e.g., hemochromatosis, beta-thalassemia major)",
+          "Severe calcium deficiency",
+          "Congenital lactase deficiency",
+          "Hyperthyroidism"
+        ],
+        correct: 0,
+        explanation: "Yersinia enterocolitica is a siderophilic organism that lacks its own efficient iron-chelating siderophores. Consequently, patients with systemic iron overload (hemochromatosis, frequent blood transfusions) are at heightened risk for life-threatening bacteremia."
+      },
+      {
+        q: "What is the classical initial cutaneous lesion that may develop at the flea bite site during the invasion phase of bubonic plague?",
+        options: [
+          "A small blister that ulcerates into a blackish crust ('Plague Coal')",
+          "A spreading bull's-eye erythema migrans rash",
+          "A painless indurated chancre with elevated borders",
+          "A group of flaccid bullae that slough the entire stratum corneum"
+        ],
+        correct: 0,
+        explanation: "At the primary site of flea inoculation, a vesicle or pustule may erupt and transform into a dark, necrotic black crust historically called the 'plague coal' or cutaneous plague carbuncle."
+      },
+      {
+        q: "Which antimicrobial drug class represents the traditional gold standard first-line treatment for life-threatening Yersinia pestis plague?",
+        options: [
+          "Aminoglycosides (Streptomycin or Gentamicin)",
+          "First-generation cephalosporins (Cefazolin)",
+          "Macrolides (Erythromycin)",
+          "Narrow-spectrum penicillinase-sensitive penicillins"
+        ],
+        correct: 0,
+        explanation: "Aminoglycosides—traditionally Streptomycin, and increasingly Gentamicin—are the clinical gold standard bactericidal agents for treating all forms of plague."
+      },
+      {
+        q: "Which oral antibiotics are commonly used as effective alternatives or post-exposure prophylaxis for plague?",
+        options: [
+          "Doxycycline (a tetracycline) or Ciprofloxacin (a fluoroquinolone)",
+          "Vancomycin or Daptomycin",
+          "Metronidazole or Tinidazole",
+          "Amoxicillin or Ampicillin"
+        ],
+        correct: 0,
+        explanation: "Doxycycline and fluoroquinolones (such as Ciprofloxacin or Levofloxacin) are highly effective alternatives for treatment and the preferred regimens for post-exposure prophylaxis in contacts."
+      },
+      {
+        q: "Which antibiotic is specifically recommended when treating plague meningitis due to its excellent penetration across the blood-brain barrier?",
+        options: [
+          "Chloramphenicol",
+          "Oral Nystatin",
+          "Gentamicin alone",
+          "Colistin"
+        ],
+        correct: 0,
+        explanation: "Chloramphenicol readily crosses the blood-brain barrier and achieves high therapeutic concentrations in the CSF, making it the preferred choice for plague meningitis."
+      },
+      {
+        q: "How should mild, uncomplicated gastrointestinal yersiniosis in an otherwise healthy patient typically be managed?",
+        options: [
+          "Emergency triple-antibiotic IV therapy for 6 weeks",
+          "Supportive care with oral hydration and electrolyte management, as the disease is usually self-limiting",
+          "Immediate prophylactic surgical appendectomy",
+          "High-dose corticosteroid infusions"
+        ],
+        correct: 1,
+        explanation: "Uncomplicated enterocolitis caused by Y. enterocolitica in immunocompetent hosts is generally self-limiting (lasting 1–3 weeks) and resolves with supportive rehydration therapy without requiring routine antibiotics."
+      },
+      {
+        q: "What cellular capability allows Yersinia pestis to survive and disseminate silently during the initial stages of infection?",
+        options: [
+          "Ability to survive and replicate intracellularly inside host macrophages",
+          "Formation of airborne endospores inside red blood cells",
+          "Synthesis of a thick D-glutamic acid capsule at 20°C",
+          "Complete degradation of host serum immunoglobulins via keratinase"
+        ],
+        correct: 0,
+        explanation: "Following flea injection, Y. pestis organisms are engulfed by tissue macrophages. Instead of being killed, they survive and multiply inside phagosomes, using the cells as vehicles to reach regional lymph nodes."
+      },
+      {
+        q: "What biochemical profile is shared across all pathogenic Yersinia species?",
+        options: [
+          "Oxidase positive, Catalase negative, Strict aerobe",
+          "Oxidase negative, Catalase positive, Facultative anaerobe",
+          "Oxidase negative, Catalase negative, Obligate anaerobe",
+          "Oxidase positive, Catalase positive, Microaerophilic"
+        ],
+        correct: 1,
+        explanation: "Like other Enterobacteriaceae, Yersinia species are oxidase negative, catalase positive, and facultatively anaerobic."
+      },
+      {
+        q: "What is the typical incubation period of Bubonic Plague following the bite of an infected flea?",
+        options: [
+          "1 to 6 days",
+          "30 to 45 days",
+          "6 to 12 months",
+          "Exactly 2 hours"
+        ],
+        correct: 0,
+        explanation: "Bubonic plague typically manifests after an incubation period of 1 to 6 days following the transmission bite of an infected rodent flea."
+      },
+      {
+        q: "Which physical measure is imperative in hospital settings to prevent the secondary spread of Pneumonic Plague?",
+        options: [
+          "Strict droplet/respiratory isolation precautions and PPE (masks) for healthcare workers",
+          "Routine bed bug fumigation without patient isolation",
+          "Submerging all patient linens in hot oil",
+          "Discontinuing all oral fluid intake"
+        ],
+        correct: 0,
+        explanation: "Because pneumonic plague spreads directly and rapidly through respiratory droplets, immediate strict respiratory droplet isolation precautions (including masks, gowns, and eye protection) are essential."
+      },
+      {
+        q: "Why can Yersinia enterocolitica proliferate in refrigerated food products (e.g., milk, vacuum-packed pork) stored at 4°C?",
+        options: [
+          "It is a psychrotrophic bacterium capable of cold enrichment and replication at refrigerator temperatures",
+          "It forms heat-activated spores that germinate when frozen",
+          "It uses atmospheric freon as a nitrogen source",
+          "It relies on ice crystals to synthesize peptidoglycan"
+        ],
+        correct: 0,
+        explanation: "Y. enterocolitica is psychrotrophic—it can survive and replicate at 4°C. This allows it to multiply in refrigerated dairy and vacuum-packed meats ('cold enrichment' principle)."
+      },
+      {
+        q: "What systemic complication accounts for the historical nickname 'The Black Death' in septicemic plague?",
+        options: [
+          "Extensive disseminated intravascular coagulation (DIC), microvascular thrombosis, and acral gangrene of fingers, toes, and nose",
+          "Massive melanin hyperpigmentation triggered by pituitary bacterial toxins",
+          "Black urine caused by severe hemoglobinuria",
+          "Diffuse deposition of elemental carbon in subcutaneous fat"
+        ],
+        correct: 0,
+        explanation: "High-grade endotoxemia and bacteremia trigger disseminated intravascular coagulation (DIC), widespread purpura, ischemic tissue necrosis, and peripheral gangrene (turning extremities black), giving rise to the name 'The Black Death'."
+      },
+      {
+        q: "Which key public health strategy is most vital for preventing sylvatic and urban Bubonic Plague outbreaks in human communities?",
+        options: [
+          "Controlling rodent populations and applying insecticides to reduce flea burdens before rodent eradication",
+          "Routine prophylactic chlorination of all ocean water",
+          "Mass vaccination of all migratory wild birds",
+          "Banning the sale of refrigerated pork in urban supermarkets"
+        ],
+        correct: 0,
+        explanation: "Plague control requires controlling rodent hosts and suppressing flea populations with insecticides. (Critically, fleas must be killed before or concurrently with rodent extermination so hungry fleas do not abandon dying rats to bite humans)."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
