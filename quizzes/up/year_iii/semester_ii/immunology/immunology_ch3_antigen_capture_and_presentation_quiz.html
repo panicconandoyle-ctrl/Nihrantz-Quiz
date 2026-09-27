@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immunology CH3: Antigen Capture and Presentation Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px 40px;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Header & Progress */
+    .header-card {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .quiz-subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .list-toggle-btn {
+      background-color: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d5dcff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .list-toggle-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-bg {
+      background-color: #e6e9f2;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-fill {
+      background-color: #4255ff;
+      height: 100%;
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    /* Question Drawer / Modal Grid */
+    .grid-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .grid-modal.open {
+      display: block;
+    }
+
+    .grid-modal-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 12px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #d5dcff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      background-color: #eef1ff;
+      border-color: #4255ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      color: #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-item.answered {
+      background-color: #eef1ff;
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    /* Study Card */
+    .card {
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .q-number-tag {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #646f90;
+      font-weight: 700;
+    }
+
+    .q-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.45;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 14.5px;
+      color: #2e3856;
+      transition: all 0.15s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fbfcff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: #f6f7fb;
+      color: #646f90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      border: 1px solid #e6e9f2;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .feedback-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: none;
+      text-transform: uppercase;
+    }
+
+    /* Option Feedback States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .feedback-pill {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .feedback-pill {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Rationale Card */
+    .rationale-box {
+      display: none;
+      background: #fcfdfe;
+      border: 1px solid #e6e9f2;
+      border-left: 5px solid #4255ff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 4px;
+    }
+
+    .rationale-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-content {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.5;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      border-color: #d5dcff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      color: #ffffff;
+      border: 1px solid #4255ff;
+      margin-left: auto;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+    }
+
+    /* Results Card */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      padding: 40px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .score-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 10px auto;
+    }
+
+    .score-percent {
+      font-size: 32px;
+      font-weight: 800;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 11px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .score-breakdown {
+      display: flex;
+      gap: 24px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .stat-correct { color: #18ae79; }
+    .stat-incorrect { color: #ff6871; }
+
+    /* Footer & Branding */
+    .footer {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 13px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      width: 34px;
+      height: 34px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Header Card -->
+  <div class="header-card">
+    <div class="title-row">
+      <div>
+        <div class="quiz-title">Immunology: CH3 Antigen Capture and Presentation</div>
+        <div class="quiz-subtitle">30 High-Yield Multiple Choice Questions & Rationales</div>
+      </div>
+      <button class="list-toggle-btn" id="listToggleBtn" onclick="toggleGrid()">View List</button>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="stats-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </div>
+
+  <!-- Question Overview Grid Drawer -->
+  <div class="grid-modal" id="gridModal">
+    <div class="grid-modal-header">Jump directly to question:</div>
+    <div class="question-grid" id="questionGrid"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <div class="card" id="questionCard">
+    <div class="q-number-tag" id="qNumberTag">Question 1</div>
+    <div class="q-text" id="qText">Loading question stem...</div>
+    <div class="options-list" id="optionsList"></div>
+    <div class="rationale-box" id="rationaleBox">
+      <div class="rationale-title">Explanation & Rationales</div>
+      <div class="rationale-content" id="rationaleContent"></div>
+    </div>
+  </div>
+
+  <!-- Results Scorecard -->
+  <div class="scorecard" id="scoreCard">
+    <h2 style="font-size: 22px; font-weight: 800;">Quiz Completed!</h2>
+    <div class="score-circle">
+      <div class="score-percent" id="scorePercent">0%</div>
+      <div class="score-label">Score</div>
+    </div>
+    <div class="score-breakdown">
+      <span class="stat-correct" id="scoreCorrect">Correct: 0</span>
+      <span class="stat-incorrect" id="scoreIncorrect">Incorrect: 0</span>
+    </div>
+    <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+  </div>
+
+  <!-- Footer Branding -->
+  <div class="footer">
+    <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+      <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+      <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  {
+    q: "Which cell type is primarily responsible for capturing antigens in peripheral tissues and migrating to regional lymph nodes to activate naïve T cells?",
+    options: [
+      "Macrophage",
+      "B lymphocyte",
+      "Dendritic cell",
+      "Neutrophil"
+    ],
+    correct: 2,
+    explanation: "Dendritic cells (DCs), including Langerhans cells in the skin, are specialized scouts that capture antigens via CLRs, FcRs, or CRs, mature upon PAMP sensing, and migrate via lymphatics to lymph nodes—where they prime naïve T cells."
+  },
+  {
+    q: "MHC class I molecules are expressed on:",
+    options: [
+      "Only professional antigen-presenting cells",
+      "All nucleated cells",
+      "Red blood cells and platelets",
+      "Only B and T lymphocytes"
+    ],
+    correct: 1,
+    explanation: "MHC class I is constitutively expressed on all nucleated cells (including epithelial, neuronal, and muscle cells) to allow CD8⁺ T cells to monitor for intracellular infection or cancer. Erythrocytes lack nuclei and MHC-I."
+  },
+  {
+    q: "Antigens presented by MHC class II molecules typically originate from:",
+    options: [
+      "Cytosolic proteins synthesized within the host cell",
+      "Extracellular pathogens internalized by endocytosis or phagocytosis",
+      "Viral genomes integrated directly into host DNA",
+      "Endogenous mitochondrial proteins"
+    ],
+    correct: 1,
+    explanation: "MHC class II presents exogenous antigens—proteins from extracellular microbes (e.g., bacteria, toxins) that are phagocytosed/endocytosed and degraded in endolysosomes of professional APCs."
+  },
+  {
+    q: "Which co-receptor binds to the invariant α3 domain of MHC class I and is expressed on cytotoxic T cells?",
+    options: [
+      "CD4",
+      "CD28",
+      "CD8",
+      "CD40"
+    ],
+    correct: 2,
+    explanation: "CD8 binds specifically to the invariant α3 domain of MHC class I, stabilizing the TCR–peptide–MHC interaction and recruiting Lck kinase to enhance signaling in CD8⁺ cytotoxic T lymphocytes (CTLs)."
+  },
+  {
+    q: "What is the primary function of the invariant chain (Ii) during MHC class II biosynthesis in the endoplasmic reticulum (ER)?",
+    options: [
+      "Transports MHC-II directly into the cell nucleus",
+      "Blocks the peptide-binding groove to prevent premature binding of endogenous ER peptides",
+      "Directly activates the cytosolic 26S proteasome",
+      "Binds TAP transporters to import short viral peptides"
+    ],
+    correct: 1,
+    explanation: "The invariant chain occupies the peptide-binding groove of MHC-II in the ER, preventing binding of endogenous peptides. It guides MHC-II to endosomes, where it is degraded to CLIP before peptide exchange by HLA-DM."
+  },
+  {
+    q: "Cross-presentation refers to the specialized capability of dendritic cells to:",
+    options: [
+      "Present lipid antigens via CD1 molecules",
+      "Present exogenous (extracellular) antigens on MHC class I molecules to CD8⁺ T cells",
+      "Secrete both IL-4 and IFN-γ simultaneously",
+      "Activate B cells without any helper T cell interaction"
+    ],
+    correct: 1,
+    explanation: "Cross-presentation allows DCs to ingest extracellular antigens (e.g., from dying virus-infected cells) and divert them into the MHC class I pathway, enabling the priming of naive CD8⁺ CTLs against viruses or tumors that do not directly infect DCs."
+  },
+  {
+    q: "Which transporter shuttles cytosolic peptides into the lumen of the endoplasmic reticulum for MHC class I loading?",
+    options: [
+      "HLA-DM",
+      "Tapasin",
+      "TAP (Transporter Associated with Antigen Processing)",
+      "Invariant chain"
+    ],
+    correct: 2,
+    explanation: "TAP is an ATP-dependent heterodimer in the ER membrane that pumps short 8–9 amino acid peptides generated by the proteasome into the ER lumen for loading into nascent MHC class I molecules."
+  },
+  {
+    q: "Professional antigen-presenting cells (APCs) are immunologically defined by their ability to express:",
+    options: [
+      "MHC class I exclusively",
+      "MHC class II and co-stimulatory molecules (e.g., B7-1/B7-2)",
+      "High-affinity FcεRI receptors",
+      "Perforin and granzyme B granules"
+    ],
+    correct: 1,
+    explanation: "Professional APCs (dendritic cells, macrophages, and B cells) are distinguished by their constitutive or inducible expression of MHC class II and co-stimulatory molecules (CD80/CD86), allowing them to deliver both Signal 1 and Signal 2 to CD4⁺ T cells."
+  },
+  {
+    q: "Which chemokine receptor is upregulated upon dendritic cell activation to guide its migration from inflamed tissue to the draining lymph node?",
+    options: [
+      "CXCR5",
+      "CCR7",
+      "CXCR3",
+      "CCR5"
+    ],
+    correct: 1,
+    explanation: "Upon activation, DCs downregulate tissue adhesion molecules and upregulate CCR7. CCR7 guides the DC toward CCL19 and CCL21 produced by lymphatic endothelial cells and stromal cells in the T-cell zones of lymph nodes."
+  },
+  {
+    q: "Peptides presented within the closed-ended cleft of MHC class I molecules typically measure:",
+    options: [
+      "5–7 amino acids",
+      "8–9 amino acids",
+      "13–17 amino acids",
+      "20–30 amino acids"
+    ],
+    correct: 1,
+    explanation: "The peptide-binding cleft of MHC class I is closed at both ends, restricting the length of bound peptides to short sequences of 8–9 amino acids. MHC class II clefts are open at the ends and accommodate 10–30 amino acids."
+  },
+  {
+    q: "Which of the following is NOT classified as a professional antigen-presenting cell (APC)?",
+    options: [
+      "Dendritic cell",
+      "Macrophage",
+      "B cell",
+      "Fibroblast"
+    ],
+    correct: 3,
+    explanation: "Fibroblasts are non-professional cells that express MHC class I to display endogenous antigens to CD8⁺ T cells, but they lack constitutive MHC class II and co-stimulatory molecules necessary to prime naive CD4⁺ helper T cells."
+  },
+  {
+    q: "What is the critical molecular role of HLA-DM in the MHC class II antigen presentation pathway?",
+    options: [
+      "It marks cytoplasmic proteins with ubiquitin for degradation",
+      "It removes the CLIP peptide from MHC class II and facilitates binding of antigenic peptides",
+      "It transports peptides from lysosomes into the nucleus",
+      "It stabilizes the assembly of β₂-microglobulin in the ER"
+    ],
+    correct: 1,
+    explanation: "HLA-DM acts as a molecular chaperone in endosomal compartments. It catalyzes the release of Class II-associated Invariant chain Peptide (CLIP) from the MHC-II binding groove, allowing processed high-affinity foreign peptides to bind."
+  },
+  {
+    q: "According to the two-signal model of T cell activation, what provides Signal 2 to prevent anergy?",
+    options: [
+      "TCR binding to peptide–MHC",
+      "CD4 or CD8 co-receptor binding to MHC",
+      "B7-1/B7-2 (CD80/86) on the APC binding to CD28 on the T cell",
+      "Engagement of IL-2 with its high-affinity receptor"
+    ],
+    correct: 2,
+    explanation: "Signal 1 is TCR recognition of the peptide-MHC complex. Signal 2 is co-stimulation delivered by B7-1/B7-2 on the APC binding to CD28 on the T cell. Antigen encounter without Signal 2 leads to functional anergy or apoptosis."
+  },
+  {
+    q: "Which antigen-processing pathway is utilized to present endogenous viral proteins synthesized inside an infected epithelial cell?",
+    options: [
+      "MHC class II pathway",
+      "Cross-presentation pathway",
+      "MHC class I pathway",
+      "CD1 non-polymorphic pathway"
+    ],
+    correct: 2,
+    explanation: "Endogenously synthesized cytosolic viral proteins are degraded into peptides by the 26S proteasome, imported into the ER via TAP, loaded onto MHC class I molecules, and presented at the cell surface to CD8⁺ cytotoxic T cells."
+  },
+  {
+    q: "Langerhans cells of the skin epidermis are a specialized lineage of:",
+    options: [
+      "Tissue macrophages",
+      "B lymphocytes",
+      "Dendritic cells",
+      "Mast cells"
+    ],
+    correct: 2,
+    explanation: "Langerhans cells are epidermis-resident dendritic cells (classified within the cDC2 lineage) that capture cutaneous antigens via receptors like Langerin (CD207) and migrate via lymphatics to regional draining lymph nodes."
+  },
+  {
+    q: "Which macromolecular enzymatic machine is responsible for degrading cytosolic proteins into peptides for MHC class I display?",
+    options: [
+      "Acid lysosomal cathepsins",
+      "The 26S proteasome complex",
+      "The Golgi vesicle translocon",
+      "NADPH oxidase complex"
+    ],
+    correct: 1,
+    explanation: "The proteasome is a cylindrical cytosolic protease complex that targets ubiquitin-tagged proteins (such as viral, tumor, or misfolded self-proteins) and chops them into 8–9 amino acid peptides for MHC class I presentation."
+  },
+  {
+    q: "The genetic cluster encoding the human Major Histocompatibility Complex (MHC) is located on which chromosome?",
+    options: [
+      "Chromosome 1",
+      "Chromosome 6",
+      "Chromosome 15",
+      "Chromosome 21"
+    ],
+    correct: 1,
+    explanation: "The human MHC (HLA complex) is located on the short arm of chromosome 6. Note that β₂-microglobulin is encoded separately on chromosome 15."
+  },
+  {
+    q: "Which T cell subset recognizes peptide antigens presented in association with MHC class II molecules?",
+    options: [
+      "CD8⁺ cytotoxic T lymphocytes",
+      "Natural Killer (NK) cells",
+      "CD4⁺ helper T lymphocytes",
+      "γδ T cells"
+    ],
+    correct: 2,
+    explanation: "CD4⁺ helper T lymphocytes specifically recognize foreign peptide antigens bound to MHC class II molecules on professional APCs, guided by the CD4 co-receptor which binds the non-polymorphic β2 domain of MHC-II."
+  },
+  {
+    q: "What components are required for an MHC class I molecule to achieve stable conformation and exit the endoplasmic reticulum toward the cell surface?",
+    options: [
+      "The α heavy chain, β₂-microglobulin, and a high-affinity bound peptide",
+      "The α heavy chain and invariant chain (Ii)",
+      "The α and β chains complexed with CLIP",
+      "Only the heavy α chain anchored to ubiquitin"
+    ],
+    correct: 0,
+    explanation: "MHC class I is a heterotrimer requiring the polymorphic α heavy chain, invariant β₂-microglobulin, and an appropriately sized, high-affinity peptide. Empty or unstable complexes fail quality control and are degraded in the ER."
+  },
+  {
+    q: "Which non-classical MHC-like molecules specialize in presenting microbial lipid and glycolipid antigens (e.g., from Mycobacterium) to T cells?",
+    options: [
+      "HLA-DR molecules",
+      "HLA-A and HLA-B",
+      "CD1 molecules (CD1a–d)",
+      "HLA-DM chaperones"
+    ],
+    correct: 2,
+    explanation: "CD1 molecules (CD1a, CD1b, CD1c, CD1d) are non-polymorphic, MHC class I–like glycoproteins associated with β₂m that possess hydrophobic clefts tailored to present lipid and glycolipid antigens to NKT cells and specialized T cells."
+  },
+  {
+    q: "When protein antigens enter through cutaneous barriers, in which anatomical structures do they predominantly concentrate for immune presentation?",
+    options: [
+      "Splenic marginal zones",
+      "Bone marrow sinusoids",
+      "Regional draining lymph nodes",
+      "Thymic Hassall's corpuscles"
+    ],
+    correct: 2,
+    explanation: "Antigens penetrating the skin are picked up by local dermal DCs or epidermal Langerhans cells, which enter afferent lymphatic vessels and carry the antigens directly to regional draining lymph nodes (e.g., inguinal or axillary nodes)."
+  },
+  {
+    q: "Which pair of genetic characteristics distinguishes the MHC genes within the human population?",
+    options: [
+      "Extreme polymorphism and co-dominant expression",
+      "Monomorphism and recessive inheritance",
+      "Somatic hypermutation and X-linked dominance",
+      "Alternative mRNA splicing and paternal imprinting"
+    ],
+    correct: 0,
+    explanation: "MHC genes are polygenic and the most polymorphic genes in mammals (>3,000 alleles). Furthermore, they are co-dominantly expressed, meaning both maternal and paternal alleles are expressed simultaneously on every cell."
+  },
+  {
+    q: "How do Follicular Dendritic Cells (FDCs) differ functionally from conventional dendritic cells?",
+    options: [
+      "They present endogenously degraded peptides on MHC class II to naive T cells",
+      "They are non-hematopoietic stromal cells that display intact native antigens to B cells in germinal centers via complement and Fc receptors",
+      "They migrate continuously between mucosal tissues and thymic cortex",
+      "They secrete large bursts of type I interferons during viral entry"
+    ],
+    correct: 1,
+    explanation: "FDCs reside in B cell follicles. They are stromal in origin, do not express MHC class II, do not process antigens into peptides, and do not activate T cells; instead, they capture intact immune complexes via FcRs and complement receptors to support B cell affinity maturation."
+  },
+  {
+    q: "What is the biological definition of 'MHC restriction'?",
+    options: [
+      "T cells can only recognize naked peptides free in extracellular solution",
+      "MHC molecules are strictly restricted to synthesizing antibodies",
+      "A specific T cell receptor recognizes a foreign peptide antigen ONLY when bound within a self-MHC molecule",
+      "MHC genes are expressed exclusively in generative lymphoid organs"
+    ],
+    correct: 2,
+    explanation: "MHC restriction means a T cell receptor recognizes neither free foreign antigen nor non-self MHC alone; it recognizes the combined structural motif of a foreign peptide nested within a self-MHC molecule."
+  },
+  {
+    q: "Which cytokine secreted by activated T cells and NK cells strongly upregulates MHC class II expression and co-stimulatory molecules on macrophages?",
+    options: [
+      "Interleukin-4 (IL-4)",
+      "Interleukin-10 (IL-10)",
+      "Interferon-gamma (IFN-γ)",
+      "Transforming Growth Factor-beta (TGF-β)"
+    ],
+    correct: 2,
+    explanation: "IFN-γ is a signature Th1 and NK cell cytokine that potently upregulates transcription of MHC class II genes and co-stimulators (B7) on macrophages, converting them into competent antigen-presenting cells."
+  },
+  {
+    q: "Which ER-associated chaperone directly links nascent MHC class I to the TAP transporter in the peptide-loading complex?",
+    options: [
+      "Invariant chain",
+      "HLA-DM",
+      "Tapasin",
+      "Cathepsin S"
+    ],
+    correct: 2,
+    explanation: "Tapasin acts as a physical bridge within the peptide-loading complex in the ER membrane, linking TAP to empty MHC class I molecules and optimizing peptide cargo selection for high affinity."
+  },
+  {
+    q: "Why are naïve T cells strictly dependent on co-stimulation (Signal 2) during initial antigen encounter?",
+    options: [
+      "Naïve T cells lack functional T cell receptors",
+      "To ensure T cells only mount an active response when APCs confirm the presence of microbial infection or danger",
+      "Co-stimulation is required to mutate the TCR variable region",
+      "Without co-stimulation, T cells spontaneously convert into plasma cells"
+    ],
+    correct: 1,
+    explanation: "Co-stimulation acts as a safeguard. Since self-antigens are presented constantly on host APCs without danger signals, requiring Signal 2 (B7-CD28) ensures naive T cells are only activated during genuine microbial infections, preventing autoimmunity."
+  },
+  {
+    q: "The anchor residues of an antigenic peptide bind specifically to:",
+    options: [
+      "The variable loop domains of the T cell receptor directly",
+      "Polymorphic binding pockets within the MHC cleft",
+      "The CD4 or CD8 co-receptors",
+      "The constant immunoglobulin domain of β₂-microglobulin"
+    ],
+    correct: 1,
+    explanation: "Anchor residues are conserved amino acid side chains along the peptide that insert into polymorphic pockets lining the floor of the MHC peptide-binding groove, anchoring the peptide firmly in place while upward-facing residues contact the TCR."
+  },
+  {
+    q: "Which enzymatic compartment and proteases are responsible for generating peptides in the MHC class II pathway?",
+    options: [
+      "The 26S cytosolic proteasome complex",
+      "Mitochondrial matrix caspases",
+      "Acidic endosomes and lysosomes containing cathepsins",
+      "The endoplasmic reticulum lumen via signal peptidase"
+    ],
+    correct: 2,
+    explanation: "In the MHC class II pathway, internalized proteins enter endosomal vesicles that fuse with lysosomes. The low pH and acid-dependent proteases (such as cathepsins) degrade the protein into linear peptide fragments of 10–30 amino acids."
+  },
+  {
+    q: "Why is the biological process of cross-presentation essential for generating protective immunity against many non-hepatotropic and non-macrophage viruses?",
+    options: [
+      "It allows B cells to synthesize neutralizing IgA in the bone marrow",
+      "It enables dendritic cells to prime CD8⁺ cytotoxic T lymphocytes against viruses that exclusively infect non-APC tissue cells",
+      "It suppresses excessive natural killer cell cytotoxicity",
+      "It prevents extracellular viruses from entering the blood circulation"
+    ],
+    correct: 1,
+    explanation: "Many viruses only infect specialized parenchymal or epithelial cells (e.g., influenza in respiratory epithelium) rather than dendritic cells. Cross-presentation allows DCs to ingest debris from dying infected cells and present viral antigens on MHC-I, activating the CD8⁺ CTLs needed to kill those infected host cells."
+  }
+];
+
+let currentIdx = 0;
+let userAnswers = new Array(quizData.length).fill(null);
+
+function initQuiz() {
+  renderGrid();
+  renderQuestion();
+  updateProgress();
+}
+
+function renderGrid() {
+  const grid = document.getElementById("questionGrid");
+  grid.innerHTML = "";
+  quizData.forEach((_, idx) => {
+    const item = document.createElement("div");
+    item.className = "grid-item";
+    item.id = `grid-item-${idx}`;
+    item.innerText = idx + 1;
+    item.onclick = () => jumpToQuestion(idx);
+    grid.appendChild(item);
+  });
+}
+
+function toggleGrid() {
+  const modal = document.getElementById("gridModal");
+  const btn = document.getElementById("listToggleBtn");
+  if (modal.classList.contains("open")) {
+    modal.classList.remove("open");
+    btn.innerText = "View List";
+  } else {
+    modal.classList.add("open");
+    btn.innerText = "Hide List";
+  }
+}
+
+function jumpToQuestion(idx) {
+  currentIdx = idx;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizData[currentIdx];
+  document.getElementById("qNumberTag").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+  document.getElementById("qText").innerText = q.q;
+  document.getElementById("questionCounter").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+
+  const optionsList = document.getElementById("optionsList");
+  optionsList.innerHTML = "";
+  const rationaleBox = document.getElementById("rationaleBox");
+  const rationaleContent = document.getElementById("rationaleContent");
+
+  const letters = ["A", "B", "C", "D"];
+  const answered = userAnswers[currentIdx] !== null;
+
+  q.options.forEach((optText, optIdx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.disabled = answered;
+
+    const badge = document.createElement("div");
+    badge.className = "badge";
+    badge.innerText = letters[optIdx];
+
+    const textSpan = document.createElement("div");
+    textSpan.className = "option-text";
+    textSpan.innerText = optText;
+
+    const feedbackPill = document.createElement("div");
+    feedbackPill.className = "feedback-pill";
+
+    btn.appendChild(badge);
+    btn.appendChild(textSpan);
+    btn.appendChild(feedbackPill);
+
+    if (answered) {
+      if (optIdx === q.correct) {
+        btn.classList.add("correct");
+        feedbackPill.innerText = "Correct";
+      } else if (optIdx === userAnswers[currentIdx]) {
+        btn.classList.add("incorrect");
+        feedbackPill.innerText = "Incorrect";
+      }
+    } else {
+      btn.onclick = () => handleSelectOption(optIdx);
+    }
+
+    optionsList.appendChild(btn);
+  });
+
+  if (answered) {
+    rationaleBox.style.display = "block";
+    rationaleContent.innerText = q.explanation;
+  } else {
+    rationaleBox.style.display = "none";
+  }
+
+  // Navigation controls
+  document.getElementById("prevBtn").disabled = currentIdx === 0;
+  const nextBtn = document.getElementById("nextBtn");
+  if (currentIdx === quizData.length - 1) {
+    nextBtn.innerText = "Submit Test";
+  } else {
+    nextBtn.innerText = "Next";
+  }
+
+  updateGridStyles();
+}
+
+function handleSelectOption(optIdx) {
+  userAnswers[currentIdx] = optIdx;
+  renderQuestion();
+  updateProgress();
+}
+
+function prevQuestion() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    renderQuestion();
+  }
+}
+
+function nextQuestion() {
+  if (currentIdx < quizData.length - 1) {
+    currentIdx++;
+    renderQuestion();
+  } else {
+    submitQuiz();
+  }
+}
+
+function updateProgress() {
+  const answeredCount = userAnswers.filter(a => a !== null).length;
+  const pct = (answeredCount / quizData.length) * 100;
+  document.getElementById("progressBar").style.width = `${pct}%`;
+  document.getElementById("answeredCounter").innerText = `${answeredCount} / ${quizData.length} Answered`;
+}
+
+function updateGridStyles() {
+  quizData.forEach((_, idx) => {
+    const el = document.getElementById(`grid-item-${idx}`);
+    if (!el) return;
+    el.className = "grid-item";
+    if (idx === currentIdx) {
+      el.classList.add("active");
+    }
+    if (userAnswers[idx] !== null) {
+      el.classList.add("answered");
+    }
+  });
+}
+
+function submitQuiz() {
+  document.getElementById("questionCard").style.display = "none";
+  document.getElementById("navBar").style.display = "none";
+  document.getElementById("gridModal").classList.remove("open");
+  document.getElementById("listToggleBtn").style.display = "none";
+
+  let correctCount = 0;
+  userAnswers.forEach((ans, idx) => {
+    if (ans === quizData[idx].correct) correctCount++;
+  });
+
+  const percent = Math.round((correctCount / quizData.length) * 100);
+  document.getElementById("scorePercent").innerText = `${percent}%`;
+  document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+  document.getElementById("scoreIncorrect").innerText = `Incorrect: ${quizData.length - correctCount}`;
+  document.getElementById("scoreCard").style.display = "flex";
+}
+
+function restartQuiz() {
+  userAnswers = new Array(quizData.length).fill(null);
+  currentIdx = 0;
+  document.getElementById("questionCard").style.display = "flex";
+  document.getElementById("navBar").style.display = "flex";
+  document.getElementById("listToggleBtn").style.display = "inline-block";
+  document.getElementById("scoreCard").style.display = "none";
+  initQuiz();
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
