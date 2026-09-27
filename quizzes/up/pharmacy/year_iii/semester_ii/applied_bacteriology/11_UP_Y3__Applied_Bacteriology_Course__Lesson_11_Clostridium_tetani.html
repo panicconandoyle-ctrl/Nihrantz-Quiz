@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 11: Clostridium tetani Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Progress */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #c8d1ff;
+      color: #4255ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .meta-counts {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #e6e9f2;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    /* Question Overview Modal / Grid */
+    .grid-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .grid-card.active {
+      display: block;
+    }
+
+    .grid-card h3 {
+      font-size: 0.9rem;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-btn {
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      border-color: #b8c4ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.current {
+      border: 2px solid #4255ff;
+      font-weight: bold;
+      box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.18);
+    }
+
+    /* Main Question Card */
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .q-number-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .question-stem {
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:hover:not(:disabled) {
+      border-color: #4255ff;
+      background: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .opt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #646f90;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 3px;
+    }
+
+    .opt-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* Feedback styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-tile.correct .opt-badge {
+      background: #18ae79;
+      color: #ffffff;
+    }
+    .option-tile.correct .opt-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-tile.incorrect .opt-badge {
+      background: #ff6871;
+      color: #ffffff;
+    }
+    .option-tile.incorrect .opt-tag {
+      display: inline-block;
+      background: #b31d27;
+      color: #ffffff;
+    }
+
+    /* Explanation Card */
+    .rationale-card {
+      margin-top: 20px;
+      background: #fbfcfe;
+      border: 1px solid #e0e5f2;
+      border-left: 4px solid #4255ff;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #2e3856;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-nav.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Scorecard / Results View */
+    .scorecard {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .scorecard.active {
+      display: block;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4255ff;
+      margin: 0 auto 20px;
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+    }
+
+    .score-breakdown {
+      font-size: 1rem;
+      color: #646f90;
+      margin-bottom: 24px;
+    }
+
+    .score-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 110px;
+    }
+
+    .stat-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .stat-val.correct { color: #0e6948; }
+    .stat-val.incorrect { color: #b31d27; }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: #646f90;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Footer & Branding */
+    .footer-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 0.88rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #2e3856;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      border: 1px solid #e0e5f2;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header / Progress Bar -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Lesson 11: Clostridium tetani Comprehensive Quiz</h1>
+          <p>Applied Bacteriology Course &bull; 30 High-Yield Test Questions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-toggle-grid" id="toggleGridBtn" onclick="toggleGrid()">View List</button>
+          <div class="meta-counts" id="metaCounter">1 / 30</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Question Overview Grid -->
+    <div class="grid-card" id="gridCard">
+      <h3>Question Navigator</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div class="quiz-card" id="quizCard">
+      <span class="q-number-tag" id="qNumberTag">Question 1</span>
+      <div class="question-stem" id="questionStem">Loading question...</div>
+      
+      <div class="options-group" id="optionsGroup"></div>
+
+      <div class="rationale-card" id="rationaleCard">
+        <div class="rationale-title">Explanation & Rationale</div>
+        <div class="rationale-text" id="rationaleText"></div>
+      </div>
+
+      <div class="nav-controls">
+        <button class="btn-nav" id="prevBtn" onclick="navigate(-1)">Previous</button>
+        <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard Interface -->
+    <div class="scorecard" id="scorecard">
+      <div class="score-circle" id="scoreCircle">0%</div>
+      <h2 class="score-title" id="scoreTitle">Exam Completed!</h2>
+      <p class="score-breakdown" id="scoreBreakdown">You answered 0 out of 30 questions correctly.</p>
+      
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val correct" id="statCorrect">0</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val incorrect" id="statIncorrect">0</div>
+          <div class="stat-lbl">Incorrect</div>
+        </div>
+      </div>
+
+      <button class="btn-nav primary" style="padding: 12px 28px;" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer & Attribution -->
+    <div class="footer-card">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+        <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+        <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Why is Clostridium tetani classified as a 'strict anaerobe' and unable to survive in ambient air?",
+        options: [
+          "It lacks essential antioxidant enzymes like catalase and superoxide dismutase to neutralize reactive oxygen species",
+          "Its outer membrane consists entirely of saturated lipopolysaccharide that dissolves in oxygen",
+          "It requires nitrogen gas fixation at high atmospheric pressures to synthesize ATP",
+          "Oxygen irreversibly denatures its circular bacterial chromosome within seconds"
+        ],
+        correct: 0,
+        explanation: "As strict anaerobes, Clostridium species cannot survive in the presence of oxygen because they lack protective enzymes (such as catalase and superoxide dismutase) necessary to detoxify reactive oxygen species (ROS)."
+      },
+      {
+        q: "Which specific neurotoxin produced by Clostridium tetani is directly responsible for the clinical manifestations of tetanus?",
+        options: [
+          "Alpha-toxin (lecithinase)",
+          "Tetanospasmin",
+          "Tetanolysin",
+          "Enterotoxin B"
+        ],
+        correct: 1,
+        explanation: "Tetanospasmin is the potent A-B neurotoxin synthesized by C. tetani that enters peripheral motor neurons and ascends to the CNS to produce spastic muscle contractions."
+      },
+      {
+        q: "How does tetanospasmin travel from a peripheral tissue wound to the central nervous system (CNS)?",
+        options: [
+          "Via systemic lymphatic vessels into the thoracic duct",
+          "Via retrograde axonal transport along peripheral motor nerves",
+          "Through direct diffusion across the blood-brain barrier",
+          "Carried intracellularly inside circulating platelets"
+        ],
+        correct: 1,
+        explanation: "Tetanospasmin binds to gangliosides on peripheral nerve terminals and travels retrogradely (moving backward toward the cell body) along motor axons into the spinal cord and brainstem."
+      },
+      {
+        q: "What is the precise cellular and molecular target of tetanospasmin within the spinal cord?",
+        options: [
+          "Inhibitory interneurons releasing GABA and glycine, where it degrades SNARE proteins (synaptobrevin)",
+          "Excitatory motor endplates, where it accelerates acetylcholine vesicle exocytosis",
+          "Post-synaptic dopamine D2 receptors within the basal ganglia",
+          "Voltage-gated sodium channels along sensory myelinated axons"
+        ],
+        correct: 0,
+        explanation: "Tetanospasmin acts as a zinc-endopeptidase that cleaves synaptobrevin (a vesicular SNARE protein), preventing exocytosis of the inhibitory neurotransmitters GABA and glycine from Renshaw interneurons, leaving lower motor neurons in uninhibited hyperactivity."
+      },
+      {
+        q: "What is typically the earliest presenting clinical sign of generalized tetanus?",
+        options: [
+          "Opisthotonos with arching of the spine",
+          "Trismus ('lockjaw') involving masseter muscle spasm",
+          "Flaccid descending symmetrical paralysis",
+          "Generalized tonic-clonic convulsions with hyperpyrexia"
+        ],
+        correct: 1,
+        explanation: "Trismus (lockjaw), caused by spasms of the masseter muscles making it difficult or impossible to open the mouth, is the classic initial sign of tetanus."
+      },
+      {
+        q: "What is 'risus sardonicus' in the context of Clostridium tetani infection?",
+        options: [
+          "A characteristic fixed grimace or 'sardonic smile' caused by sustained contraction of facial muscles",
+          "A petechial rash observed around the oral commissures and cheeks",
+          "Sudden bilateral facial nerve palsy leading to facial droop",
+          "A painful ulceration at the base of the lingual frenulum"
+        ],
+        correct: 0,
+        explanation: "Risus sardonicus is a sustained, involuntary grimace with furrowed brow, slanted eyes, and curled lips resembling an eerie fixed smile ('sardonic smile'), resulting from facial muscle spasms."
+      },
+      {
+        q: "What is the typical incubation period of tetanus between spore entry into a wound and the onset of initial clinical signs?",
+        options: [
+          "1 to 4 hours",
+          "4 to 15 days",
+          "30 to 90 days",
+          "6 to 12 months"
+        ],
+        correct: 1,
+        explanation: "The incubation period of tetanus generally ranges from 4 to 15 days (most commonly around 7–10 days), depending on the distance between the wound site and the central nervous system."
+      },
+      {
+        q: "Why is Clostridium tetani classified as a non-invasive bacterium?",
+        options: [
+          "It rapidly enters the bloodstream and disseminates to multiple visceral organs without multiplying",
+          "It remains localized to necrotic tissue at the portal of entry and causes disease exclusively via released exotoxins",
+          "It obligately requires intracellular entry into hepatocytes to replicate",
+          "It is completely cleared by neutrophils within 10 minutes of entering tissue"
+        ],
+        correct: 1,
+        explanation: "C. tetani itself does not invade adjacent healthy tissues or cause bacteremia. Pathogenicity is mediated entirely by exotoxin production from the localized, anaerobic infection site."
+      },
+      {
+        q: "Which microscopic morphology is classically associated with sporulating Clostridium tetani under Gram staining?",
+        options: [
+          "Gram-negative diplococci with adjacent capsules",
+          "Gram-positive rods with terminal round spores producing a 'drumstick' or 'tennis racket' shape",
+          "Large Gram-positive box-car shaped rods lacking visible spores",
+          "Branching filamentous Gram-positive rods with sulfur granules"
+        ],
+        correct: 1,
+        explanation: "C. tetani forms round, terminal endospores that cause the bacterium to swell at one end, giving it a distinctive 'drumstick' or 'tennis racket' appearance."
+      },
+      {
+        q: "How does the microscopic appearance of Clostridium perfringens differ from that of Clostridium tetani in clinical specimens?",
+        options: [
+          "C. perfringens appears as large, thick 'box-car' shaped Gram-positive rods typically lacking visible spores in wound pus",
+          "C. perfringens forms delicate, spiral-shaped spirochetes with axial filaments",
+          "C. perfringens is an acid-fast beaded rod that stains bright red on Ziehl-Neelsen stain",
+          "C. perfringens is a tiny, non-motile Gram-negative pleomorphic coccobacillus"
+        ],
+        correct: 0,
+        explanation: "C. perfringens presents as thick, stubby, rectangular ('box-car' shaped) Gram-positive rods and rarely produces visible spores in direct clinical specimens (unlike the terminal spores of C. tetani)."
+      },
+      {
+        q: "Why is serological antibody testing considered unhelpful and unreliable for diagnosing acute tetanus in a sick patient?",
+        options: [
+          "Tetanospasmin is so lethally potent that the minute amount causing clinical disease is insufficient to trigger a detectable antibody response",
+          "Human B-lymphocytes are destroyed directly by tetanospasmin within 24 hours",
+          "Tetanospasmin is an endogenous autoantigen that produces immune tolerance",
+          "Standard serological tests can only detect viral antigens, not bacterial toxins"
+        ],
+        correct: 0,
+        explanation: "The lethal dose of tetanospasmin is minuscule (nanogram levels). This amount is toxic enough to produce fatal spasms without exposing the immune system to sufficient antigen to elicit a detectable antibody titer."
+      },
+      {
+        q: "What role do sodium thioglycolate and L-cysteine hydrochloride serve in culture media such as TGY or VL agar for growing C. tetani?",
+        options: [
+          "They act as selective antibiotics suppressing Gram-negative Enterobacteriaceae",
+          "They act as reducing agents that remove dissolved oxygen to maintain an anaerobic environment",
+          "They serve as chromogenic substrates for alkaline phosphatase detection",
+          "They buffer the media at an acidic pH of 4.2 to select against fungal contaminants"
+        ],
+        correct: 1,
+        explanation: "Sodium thioglycolate and L-cysteine are chemical reducing agents that scavenge free oxygen, lowering the oxidation-reduction potential (Eh) to support strict anaerobic growth."
+      },
+      {
+        q: "On specialized VL or TGY agar supplemented with tetanus antitoxin, how are toxigenic colonies of C. tetani definitively identified?",
+        options: [
+          "By the development of a dark green metallic sheen over the entire plate",
+          "By the appearance of a visible halo of precipitation surrounding the colony (toxin-antitoxin complex)",
+          "By rapid bubbling upon application of 3% hydrogen peroxide",
+          "By complete hemolysis and liquefaction of the entire agar slant"
+        ],
+        correct: 1,
+        explanation: "When toxigenic C. tetani colonies secrete tetanospasmin into agar incorporating specific antitoxin, an immune precipitation line/halo forms around the colonies, confirming toxin synthesis."
+      },
+      {
+        q: "What is the primary transmission route for neonatal tetanus in developing regions?",
+        options: [
+          "Transplacental hematogenous transfer during maternal bacteremia",
+          "Cutting the umbilical cord with unsterile tools or dressing the cord stump with animal dung, soil, or ash",
+          "Ingestion of contaminated breast milk containing vegetative bacteria",
+          "Inhalation of respiratory aerosols from healthcare workers in nursery wards"
+        ],
+        correct: 1,
+        explanation: "Neonatal tetanus (tetanus neonatorum) occurs when the umbilical stump is severed using contaminated unsterile implements (knives, bamboo, unwashed scissors) or dressed with substances like cow dung, mud, or ash in unimmunized mothers."
+      },
+      {
+        q: "What major factor explains why tetanus remains a persistent threat among the elderly in developed nations despite childhood vaccine programs?",
+        options: [
+          "C. tetani develops intrinsic resistance to circulating immunoglobulins over time",
+          "Waning immunity due to lack of decennial (10-year) booster vaccinations in older adults",
+          "Age-related conversion of peripheral motor axons into sensory nerves",
+          "Genetic mutations in human synaptobrevin that develop after age 60"
+        ],
+        correct: 1,
+        explanation: "Protective antitoxin levels decline over time. Without receiving recommended booster doses every 10 years, elderly individuals often become unprotected and susceptible to wound contamination."
+      },
+      {
+        q: "What is the nature of the tetanus component in the DTaP/Tdap/Td vaccine?",
+        options: [
+          "Live attenuated Clostridium tetani bacilli",
+          "Tetanus toxoid (anatoxin): tetanospasmin inactivated by formaldehyde treatment",
+          "Purified terminal endospores killed by high heat and gamma irradiation",
+          "Recombinant outer membrane protein extracts combined with aluminum hydroxide"
+        ],
+        correct: 1,
+        explanation: "The tetanus vaccine consists of tetanus toxoid (anatoxin)—tetanospasmin rendered non-toxic by formaldehyde inactivation while preserving its immunogenic epitopes."
+      },
+      {
+        q: "What serum antibody concentration is recognized as the minimum threshold for protective active immunity against tetanus?",
+        options: [
+          "0.001 IU/mL",
+          "0.05 IU/mL",
+          "0.15 IU/mL",
+          "10.0 IU/mL"
+        ],
+        correct: 2,
+        explanation: "An anti-tetanus antibody concentration of ≥0.15 IU/mL (International Units per milliliter) is widely recognized as the protective titer against tetanus."
+      },
+      {
+        q: "Why is surgical wound debridement an indispensable cornerstone in the management and prevention of tetanus?",
+        options: [
+          "It directly destroys circulating neurotoxin molecules within the brainstem",
+          "It removes foreign bodies, dirt, and devitalized necrotic tissue, eliminating the anaerobic niche required for spore germination",
+          "It induces a massive local surge in secretory IgA antibodies",
+          "It raises the atmospheric oxygen tension inside the venous circulation to 100%"
+        ],
+        correct: 1,
+        explanation: "C. tetani spores require a low-oxygen, necrotic microenvironment to germinate into vegetative, toxin-secreting bacilli. Surgical debridement eradicates dead tissue and foreign debris, restoring tissue oxygenation."
+      },
+      {
+        q: "What is the primary clinical limitation of Tetanus Immunoglobulin (TIG) during active tetanus treatment?",
+        options: [
+          "It can only neutralize free, unbound toxin in the circulation; it has no effect on toxin already internalized into neurons",
+          "It only neutralizes tetanolysin, leaving tetanospasmin completely intact",
+          "It acts as a potent GABA antagonist, exacerbating muscle spasms",
+          "It triggers immediate destruction of all motor neuron terminal boutons"
+        ],
+        correct: 0,
+        explanation: "TIG (human or equine antitoxin) binds and clears free neurotoxin in the bloodstream and interstitial spaces before nerve entry. It cannot cross into neurons or undo damage caused by already-internalized toxin."
+      },
+      {
+        q: "Which antimicrobial agent is currently preferred as first-line antibacterial therapy for wound infection with C. tetani?",
+        options: [
+          "Metronidazole",
+          "Gentamicin",
+          "Ciprofloxacin",
+          "Amphotericin B"
+        ],
+        correct: 0,
+        explanation: "Metronidazole is widely favored because it has bactericidal activity against anaerobes and lacks the GABA-antagonistic potential theoretically linked to high-dose penicillin G."
+      },
+      {
+        q: "Why has penicillin G, though historically standard, raised theoretical concerns when used to treat severe tetanus?",
+        options: [
+          "It is completely inactive against all Gram-positive anaerobes",
+          "It is a known GABA receptor antagonist and might synergistically worsen muscle spasms",
+          "It rapidly digests human tetanus immunoglobulins upon administration",
+          "It induces sporulation of vegetative bacilli into heat-resistant spores"
+        ],
+        correct: 1,
+        explanation: "High doses of penicillin G have mild central GABA-antagonist properties, which could theoretically exacerbate the neuro-spastic effects of tetanospasmin."
+      },
+      {
+        q: "According to WHO recommendations for pregnant women, how many total doses of Tetanus Toxoid (TT) provide lifelong protection?",
+        options: [
+          "2 doses",
+          "3 doses",
+          "5 doses",
+          "10 doses"
+        ],
+        correct: 2,
+        explanation: "Under the WHO 5-dose schedule for women of reproductive age (TT1 through TT5), completing all 5 doses confers lifelong immunity against tetanus and prevents neonatal tetanus across childbearing years."
+      },
+      {
+        q: "According to post-exposure prophylaxis protocols, what is recommended for a patient with an unimmunized status who sustains a dirty wound contaminated with soil and manure?",
+        options: [
+          "Topical hydrogen peroxide only; no injections needed",
+          "Administration of Tetanus Immunoglobulin (TIG) immediately plus initiation of the complete tetanus toxoid vaccine series at separate anatomical sites",
+          "Single dose of oral amoxicillin and discharge without vaccination",
+          "Tetanus toxoid booster alone without immunoglobulin"
+        ],
+        correct: 1,
+        explanation: "An unimmunized patient with a contaminated/dirty wound requires both immediate passive protection (TIG) to bind circulating toxin and active immunization (toxoid vaccine series started) injected at separate anatomical sites."
+      },
+      {
+        q: "What is the recommended standard prophylactic dose of intramuscular Human Tetanus Immunoglobulin (TIG) for dirty wounds presenting within 24 hours?",
+        options: [
+          "50 IU IM",
+          "250 IU IM",
+          "2,500 IU IM",
+          "10,000 IU IM"
+        ],
+        correct: 1,
+        explanation: "The standard prophylactic dose of human TIG for contaminated wounds seen within 24 hours is 250 IU administered intramuscularly."
+      },
+      {
+        q: "Under what condition is the prophylactic dose of TIG escalated to 500 IU IM in post-exposure management?",
+        options: [
+          "When the patient is younger than 12 months of age",
+          "When the wound is heavily contaminated, involves extensive burns, or treatment is delayed beyond 24 hours",
+          "When the patient has received a tetanus booster within the preceding 2 years",
+          "When the injury is a clean, superficial paper cut on the fingertip"
+        ],
+        correct: 1,
+        explanation: "The dose of TIG is increased to 500 IU IM if the wound is heavily contaminated/burned, or when wound presentation is delayed past 24 hours."
+      },
+      {
+        q: "A 30-year-old construction worker sustained a clean, minor incision from a clean scalpel. He completed his childhood series and received a booster 7 years ago. What is the appropriate prophylaxis?",
+        options: [
+          "No vaccine or TIG injection required",
+          "Immediate administration of 500 IU TIG",
+          "One booster of tetanus toxoid plus full antibiotic course",
+          "Restart the entire 3-dose primary vaccination series"
+        ],
+        correct: 0,
+        explanation: "For a clean, minor wound in a fully vaccinated individual whose last booster was within 10 years (<10 years), no tetanus toxoid booster or TIG is indicated."
+      },
+      {
+        q: "A gardener steps on a rusty, dirt-encrusted nail (dirty wound). He confirms he received a full primary series, but his last booster dose was 8 years ago. What should be administered?",
+        options: [
+          "No intervention needed because immunity lasts 20 years",
+          "One booster dose of tetanus toxoid (0.5 mL); TIG is not required",
+          "TIG 500 IU only; no vaccine",
+          "Intravenous vancomycin alone without debridement"
+        ],
+        correct: 1,
+        explanation: "For a dirty/contaminated wound in a fully immunized person, a toxoid booster is indicated if more than 5 years have elapsed since the last dose. TIG is not required since the individual is fully vaccinated."
+      },
+      {
+        q: "Which medication is commonly administered as adjunctive curative therapy to control muscle rigidity and spasms in clinical tetanus?",
+        options: [
+          "Diazepam",
+          "Succinylcholine continuous oral wash",
+          "Neostigmine",
+          "Haloperidol continuous infusion"
+        ],
+        correct: 0,
+        explanation: "Benzodiazepines like Diazepam enhance GABAergic central inhibition, effectively relaxing rigid musculature, mitigating spasms, and decreasing patient autonomic arousal."
+      },
+      {
+        q: "How does the toxin mechanism of Clostridium botulinum compare to that of Clostridium tetani?",
+        options: [
+          "Both toxins block glycine release in spinal Renshaw cells",
+          "Botulinum toxin blocks acetylcholine release at the neuromuscular junction causing flaccid paralysis, whereas tetanospasmin blocks inhibitory neurotransmitter release in the CNS causing spastic paralysis",
+          "Tetanospasmin causes flaccid paralysis of respiratory muscles, whereas botulinum toxin causes lockjaw",
+          "Botulinum toxin is an invasive hemolysin, whereas tetanospasmin is an intracellular endotoxin"
+        ],
+        correct: 1,
+        explanation: "While both are zinc proteases cleaving SNARE proteins, Botulinum toxin acts peripherally at the neuromuscular junction to block acetylcholine release (causing flaccid paralysis), whereas Tetanospasmin acts centrally on inhibitory interneurons (causing spastic paralysis/contractions)."
+      },
+      {
+        q: "Why must tetanus vaccine (toxoid) and tetanus immunoglobulin (TIG) be injected into separate anatomical sites when co-administered?",
+        options: [
+          "To avoid local neutralization of the vaccine toxoid by the injected antitoxin before an active immune response can develop",
+          "To prevent systemic intravascular coagulation at the injection site",
+          "Because simultaneous injection into the same muscle permanently damages the radial nerve",
+          "To allow microscopic distinction between T-cell and B-cell migration routes"
+        ],
+        correct: 0,
+        explanation: "Injecting TIG and tetanus toxoid at the same anatomical site can lead to immediate binding and neutralization of the toxoid antigen by the circulating antibodies, blunting the active immune induction."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function init() {
+      buildGrid();
+      loadQuestion(0);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById("questionGrid");
+      grid.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `gridBtn_${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function toggleGrid() {
+      const gridCard = document.getElementById("gridCard");
+      const toggleBtn = document.getElementById("toggleGridBtn");
+      if (gridCard.classList.contains("active")) {
+        gridCard.classList.remove("active");
+        toggleBtn.textContent = "View List";
+      } else {
+        gridCard.classList.add("active");
+        toggleBtn.textContent = "Hide List";
+      }
+    }
+
+    function jumpToQuestion(index) {
+      currentQ = index;
+      loadQuestion(currentQ);
+      document.getElementById("quizCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function loadQuestion(index) {
+      currentQ = index;
+      const data = quizData[index];
+      const answered = userAnswers[index] !== null;
+
+      // Update Header & Counters
+      document.getElementById("qNumberTag").textContent = `Question ${index + 1} of ${quizData.length}`;
+      document.getElementById("metaCounter").textContent = `${index + 1} / ${quizData.length}`;
+      
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      const progressPct = (totalAnswered / quizData.length) * 100;
+      document.getElementById("progressBar").style.width = `${progressPct}%`;
+
+      // Update Question text
+      document.getElementById("questionStem").textContent = data.q;
+
+      // Render Options
+      const optionsGroup = document.getElementById("optionsGroup");
+      optionsGroup.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      data.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-tile";
+        btn.disabled = answered;
+
+        let tagText = "";
+        if (answered) {
+          if (optIdx === data.correct) {
+            btn.classList.add("correct");
+            tagText = "CORRECT";
+          } else if (optIdx === userAnswers[index]) {
+            btn.classList.add("incorrect");
+            tagText = "INCORRECT";
+          }
+        }
+
+        btn.innerHTML = `
+          <span class="opt-badge">${letters[optIdx]}</span>
+          <span class="opt-text">${optText}</span>
+          ${tagText ? `<span class="opt-tag">${tagText}</span>` : ""}
+        `;
+
+        if (!answered) {
+          btn.onclick = () => selectOption(optIdx);
+        }
+
+        optionsGroup.appendChild(btn);
+      });
+
+      // Rationale Box
+      const rationaleCard = document.getElementById("rationaleCard");
+      const rationaleText = document.getElementById("rationaleText");
+      if (answered) {
+        rationaleText.textContent = data.explanation;
+        rationaleCard.classList.add("show");
+      } else {
+        rationaleCard.classList.remove("show");
+      }
+
+      // Update Nav Buttons
+      document.getElementById("prevBtn").disabled = index === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      if (index === quizData.length - 1) {
+        nextBtn.textContent = "Finish & Review";
+      } else {
+        nextBtn.textContent = "Next";
+      }
+
+      // Update Grid Buttons state
+      updateGridUI();
+    }
+
+    function selectOption(selectedIdx) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = selectedIdx;
+      loadQuestion(currentQ);
+    }
+
+    function updateGridUI() {
+      quizData.forEach((_, idx) => {
+        const btn = document.getElementById(`gridBtn_${idx}`);
+        if (!btn) return;
+        btn.className = "grid-btn";
+        if (userAnswers[idx] !== null) {
+          btn.classList.add("answered");
+        }
+        if (idx === currentQ) {
+          btn.classList.add("current");
+        }
+      });
+    }
+
+    function navigate(delta) {
+      const nextIndex = currentQ + delta;
+      if (nextIndex >= 0 && nextIndex < quizData.length) {
+        loadQuestion(nextIndex);
+      } else if (nextIndex >= quizData.length) {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("gridCard").classList.remove("active");
+      document.getElementById("toggleGridBtn").style.display = "none";
+      
+      const scorecard = document.getElementById("scorecard");
+      scorecard.classList.add("active");
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) correctCount++;
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("scoreCircle").textContent = `${percentage}%`;
+      document.getElementById("scoreBreakdown").textContent = `You correctly answered ${correctCount} of ${quizData.length} questions.`;
+      document.getElementById("statCorrect").textContent = correctCount;
+      document.getElementById("statIncorrect").textContent = incorrectCount;
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("metaCounter").textContent = `${quizData.length} / ${quizData.length}`;
+
+      if (percentage >= 80) {
+        document.getElementById("scoreTitle").textContent = "Outstanding Performance!";
+      } else if (percentage >= 60) {
+        document.getElementById("scoreTitle").textContent = "Good Effort - Review Notes!";
+      } else {
+        document.getElementById("scoreTitle").textContent = "Keep Practicing Bacteriology!";
+      }
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById("scorecard").classList.remove("active");
+      document.getElementById("quizCard").style.display = "block";
+      document.getElementById("toggleGridBtn").style.display = "inline-block";
+      document.getElementById("toggleGridBtn").textContent = "View List";
+      loadQuestion(0);
+    }
+
+    // Initialize application on load
+    window.onload = init;
+  </script>
+</body>
+</html>
