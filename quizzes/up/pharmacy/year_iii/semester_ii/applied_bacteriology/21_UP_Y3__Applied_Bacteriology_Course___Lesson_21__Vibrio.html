@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 21: Vibrio cholerae Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 21: Vibrio cholerae</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the characteristic microscopic morphology and Gram reaction of Vibrio cholerae?",
+        options: [
+          "Gram-positive large square-ended rods arranged in chains",
+          "Gram-negative curved or comma-shaped short rods with pointed ends",
+          "Gram-negative diplococci with flattened adjacent sides",
+          "Gram-positive spherical cocci in clusters"
+        ],
+        correct: 1,
+        explanation: "Vibrio cholerae appears under light microscopy as short, Gram-negative, curved or comma-shaped bacilli with tapered, pointed ends."
+      },
+      {
+        q: "Which flagellar arrangement and motility pattern characterize Vibrio cholerae in fresh stool examinations?",
+        options: [
+          "Non-motile with no flagella",
+          "Peritrichous flagella with slow tumbling motility",
+          "Single polar flagellum (monotrichous) exhibiting rapid, darting 'shooting star' movement",
+          "Lophotrichous tuft exhibiting slow corkscrew flexing"
+        ],
+        correct: 2,
+        explanation: "V. cholerae possesses a single polar flagellum (monotrichous) that drives rapid, darting motility across the microscopic field, often likened to 'shooting stars'."
+      },
+      {
+        q: "What is the cytochrome oxidase test result for Vibrio cholerae, distinguishing it from Enterobacteriaceae?",
+        options: [
+          "Oxidase positive (+)",
+          "Oxidase negative (-)",
+          "Variable depending on incubation temperature",
+          "Oxidase inert due to obligate anaerobic metabolism"
+        ],
+        correct: 0,
+        explanation: "Vibrio cholerae is oxidase positive, a key diagnostic biochemical trait that separates the genus Vibrio from members of the family Enterobacteriaceae (which are oxidase negative)."
+      },
+      {
+        q: "What are the oxygen requirement and general atmospheric growth classification of Vibrio cholerae?",
+        options: [
+          "Obligate aerobe",
+          "Facultative anaerobe (aero-anaerobic)",
+          "Obligate strict anaerobe",
+          "Microaerophile requiring 10% oxygen and 85% nitrogen"
+        ],
+        correct: 1,
+        explanation: "Vibrio cholerae is a facultative anaerobe (aero-anaerobe), capable of growing both in the presence and absence of atmospheric oxygen."
+      },
+      {
+        q: "Out of more than 155 identified O-antigen serovars of Vibrio cholerae, which two are responsible for epidemic and pandemic cholera?",
+        options: [
+          "Serovars O2 and O3",
+          "Serovars O1 and O139",
+          "Serovars O157 and O104",
+          "Serovars O124 and O142"
+        ],
+        correct: 1,
+        explanation: "Only two O-serogroups cause severe epidemic and pandemic cholera: Serovar O1 and Serovar O139 (Bengal). The non-O1/non-O139 strains generally cause milder diarrheal illnesses or extraintestinal infections."
+      },
+      {
+        q: "What is the primary natural reservoir and transmission route for Vibrio cholerae?",
+        options: [
+          "Strictly human reservoir; transmitted primarily through the fecal-oral route via contaminated water, food, and dirty hands",
+          "Avian reservoir; transmitted through inhalation of dried bird droppings",
+          "Rodent reservoir; transmitted via the bite of infected rat fleas",
+          "Porcine reservoir; transmitted solely by handling raw pig carcasses"
+        ],
+        correct: 0,
+        explanation: "Epidemic Vibrio cholerae is a strictly human pathogen (patients and carriers shed vast quantities of bacteria). It spreads via the fecal-oral route through contaminated drinking water, contaminated food, and poor hand hygiene."
+      },
+      {
+        q: "Does Vibrio cholerae deeply invade the intestinal mucosa or enter the bloodstream during classical clinical disease?",
+        options: [
+          "Yes, it penetrates deep into the submucosa and causes widespread bacteremia",
+          "No, it adheres to the surface of enterocytes without mucosal invasion, causing non-invasive, toxin-mediated disease",
+          "Yes, it replicates intracellularly within intestinal macrophages like Salmonella",
+          "No, it only infects the keratinized stratified epithelium of the esophagus"
+        ],
+        correct: 1,
+        explanation: "Vibrio cholerae is a non-invasive luminal pathogen. It adheres to the apical surface of small intestinal enterocytes and produces cholera toxin; it does not invade host enterocytes or disseminate into the bloodstream."
+      },
+      {
+        q: "What is the intracellular enzymatic mechanism of Cholera Toxin (choleragen)?",
+        options: [
+          "Inactivation of the 60S eukaryotic ribosomal subunit to halt translation",
+          "Irreversible activation of host adenylate cyclase, resulting in massive accumulation of intracellular cAMP",
+          "Cleavage of host cell actin filaments to prevent cytoskeleton assembly",
+          "Inhibition of voltage-gated sodium channels in myocardial tissue"
+        ],
+        correct: 1,
+        explanation: "Cholera toxin ADP-ribosylates the Gs alpha regulatory protein, persistently activating adenylate cyclase. Elevated intracellular cyclic AMP (cAMP) levels trigger active secretion of chloride and water into the intestinal lumen."
+      },
+      {
+        q: "What is the direct physiological consequence of adenylate cyclase activation in enterocytes by Cholera Toxin?",
+        options: [
+          "Massive efflux of chloride ions (Cl⁻) and water into the intestinal lumen with blocked sodium absorption",
+          "Total cessation of water movement across the epithelial border",
+          "Excessive resorption of all water from the lumen into the bloodstream causing severe hypervolemia",
+          "Formation of fibrinous pseudomembranes over necrotic intestinal ulcers"
+        ],
+        correct: 0,
+        explanation: "Elevated cAMP stimulates chloride channel secretion (efflux of Cl⁻ and water) into the gut lumen while blocking NaCl reabsorption, producing copious, isotonic, electrolyte-rich diarrhea."
+      },
+      {
+        q: "What is the pathognomonic visual appearance of diarrheal stool in severe cholera?",
+        options: [
+          "Small-volume dark green stools with macroscopic pus",
+          "'Rice water' stools—pale, watery, milky fluid containing small flecks of epithelial mucus",
+          "Bloody, mucoid stools containing abundant fecal leukocytes",
+          "Frothy, foul-smelling, fatty stools that float"
+        ],
+        correct: 1,
+        explanation: "Cholera stool is classically described as 'rice water' stool—an inoffensive-smelling, pale grey/milky watery fluid containing mucus flakes, epithelial cells, and vibrios, devoid of blood."
+      },
+      {
+        q: "What microscopic observation in a Gram-stained stool smear distinguishes cholera from inflammatory dysentery (e.g., Shigella)?",
+        options: [
+          "Total absence of polymorphonuclear leukocytes (white blood cells), reflecting its non-inflammatory toxin-mediated nature",
+          "Massive influx of neutrophils covering the entire slide",
+          "Large quantities of budding fungal yeast cells",
+          "Predominance of Gram-positive spore-forming bacilli in pairs"
+        ],
+        correct: 0,
+        explanation: "Because V. cholerae does not invade tissue or induce mucosal ulceration, the stool smear lacks polymorphonuclear leukocytes (pus cells/WBCs) and red blood cells, showing a monomorphic population of curved rods."
+      },
+      {
+        q: "What is the primary cause of death in untreated patients suffering from cholera?",
+        options: [
+          "Bacterial meningitis and cerebral herniation",
+          "Severe dehydration leading to hypovolemic shock, circulatory collapse, and metabolic acidosis",
+          "Perforated colonic ulcers resulting in generalized peritonitis",
+          "Massive pulmonary alveolar hemorrhage"
+        ],
+        correct: 1,
+        explanation: "Rapid loss of several liters of fluid per day (often exceeding 1 liter/hour) leads to profound hypovolemia, electrolyte loss, severe dehydration, circulatory collapse, and shock within hours if uncorrected."
+      },
+      {
+        q: "What is the expected mortality rate of severe cholera when timely and appropriate rehydration therapy is administered compared to when left untreated?",
+        options: [
+          "Less than 1% with rehydration, compared to up to 25% or higher when untreated",
+          "50% with rehydration, compared to 60% untreated",
+          "Remains fixed at 25% regardless of hydration",
+          "0% untreated, as cholera is universally mild"
+        ],
+        correct: 0,
+        explanation: "Without treatment, the fatality rate of severe cholera can reach 25% to 50%. With prompt, aggressive oral or intravenous fluid and electrolyte replacement, mortality drops below 1%."
+      },
+      {
+        q: "Which liquid medium is specifically used as an enrichment broth for isolating Vibrio cholerae from stool specimens?",
+        options: [
+          "Alkaline Peptone Water (APW)",
+          "Acidified Thioglycollate Broth",
+          "Selenite Cystine Broth",
+          "Gram-Negative (GN) Broth"
+        ],
+        correct: 0,
+        explanation: "Alkaline Peptone Water (APW) adjusted to a high pH (~8.6) is the classic enrichment broth. Vibrio thrives in alkaline conditions, whereas competing fecal flora is suppressed."
+      },
+      {
+        q: "What specific macroscopic sign indicates optimal growth of V. cholerae in Alkaline Peptone Water after 6 hours of incubation at 37°C?",
+        options: [
+          "Dense black precipitate at the bottom of the test tube",
+          "A delicate surface film or 'veil' forming at the air-liquid interface",
+          "Complete clumping into large gelatinous beads",
+          "Gas production filling an inverted Durham tube"
+        ],
+        correct: 1,
+        explanation: "Because V. cholerae is an aerobic/facultative organism that requires oxygen for rapid proliferation, it grows rapidly at the broth surface, forming a visible surface pellicle or 'veil' after 6 hours."
+      },
+      {
+        q: "From which portion of the Alkaline Peptone Water tube must the subculture inoculum be collected for plating?",
+        options: [
+          "Directly from the uppermost surface layer where the pellicle/veil forms",
+          "From the deepest anaerobic sediment at the tube bottom",
+          "From the center of the tube after shaking vigorously for 10 minutes",
+          "Only from fluid filtered through charcoal"
+        ],
+        correct: 0,
+        explanation: "Subcultures must be taken unmixed from the very surface layer (pellicle/veil) of the alkaline peptone water within 6 to 8 hours, where viable Vibrio organisms are heavily concentrated."
+      },
+      {
+        q: "What is the primary selective and differential solid agar used globally to isolate Vibrio cholerae?",
+        options: [
+          "TCBS (Thiosulfate-Citrate-Bile Salts-Sucrose) Agar",
+          "MacConkey Agar with Sorbitol",
+          "CIN (Cefsulodin-Irgasan-Novobiocin) Agar",
+          "XLD (Xylose Lysine Deoxycholate) Agar"
+        ],
+        correct: 0,
+        explanation: "TCBS (Thiosulfate-Citrate-Bile Salts-Sucrose) agar is the standard selective and differential plating medium for the isolation of Vibrio cholerae and other pathogenic Vibrios."
+      },
+      {
+        q: "How do colonies of Vibrio cholerae characteristically appear on TCBS agar, and what biochemical reaction causes this appearance?",
+        options: [
+          "Bright yellow colonies due to sucrose fermentation and acid production",
+          "Green/blue colonies due to the inability to ferment sucrose",
+          "Jet-black colonies caused by hydrogen sulfide production",
+          "Colorless colonies due to absence of lactose utilization"
+        ],
+        correct: 0,
+        explanation: "V. cholerae ferments sucrose (sucrose positive). The resulting acid lowers the pH, changing the bromothymol blue/thymol blue indicators to yield distinct bright yellow colonies on the green agar."
+      },
+      {
+        q: "How does Vibrio parahaemolyticus typically appear on TCBS agar in contrast to Vibrio cholerae?",
+        options: [
+          "Yellow colonies because it ferments sucrose vigorously",
+          "Green or blue colonies because it does not ferment sucrose (sucrose negative)",
+          "Black colonies due to extensive esculin hydrolysis",
+          "It fails completely to grow on TCBS agar under any circumstances"
+        ],
+        correct: 1,
+        explanation: "Unlike V. cholerae, Vibrio parahaemolyticus is sucrose negative and therefore forms blue-green colonies on TCBS agar."
+      },
+      {
+        q: "Why can testing oxidase directly from a colony grown on TCBS agar yield a false-negative result?",
+        options: [
+          "Bile salts mutate the bacterial DNA permanently",
+          "The acidic pH generated by active sucrose fermentation can suppress the cytochrome oxidase enzyme activity",
+          "TCBS agar lacks thiosulfate",
+          "Vibrios switch to strict anaerobic fermentation on solid media"
+        ],
+        correct: 1,
+        explanation: "Carbohydrate fermentation on TCBS creates a strongly acidic microenvironment that can inhibit oxidase enzyme activity. Testing should be performed on colonies subcultured to non-selective media (like nutrient or blood agar)."
+      },
+      {
+        q: "What modification must be made when setting up an API 20E biochemical strip for the identification of Vibrio species?",
+        options: [
+          "Suspending the bacterial inoculum in 1% NaCl solution because Vibrios are halophilic",
+          "Incubating the strip at 55°C under 100% CO2",
+          "Replacing all reagents with pure ethyl alcohol",
+          "Flooding the entire strip with concentrated hydrochloric acid"
+        ],
+        correct: 0,
+        explanation: "Because Vibrio species are halophilic (salt-preferring), sterile 1% NaCl (saline) must be used as the suspension medium when inoculating the API 20E gallery to ensure normal growth and metabolic activity."
+      },
+      {
+        q: "How does the El Tor biotype of V. cholerae O1 differ from the Classical biotype regarding Polymyxin B sensitivity?",
+        options: [
+          "Classical is resistant, whereas El Tor is sensitive",
+          "El Tor is resistant to Polymyxin B (50 IU), whereas the Classical biotype is sensitive (inhibited)",
+          "Both biotypes are equally sensitive to Polymyxin B",
+          "Both biotypes require Polymyxin B as a necessary growth cofactor"
+        ],
+        correct: 1,
+        explanation: "The El Tor biotype is resistant to Polymyxin B (it grows in its presence), whereas the Classical biotype is sensitive (inhibited by Polymyxin B discs)."
+      },
+      {
+        q: "What is the Voges-Proskauer (VP) reaction for the Classical and El Tor biotypes of Vibrio cholerae O1?",
+        options: [
+          "Classical is VP positive (+), El Tor is VP negative (-)",
+          "Classical is VP negative (-), El Tor is VP positive (+)",
+          "Both biotypes are strongly VP negative",
+          "Both biotypes produce abundant gas in VP broth"
+        ],
+        correct: 1,
+        explanation: "The Voges-Proskauer (VP) test (detecting acetoin production from glucose) is negative in the Classical biotype and positive in the El Tor biotype."
+      },
+      {
+        q: "Which biotype of Vibrio cholerae O1 is responsible for the current ongoing Seventh Cholera Pandemic?",
+        options: [
+          "The Classical biotype",
+          "The El Tor biotype",
+          "The MoPn biotype",
+          "The TRIC biotype"
+        ],
+        correct: 1,
+        explanation: "The El Tor biotype displaced the Classical biotype during the 20th century and is the etiologic agent of the ongoing Seventh Cholera Pandemic due to its hardiness and prolonged environmental survival."
+      },
+      {
+        q: "What is the single most essential and life-saving component in the management of cholera patients?",
+        options: [
+          "Immediate high-dose intravenous corticosteroid therapy",
+          "Rapid and aggressive rehydration therapy using Oral Rehydration Salts (ORS) or IV fluids",
+          "Emergency surgical resection of the small intestine",
+          "Prophylactic whole blood transfusion"
+        ],
+        correct: 1,
+        explanation: "Rehydration is the cornerstone of cholera management. Replacing massive water and electrolyte losses via WHO-ORS (or IV Ringer's lactate in severe shock) restores circulating blood volume and saves over 99% of patients."
+      },
+      {
+        q: "What is the clinical role of antimicrobial agents (such as Doxycycline or Azithromycin) in treating cholera?",
+        options: [
+          "They are the sole therapy and must be given before any fluids are administered",
+          "They act as an adjunct to rehydration, shortening the duration of diarrhea and reducing bacterial shedding",
+          "They directly neutralize circulating cholera enterotoxin inside enterocytes",
+          "They are entirely ineffective and contraindicated in all cases"
+        ],
+        correct: 1,
+        explanation: "Antibiotics are an adjunct to fluid therapy. They eradicate vibrios from the bowel, shortening the duration of diarrhea, reducing total fluid replacement volume, and decreasing fecal bacterial excretion."
+      },
+      {
+        q: "How does Vibrio cholerae survive outside the human host in natural aquatic environments?",
+        options: [
+          "By forming heat-resistant endospores that resist boiling",
+          "By surviving freely in estuarine and marine coastal waters, often in association with zooplankton and shellfish",
+          "By obligatory intracellular replication inside aquatic amoebae exclusively",
+          "It cannot survive more than 2 seconds outside the human bowel"
+        ],
+        correct: 1,
+        explanation: "V. cholerae is an autochthonous inhabitant of brackish coastal and estuarine waters. It can survive for extended periods in saline environments, frequently adhering to chitinous surfaces of copepods, zooplankton, and shellfish."
+      },
+      {
+        q: "What physiological property of Vibrio cholerae makes it particularly vulnerable to destruction during gastric transit?",
+        options: [
+          "Extreme sensitivity to gastric hydrochloric acid (acid-labile)",
+          "Total destruction by bile salts in the stomach",
+          "Inability to survive temperatures above 20°C",
+          "Complete lysis in the presence of dietary carbohydrates"
+        ],
+        correct: 0,
+        explanation: "Vibrio cholerae is acid-sensitive (acid-labile). A relatively high oral inoculum (10^8 organisms) is typically required to cause disease in healthy individuals, though a lower dose suffices in hypochlorhydric individuals."
+      },
+      {
+        q: "What primary serological confirmation step is performed after isolating suspicious yellow colonies from TCBS agar?",
+        options: [
+          "Slide agglutination using specific polyvalent and monovalent antisera against O1 and O139 antigens",
+          "Western blot for respiratory syncytial virus antibodies",
+          "Capsular swelling test using pneumococcal antiserum",
+          "Enzyme immunoassay for Shiga toxin 1 and 2"
+        ],
+        correct: 0,
+        explanation: "Slide agglutination with specific polyvalent anti-O1 and anti-O139 antisera (and subtyping into Inaba, Ogawa, and Hikojima) confirms the identification of epidemic V. cholerae strains."
+      },
+      {
+        q: "Which public health intervention represents the most sustainable, long-term barrier against community-wide cholera epidemics?",
+        options: [
+          "Mass administration of prophylactic antibiotics to entire urban populations",
+          "Provision of safe, chlorinated drinking water, modern sanitation infrastructure, and proper hand hygiene",
+          "Eradicating all natural bird and rodent species near coastlines",
+          "Banning all commercial sea navigation and shipping"
+        ],
+        correct: 1,
+        explanation: "Because cholera is transmitted through sewage-contaminated water and food, long-term prevention depends on clean water supplies (chlorination/filtration), sanitary sewage disposal, and strict food hygiene practices."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
