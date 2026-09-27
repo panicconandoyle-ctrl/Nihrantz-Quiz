@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 23: Haemophilus influenzae Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 23: Haemophilus influenzae</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the typical microscopic morphology and Gram reaction of Haemophilus influenzae?",
+        options: [
+          "Gram-positive large rods arranged in chains",
+          "Gram-negative pleomorphic coccobacilli",
+          "Gram-negative curved comma-shaped rods",
+          "Gram-positive lancet-shaped diplococci"
+        ],
+        correct: 1,
+        explanation: "Haemophilus influenzae is a small, Gram-negative, pleomorphic coccobacillus (short rod that can easily be mistaken for a sphere or coccus). It is non-motile and non-spore-forming."
+      },
+      {
+        q: "Which two specific blood factors are strictly required for the in vitro cultivation of Haemophilus influenzae?",
+        options: [
+          "Factor X (Hemin) and Factor V (NAD/NADP)",
+          "Factor VIII (Antihemophilic factor) and Factor IX",
+          "Factor X (Hemin) and Factor VII (Proconvertin)",
+          "Factor V (NAD) and Vitamin B12"
+        ],
+        correct: 0,
+        explanation: "H. influenzae is fastidious and requires both Factor X (hemin, a heat-stable iron porphyrin) and Factor V (NAD/NADP, heat-labile nicotinamide adenine dinucleotide) to grow."
+      },
+      {
+        q: "What is the biochemical identity and heat stability of Factor X?",
+        options: [
+          "Hemin (an iron porphyrin), which is heat-stable",
+          "Nicotinamide Adenine Dinucleotide (NAD), which is heat-labile",
+          "Coenzyme A, which is destroyed by light",
+          "Bovine serum albumin, which is cold-sensitive"
+        ],
+        correct: 0,
+        explanation: "Factor X is hemin (hematin), an iron-containing porphyrin essential for the synthesis of bacterial cytochrome respiratory enzymes and catalase. It is heat-stable."
+      },
+      {
+        q: "What is the biochemical identity and heat stability of Factor V?",
+        options: [
+          "Prothrombin, which is heat-stable",
+          "Nicotinamide Adenine Dinucleotide (NAD or NADP), which is heat-labile",
+          "Hemin, which is heat-labile",
+          "Fibrinogen, which is heat-stable"
+        ],
+        correct: 1,
+        explanation: "Factor V is NAD (or NADP), an essential pyridine nucleotide coenzyme in cellular oxidation-reduction reactions. It is heat-labile and destroyed by excessive heat."
+      },
+      {
+        q: "Why does Haemophilus influenzae fail to grow adequately on standard, unheated sheep blood agar plates?",
+        options: [
+          "Sheep blood contains toxic bile salts that lyse Gram-negative cell walls",
+          "Factor V (NAD) is trapped inside intact red blood cells and inaccessible, and sheep RBCs contain active NADases",
+          "Factor X is completely absent from all mammalian blood",
+          "Unheated blood agar has an excessively high pH greater than 11.0"
+        ],
+        correct: 1,
+        explanation: "In standard blood agar, Factor V is sequestered inside intact red blood cells. Furthermore, sheep erythrocytes contain NADase enzymes that hydrolyze free NAD, preventing H. influenzae from obtaining Factor V unless the cells are lysed."
+      },
+      {
+        q: "Why is Chocolate Agar the optimal culture medium for growing Haemophilus influenzae?",
+        options: [
+          "It contains pure dark cocoa that provides essential carbohydrates",
+          "Gentle heating of blood lyses erythrocytes, releasing both Factor X and Factor V while inactivating RBC NADase enzymes",
+          "It contains high concentrations of bile salts to inhibit non-fastidious flora",
+          "It creates an anaerobic environment that triggers endospore germination"
+        ],
+        correct: 1,
+        explanation: "Chocolate agar is prepared by adding red blood cells to molten agar base at ~80°C. The heat lyses the RBCs (giving a chocolate-brown color), releasing abundant Factor X and V into the medium and inactivating heat-labile NADases."
+      },
+      {
+        q: "What atmospheric condition is required for the optimal in vitro growth of Haemophilus influenzae?",
+        options: [
+          "5% to 10% CO2 (capnophilic atmosphere) at 35–37°C",
+          "Strict obligate anaerobic environment without nitrogen",
+          "Ambient air with 100% pure oxygen at 20°C",
+          "High-pressure methane gas"
+        ],
+        correct: 0,
+        explanation: "Haemophilus influenzae grows best at 35–37°C in a humidified atmosphere enriched with 5% to 10% carbon dioxide (CO2)."
+      },
+      {
+        q: "What is the 'Satellite Phenomenon' (satellitism) observed when H. influenzae is plated with Staphylococcus aureus on blood agar?",
+        options: [
+          "H. influenzae colonies grow exclusively as satellites around S. aureus because S. aureus secretes Factor V (NAD) and lyses RBCs",
+          "S. aureus dies because H. influenzae secretes a potent bacteriocin",
+          "H. influenzae forms large halos of green alpha-hemolysis surrounding Staphylococci",
+          "Both organisms fuse together to form giant multinucleated bacterial chains"
+        ],
+        correct: 0,
+        explanation: "When blood agar is cross-streaked with Staphylococcus aureus, the staphylococci lyse sheep RBCs and excrete excess Factor V (NAD). H. influenzae forms tiny satellite colonies directly adjacent to the S. aureus feeder streak."
+      },
+      {
+        q: "Which growth factor requirement distinguishes Haemophilus parainfluenzae from Haemophilus influenzae?",
+        options: [
+          "H. parainfluenzae requires only Factor V and does NOT require Factor X",
+          "H. parainfluenzae requires only Factor X and does NOT require Factor V",
+          "H. parainfluenzae requires neither Factor X nor Factor V",
+          "H. parainfluenzae requires three additional vitamins not found in blood"
+        ],
+        correct: 0,
+        explanation: "Haemophilus parainfluenzae requires only Factor V (NAD) and can synthesize its own porphyrins (Factor X independent), whereas H. influenzae strictly requires both Factor X and Factor V."
+      },
+      {
+        q: "Which specific growth factor requirement characterizes Haemophilus ducreyi, the causative agent of chancroid?",
+        options: [
+          "It requires only Factor X (hemin) and does NOT require Factor V",
+          "It requires only Factor V and does NOT require Factor X",
+          "It requires both Factor X and Factor V in equal proportions",
+          "It requires glucose and bile without any blood derivatives"
+        ],
+        correct: 0,
+        explanation: "Haemophilus ducreyi requires only Factor X (hemin) for growth and does not require Factor V."
+      },
+      {
+        q: "What is the major virulence determinant responsible for invasive systemic disease caused by Haemophilus influenzae?",
+        options: [
+          "A potent A-B binary exotoxin that halts eukaryotic protein synthesis",
+          "The polysaccharide capsule, which confers resistance to phagocytosis and complement lysis",
+          "A peritrichous flagellar assembly mediating rapid tissue spread",
+          "The production of endospores inside host alveoli"
+        ],
+        correct: 1,
+        explanation: "The polysaccharide capsule is the primary virulence factor of H. influenzae. It enables the bacterium to resist complement-mediated lysis and avoid phagocytosis by polymorphonuclear leukocytes."
+      },
+      {
+        q: "How many distinct serotypes of encapsulated Haemophilus influenzae exist, and what are they based on?",
+        options: [
+          "2 serotypes (1 and 2) based on flagellin proteins",
+          "6 serotypes (a, b, c, d, e, f) based on distinct capsular polysaccharide antigens",
+          "12 serotypes based on lipopolysaccharide core antigens",
+          "Over 155 serotypes based on O-antigen repeat units"
+        ],
+        correct: 1,
+        explanation: "Encapsulated strains are classified into 6 serotypes designated a through f based on the distinct biochemical and antigenic structures of their capsular polysaccharides."
+      },
+      {
+        q: "Which encapsulated serotype of Haemophilus influenzae is clinically the most virulent and historically responsible for >95% of invasive pediatric infections?",
+        options: [
+          "Serotype a",
+          "Serotype b (Hib)",
+          "Serotype d",
+          "Serotype f"
+        ],
+        correct: 1,
+        explanation: "Haemophilus influenzae type b (Hib) produces a polyribosylribitol phosphate (PRP) capsule and is by far the most invasive and lethal serotype, historically causing severe pediatric meningitis and epiglottitis."
+      },
+      {
+        q: "What does the term 'Nontypable Haemophilus influenzae' (NTHi) signify regarding bacterial structure?",
+        options: [
+          "Strains that lack a polysaccharide capsule (unencapsulated)",
+          "Strains that cannot be Gram-stained",
+          "Strains that completely lack peptidoglycan in their cell wall",
+          "Strains that have mutated into Gram-positive bacilli"
+        ],
+        correct: 0,
+        explanation: "Strains that lack a polysaccharide capsule cannot be typed using standard capsular agglutination antisera (a through f) and are termed 'nontypable' Haemophilus influenzae (NTHi)."
+      },
+      {
+        q: "What is the natural reservoir and primary mode of transmission for Haemophilus influenzae?",
+        options: [
+          "Exclusively human reservoir (nasopharyngeal colonization); transmitted via direct contact or respiratory droplets",
+          "Avian reservoir; transmitted by handling domestic poultry",
+          "Environmental water cooling towers; transmitted via Legionella-like aerosols",
+          "Soil reservoir; transmitted through deep skin puncture wounds"
+        ],
+        correct: 0,
+        explanation: "H. influenzae is strictly a human pathogen with no known animal reservoir. It colonizes the human nasopharynx and is transmitted person-to-person via inhalation of respiratory droplets or direct contact with secretions."
+      },
+      {
+        q: "Which age group was historically at the greatest risk for invasive Hib meningitis prior to widespread infant immunization?",
+        options: [
+          "Elderly patients over 75 years",
+          "Infants and young children between 6 months and 2 years of age",
+          "Healthy adolescents aged 15 to 19 years",
+          "Neonates strictly during the first 48 hours of life"
+        ],
+        correct: 1,
+        explanation: "Children between 6 months and 2 years of age were at peak risk because maternal transplacental IgG antibodies waned by ~6 months, and the infant's immune system had not yet developed natural anticapsular antibodies."
+      },
+      {
+        q: "What clinical features classically characterize acute epiglottitis caused by Haemophilus influenzae type b?",
+        options: [
+          "Gradual mild cough lasting 3 months without fever",
+          "Rapidly progressive inflammation, 'cherry-red' swollen epiglottis, inspiratory stridor, drooling, and life-threatening airway obstruction",
+          "Painless loss of voice with normal oxygen saturation",
+          "Severe bloody diarrhea accompanied by tenesmus"
+        ],
+        correct: 1,
+        explanation: "Epiglottitis is a pediatric emergency characterized by acute high fever, sore throat, inspiratory stridor, drooling, tripod positioning, and a swollen, beefy 'cherry-red' epiglottis that can rapidly asphyxiate the patient."
+      },
+      {
+        q: "What spectrum of localized, non-invasive mucosal diseases is predominantly caused by Nontypable Haemophilus influenzae (NTHi)?",
+        options: [
+          "Otitis media, sinusitis, conjunctivitis, and community-acquired bronchopneumonia",
+          "Disseminated osteomyelitis and flaccid paralysis",
+          "Waterhouse-Friderichsen syndrome and necrotizing fasciitis",
+          "Pseudomembranous colitis and toxic megacolon"
+        ],
+        correct: 0,
+        explanation: "Nontypable strains spread contiguously along mucosal surfaces from the nasopharynx to cause otitis media in children, acute sinusitis, conjunctivitis, and lower respiratory tract infections/pneumonia."
+      },
+      {
+        q: "In adult populations, which patient groups are at the highest risk for developing community-acquired pneumonia caused by nontypable H. influenzae?",
+        options: [
+          "Patients with chronic obstructive pulmonary disease (COPD), cigarette smokers, alcoholics, and the elderly",
+          "Young marathon runners with peak athletic endurance",
+          "Pediatric patients under 3 months of age receiving breast milk",
+          "Patients with isolated lactose intolerance"
+        ],
+        correct: 0,
+        explanation: "Nontypable H. influenzae is the second most common cause of community-acquired pneumonia in adults (after S. pneumoniae), disproportionately striking smokers, COPD patients, alcoholics, and elderly individuals."
+      },
+      {
+        q: "Which enzyme is secreted by mucosal pathogens like H. influenzae to neutralize host mucosal immune defenses?",
+        options: [
+          "IgA protease, which cleaves secretory IgA antibodies in mucosal secretions",
+          "DNA polymerase I, which mutates host epithelial cells",
+          "Streptokinase, which dissolves blood clots",
+          "Coagulase, which clots human plasma around the bacterial pole"
+        ],
+        correct: 0,
+        explanation: "H. influenzae produces an extracellular IgA1 protease that cleaves secretory immunoglobulin A (sIgA) molecules at the hinge region, impairing mucosal defense and facilitating attachment."
+      },
+      {
+        q: "What venereal infection with painful genital ulcers and suppurative inguinal lymphadenitis is caused by Haemophilus ducreyi?",
+        options: [
+          "Hard chancre of primary syphilis",
+          "Chancroid (soft chancre)",
+          "Lymphogranuloma venereum",
+          "Granuloma inguinale"
+        ],
+        correct: 1,
+        explanation: "Haemophilus ducreyi is the causative agent of chancroid, a sexually transmitted disease characterized by painful, non-indurated genital ulcers and painful inguinal lymphadenopathy (buboes)."
+      },
+      {
+        q: "Which Haemophilus species is classically associated with epidemic purulent conjunctivitis (pink eye)?",
+        options: [
+          "Haemophilus aegyptius",
+          "Haemophilus ducreyi",
+          "Haemophilus paraphrophilus",
+          "Haemophilus influenzae type b"
+        ],
+        correct: 0,
+        explanation: "Haemophilus aegyptius (historically known as the Koch-Weeks bacillus) is well-recognized for causing acute, highly contagious epidemic purulent conjunctivitis."
+      },
+      {
+        q: "What is the common mechanism of resistance to Ampicillin and Amoxicillin in Haemophilus influenzae?",
+        options: [
+          "Synthesis of plasmid-mediated beta-lactamase (TEM-1 or ROB-1) enzymes that hydrolyze the beta-lactam ring",
+          "Complete loss of outer membrane lipopolysaccharide",
+          "Efflux pumps that extrude all penicillin molecules into the alveoli",
+          "Target switching from D-Ala-D-Ala to D-Ala-D-Lactate"
+        ],
+        correct: 0,
+        explanation: "Many H. influenzae strains produce beta-lactamase enzymes (predominantly TEM-1 or ROB-1) that cleave the beta-lactam ring, conferring resistance to ampicillin and amoxicillin."
+      },
+      {
+        q: "Which antibiotic class is considered the first-line treatment for severe, invasive H. influenzae infections (e.g., meningitis or epiglottitis)?",
+        options: [
+          "Third-generation cephalosporins (e.g., Ceftriaxone, Cefotaxime)",
+          "Narrow-spectrum oral Penicillin V",
+          "Oral Erythromycin monotherapy",
+          "First-generation cephalosporins (e.g., Cefazolin)"
+        ],
+        correct: 0,
+        explanation: "Third-generation cephalosporins (Ceftriaxone or Cefotaxime) are first-line for invasive H. influenzae because they resist beta-lactamases, have bactericidal activity, and achieve therapeutic levels across the blood-brain barrier."
+      },
+      {
+        q: "Why are third-generation cephalosporins like Ceftriaxone preferred over Ampicillin for empiric therapy of suspected H. influenzae meningitis?",
+        options: [
+          "They have superior penetration across the blood-brain barrier and are fully stable against beta-lactamases produced by resistant strains",
+          "They stimulate the infant host to produce endogenous Factor X",
+          "They eradicate normal bowel flora to prevent diarrhea",
+          "They function by inhibiting eukaryotic protein ribosomes"
+        ],
+        correct: 0,
+        explanation: "Ceftriaxone and cefotaxime readily cross the blood-brain barrier into inflamed meninges and CSF, exert bactericidal activity, and are impervious to TEM-1 beta-lactamases that inactivate ampicillin."
+      },
+      {
+        q: "Why did pure unconjugated capsular polysaccharide vaccines fail to protect infants under 18–24 months of age against Hib?",
+        options: [
+          "Infants produce digestive enzymes that dissolve intramuscular polysaccharides immediately",
+          "Purified capsular polysaccharide antigens induce a T-cell independent immune response, to which immature infant immune systems respond poorly without memory",
+          "Pure polysaccharides are toxic to infant hepatocytes",
+          "Maternal antibodies permanently neutralize all types of vaccines"
+        ],
+        correct: 1,
+        explanation: "Pure bacterial polysaccharides are T-independent antigens. Infants under 2 years cannot mount an effective antibody response to T-independent antigens and fail to develop immunological memory."
+      },
+      {
+        q: "How does the modern Hib conjugate vaccine overcome the immunological immaturity of infants?",
+        options: [
+          "By coupling the polyribosylribitol phosphate (PRP) capsular polysaccharide to a carrier protein (e.g., tetanus or diphtheria toxoid), converting it to a T-cell dependent antigen",
+          "By adding live vegetative S. aureus cells to the syringe",
+          "By replacing the polysaccharide with pure hemin (Factor X)",
+          "By injecting the vaccine directly into the cerebrospinal fluid"
+        ],
+        correct: 0,
+        explanation: "Covalently linking the PRP polysaccharide to an immunogenic protein carrier converts it into a T-cell dependent antigen. T helper cells are recruited, generating high-affinity IgG antibodies and robust immune memory in young infants."
+      },
+      {
+        q: "Which antimicrobial drug is administered as post-exposure chemoprophylaxis to close household or daycare contacts of patients with invasive Hib disease?",
+        options: [
+          "Rifampin",
+          "Metronidazole",
+          "Vancomycin",
+          "Amphotericin B"
+        ],
+        correct: 0,
+        explanation: "Oral Rifampin is recommended for close contacts (household or daycare) of an index case with invasive Hib disease to eliminate nasopharyngeal carriage and prevent secondary transmission."
+      },
+      {
+        q: "How can rapid presumptive identification of H. influenzae capsular type b be performed on CSF from a child with acute purulent meningitis?",
+        options: [
+          "Direct capsular antigen detection via latex agglutination or PCR",
+          "Viewing under darkfield microscopy for corkscrew motility",
+          "Growing on MacConkey agar without salt at 50°C",
+          "Measuring serum alkaline phosphatase"
+        ],
+        correct: 0,
+        explanation: "Direct antigen detection methods (such as latex particle agglutination or multiplex PCR) on CSF can rapidly detect Hib capsular antigen (PRP), which is particularly useful if antibiotics were started before lumbar puncture."
+      },
+      {
+        q: "Which morphological feature distinguishes colonies of Haemophilus influenzae grown on chocolate agar?",
+        options: [
+          "Large, bright yellow colonies that turn the surrounding medium black",
+          "Small, smooth, greyish or translucent colonies with a characteristic faint mousy or bleach-like odor",
+          "Wide swarming zones covering the entire petri dish within 4 hours",
+          "Dark green colonies surrounded by complete clear beta-hemolysis"
+        ],
+        correct: 1,
+        explanation: "On chocolate agar, H. influenzae forms small (1–2 mm), smooth, convex, greyish-translucent colonies after 24 hours of incubation in 5–10% CO2, often giving off a characteristic seminal or mousy odor."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
