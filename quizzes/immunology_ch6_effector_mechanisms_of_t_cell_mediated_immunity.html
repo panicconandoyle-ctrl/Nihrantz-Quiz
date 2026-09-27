@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immunology CH6: Effector Mechanisms of T Cell–Mediated Immunity</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 820px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Top Bar & Progress */
+    .header-bar {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e6e9f2;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .quiz-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #dce2ff;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .progress-track {
+      background: #e6e9f2;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: #4255ff;
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Card Question Area */
+    .card-body {
+      padding: 28px 24px;
+      flex-grow: 1;
+      min-height: 400px;
+    }
+
+    .stem {
+      font-size: 16.5px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 22px;
+      color: #2e3856;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fbfcff;
+      transform: translateY(-1px);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: #f6f7fb;
+      border: 1px solid #dcdfe8;
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      flex-shrink: 0;
+    }
+
+    /* Feedback States */
+    .option-btn.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .status-tag {
+      font-weight: 800;
+      margin-left: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Rationale Note Card */
+    .rationale-card {
+      margin-top: 22px;
+      background: #f9faff;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #2e3856;
+      display: none;
+    }
+
+    .rationale-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #4255ff;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      padding: 16px 24px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafbfe;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f0f2f7;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+    }
+
+    /* Overview Grid Modal */
+    .grid-drawer {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.98);
+      z-index: 10;
+      padding: 24px;
+      flex-direction: column;
+    }
+
+    .grid-drawer.open {
+      display: flex;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .drawer-header h3 {
+      font-size: 18px;
+      color: #2e3856;
+    }
+
+    .close-drawer-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: #646f90;
+      cursor: pointer;
+    }
+
+    .questions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 10px;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+
+    .q-bubble {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 1.5px solid #dcdfe8;
+      background: #ffffff;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .q-bubble:hover {
+      border-color: #4255ff;
+    }
+
+    .q-bubble.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #b7c2ff;
+    }
+
+    .q-bubble.current {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Scorecard */
+    .scorecard {
+      display: none;
+      padding: 40px 24px;
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: 800;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .score-breakdown {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat-box {
+      background: #f6f7fb;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .stat-val.correct { color: #18ae79; }
+    .stat-val.incorrect { color: #ff6871; }
+
+    .stat-desc {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: 600;
+    }
+
+    /* Footer Branding */
+    .quiz-footer {
+      padding: 16px 24px;
+      background: #ffffff;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 13px;
+    }
+
+    .social-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      background: #f6f7fb;
+      border: 1px solid #dcdfe8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #4255ff;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <!-- Question Grid Drawer -->
+  <div class="grid-drawer" id="gridDrawer">
+    <div class="drawer-header">
+      <h3>Question Overview</h3>
+      <button class="close-drawer-btn" id="closeDrawerBtn">&times;</button>
+    </div>
+    <div class="questions-grid" id="questionsGrid"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="header-bar">
+    <div class="title-row">
+      <div class="quiz-title">Immunology: CH6 Effector T Cell Mechanisms</div>
+      <button class="list-toggle-btn" id="openDrawerBtn">View List</button>
+    </div>
+    <div class="progress-meta">
+      <span id="currentCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Main Question Body -->
+  <div class="card-body" id="cardBody">
+    <div class="stem" id="stemText">Question stem here</div>
+    <div class="options-grid" id="optionsGrid"></div>
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation / Clinical Rationale</div>
+      <div id="rationaleText"></div>
+    </div>
+  </div>
+
+  <!-- Scorecard View -->
+  <div class="scorecard" id="scorecard">
+    <h2 style="margin-bottom: 20px; font-size: 22px;">Test Complete!</h2>
+    <div class="score-circle">
+      <div class="score-pct" id="scorePct">0%</div>
+      <div class="score-label">Score</div>
+    </div>
+    <div class="score-breakdown">
+      <div class="score-stat-box">
+        <div class="stat-val correct" id="totalCorrect">0</div>
+        <div class="stat-desc">Correct</div>
+      </div>
+      <div class="score-stat-box">
+        <div class="stat-val incorrect" id="totalIncorrect">0</div>
+        <div class="stat-desc">Incorrect</div>
+      </div>
+    </div>
+    <button class="nav-btn primary" id="restartBtn">Take Test Again</button>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn">Previous</button>
+    <button class="nav-btn primary" id="nextBtn">Next</button>
+  </div>
+
+  <!-- Footer Branding -->
+  <div class="quiz-footer">
+    <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-bar">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn">T</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const quizData = [
+    {
+      q: "In the classical Listeria monocytogenes adoptive transfer experiment, which transferred component conferred protective immunity to naive recipient mice?",
+      options: [
+        "Immune serum containing high titers of specific antibodies",
+        "Immune T lymphocytes",
+        "Resting unactivated peritoneal macrophages",
+        "Purified complement proteins"
+      ],
+      correct: 1,
+      explanation: "Transfer of immune T cells conferred protection by drastically reducing bacterial splenic counts, whereas immune serum (antibodies) conferred no protection against this intracellular bacterium."
+    },
+    {
+      q: "Which functional analogy best depicts the distinct effector roles of CD4+ Th cells versus CD8+ CTLs?",
+      options: [
+        "CD4+ cells are phagocytes, while CD8+ cells secrete systemic antibodies",
+        "CD4+ cells act as 'Generals' coordinating attacks via cytokines, while CD8+ cells are 'Assassins' directly killing infected targets",
+        "CD4+ cells eradicate cytosolic pathogens, while CD8+ cells destroy extracellular fungi",
+        "CD4+ cells directly lyse viruses, while CD8+ cells activate tissue fibroblasts"
+      ],
+      correct: 1,
+      explanation: "CD4+ helper T cells coordinate the immune attack by secreting cytokines that stimulate macrophages and B cells, while CD8+ CTLs directly eliminate infected target cells."
+    },
+    {
+      q: "What was the traditional 'old view' of CD8+ T cells prior to modern immunological discoveries?",
+      options: [
+        "They were purely regulatory cells that suppressed allergic responses",
+        "They functioned strictly as antigen-presenting cells in secondary lymphoid tissues",
+        "They were regarded as a uniform, homogeneous killer population producing only IFN-γ",
+        "They were believed to lack TCRs and kill targets non-specifically"
+      ],
+      correct: 2,
+      explanation: "The historic view held that CD8+ T cells were a uniform cytotoxic population producing only IFN-γ, whereas contemporary immunology proves they are heterogeneous (e.g., Tc1, Tc2, Tc9, Tc17, Tc22)."
+    },
+    {
+      q: "What term describes the clinical process of harvesting, expanding/activating a patient's lymphocytes in vitro, and infusing them back into the recipient?",
+      options: [
+        "Active vaccination",
+        "Adoptive immunotherapy",
+        "Clonal anergy induction",
+        "Plasmapheresis"
+      ],
+      correct: 1,
+      explanation: "Adoptive immunotherapy involves isolating, ex vivo expanding/activating lymphocytes, and infusing them back into autologous or allogeneic recipients to combat tumors or chronic infections."
+    },
+    {
+      q: "Which inductive cytokines and master transcription factors are required for the differentiation of naive CD4+ T cells into the Th1 subset?",
+      options: [
+        "IL-4; GATA-3 and STAT6",
+        "IL-12 and IFN-γ; T-bet and STAT4",
+        "IL-1, IL-6, and TGF-β; RORγt and STAT3",
+        "TGF-β and IL-2; FoxP3"
+      ],
+      correct: 1,
+      explanation: "Th1 differentiation is induced by IL-12 (from DCs) and IFN-γ (from NK cells), which activate transcription factors STAT4 and T-bet."
+    },
+    {
+      q: "Which effector cytokine is the signature product of Th1 cells responsible for classical (M1) macrophage activation?",
+      options: [
+        "IL-4",
+        "IFN-γ (Interferon-gamma)",
+        "IL-17",
+        "IL-10"
+      ],
+      correct: 1,
+      explanation: "IFN-γ is the hallmark Th1 cytokine; together with CD40L-CD40 engagement, it drives classical macrophage activation (M1)."
+    },
+    {
+      q: "What are the primary microbicidal weapons produced by classically activated (M1) macrophages to destroy ingested microbes?",
+      options: [
+        "Histamine and heparin granules",
+        "Reactive oxygen species (ROS), nitric oxide (NO), and lysosomal enzymes",
+        "Proline-rich collagen fibers and TGF-β",
+        "Major basic protein and eosinophil cationic protein"
+      ],
+      correct: 1,
+      explanation: "M1 macrophages upregulate phagocyte oxidase (producing ROS) and inducible nitric oxide synthase (iNOS, producing NO) alongside lysosomal enzymes to kill phagocytosed microbes."
+    },
+    {
+      q: "In Mycobacterium leprae infection, which clinical presentation is associated with a dominant Th1 response versus a deficient Th1/dominant Th2 response?",
+      options: [
+        "Th1 dominance produces lepromatous leprosy; Th2 dominance produces tuberculoid leprosy",
+        "Th1 dominance produces tuberculoid leprosy (contained); deficient Th1/Th2 dominance causes lepromatous leprosy (disseminated)",
+        "Th1 dominance causes immediate systemic anaphylaxis",
+        "Both Th1 and Th2 patterns result in identical bacterial loads"
+      ],
+      correct: 1,
+      explanation: "A robust Th1 response confines M. leprae into organized granulomas (tuberculoid leprosy), whereas weak Th1 / Th2 dominance permits uncontrolled mycobacterial proliferation (lepromatous leprosy)."
+    },
+    {
+      q: "Which cytokines drive the differentiation of Th2 cells, and what are their master transcription factors?",
+      options: [
+        "IL-12 and IFN-γ; STAT4 and T-bet",
+        "IL-4; GATA-3 and STAT6",
+        "IL-6 and IL-21; Bcl-6",
+        "IL-2 and TGF-β; FoxP3"
+      ],
+      correct: 1,
+      explanation: "IL-4 drives Th2 lineage commitment through the action of master transcription factors STAT6 and GATA-3."
+    },
+    {
+      q: "Which Th2 cytokine specifically stimulates eosinophil activation and recruitment to fight helminthic parasites?",
+      options: [
+        "IL-4",
+        "IL-5",
+        "IL-13",
+        "IFN-γ"
+      ],
+      correct: 1,
+      explanation: "IL-5 is the critical cytokine for the growth, differentiation, recruitment, and activation of eosinophils."
+    },
+    {
+      q: "What dual functions do IL-4 and IL-13 share in humoral defense and tissue physiology?",
+      options: [
+        "Inducing B cell switching to IgE and stimulating alternative (M2) macrophage activation",
+        "Directly recruiting neutrophils and synthesizing defensins",
+        "Phosphorylating ITAMs and downregulating CTLA-4",
+        "Activating caspases via FasL engagement"
+      ],
+      correct: 0,
+      explanation: "IL-4 and IL-13 induce B cell heavy chain class switching to IgE and stimulate alternative macrophage activation (M2) for tissue repair."
+    },
+    {
+      q: "What defines alternative macrophage activation (M2) stimulated by Th2 cytokines?",
+      options: [
+        "High production of ROS, NO, and acute inflammatory cytokines",
+        "Promotion of fibroblast growth, collagen synthesis, tissue repair, and anti-inflammatory cytokine release (IL-10, TGF-β)",
+        "Perforin pore formation and direct target cell lysis",
+        "Inhibition of MHC Class I presentation via TAP blockage"
+      ],
+      correct: 1,
+      explanation: "M2 macrophages suppress destructive inflammation by secreting IL-10/TGF-β and synthesizing growth factors that promote collagen deposition and wound healing."
+    },
+    {
+      q: "Which transcription factor and inductive cytokines drive the differentiation of Th17 effector cells?",
+      options: [
+        "T-bet; IL-12 and IFN-γ",
+        "GATA-3; IL-4",
+        "RORγt (and STAT3); IL-1, IL-6, IL-23, and TGF-β",
+        "FoxP3; IL-2 and TGF-β"
+      ],
+      correct: 2,
+      explanation: "Th17 differentiation is induced by pro-inflammatory cytokines (IL-1, IL-6, IL-23) along with TGF-β, requiring RORγt and STAT3 transcription factors."
+    },
+    {
+      q: "What is the primary immunological hallmark function of the effector cytokine IL-17?",
+      options: [
+        "Inducing potent recruitment and mobilization of neutrophils to clear extracellular bacteria and fungi",
+        "Switching antibody production exclusively to IgE",
+        "Dephosphorylating NFAT via calcineurin",
+        "Inducing FasL-mediated apoptotic cleavage"
+      ],
+      correct: 0,
+      explanation: "IL-17 induces chemokine and cytokine release by epithelial/stromal cells, recruiting waves of neutrophils to destroy extracellular bacteria and fungal pathogens."
+    },
+    {
+      q: "Which cytokine produced by Th17 and Th22 cells maintains epithelial integrity and stimulates antimicrobial peptide production?",
+      options: [
+        "IL-4",
+        "IL-22",
+        "IL-5",
+        "IL-10"
+      ],
+      correct: 1,
+      explanation: "IL-22 acts on non-hematopoietic epithelial cells in the gut and skin to enhance barrier integrity, stimulate cell turnover, and induce antimicrobial peptides (e.g., defensins)."
+    },
+    {
+      q: "A patient with a genetic defect in Th17 development or IL-17 signaling is exceptionally susceptible to which clinical syndrome?",
+      options: [
+        "Disseminated helminthic infestation",
+        "Chronic Mucocutaneous Candidiasis and recurrent bacterial abscesses",
+        "Systemic tuberculoid granulomatosis",
+        "Immediate graft-versus-host rejection"
+      ],
+      correct: 1,
+      explanation: "Th17 immunity is vital for mucosal fungal and extracellular bacterial defense; defects cause Chronic Mucocutaneous Candidiasis and severe staphylococcal abscesses."
+    },
+    {
+      q: "Which clinical condition is driven by aberrant Th17 hyperactivity, and which biological therapy is clinically effective for it?",
+      options: [
+        "Lepromatous leprosy; treated with recombinant IL-4",
+        "Psoriasis; treated with anti-IL-17 monoclonal antibodies",
+        "Anaphylaxis; treated with recombinant IFN-γ",
+        "T cell exhaustion; treated with calcineurin agonists"
+      ],
+      correct: 1,
+      explanation: "Psoriasis involves excessive Th17/IL-17 activity causing hyperproliferation of keratinocytes; monoclonal antibodies neutralizing IL-17 are highly therapeutic."
+    },
+    {
+      q: "Which CD4+ subset expresses the master transcription factor FoxP3 and functions to maintain peripheral self-tolerance?",
+      options: [
+        "Follicular Helper T cells (Tfh)",
+        "Regulatory T cells (Treg)",
+        "Th9 cells",
+        "Th22 cells"
+      ],
+      correct: 1,
+      explanation: "Regulatory T cells (Treg) express FoxP3, require IL-2/TGF-β, and suppress autoreactive effector T cells via IL-10 and TGF-β secretion."
+    },
+    {
+      q: "Which master transcription factor and key cytokine define T Follicular Helper (Tfh) cells in germinal centers?",
+      options: [
+        "Bcl-6; IL-21",
+        "T-bet; IFN-γ",
+        "GATA-3; IL-5",
+        "FoxP3; IL-10"
+      ],
+      correct: 0,
+      explanation: "Tfh lineage commitment depends on the master repressor Bcl-6, and their helper function in germinal centers is mediated predominantly by IL-21."
+    },
+    {
+      q: "In cytokine biology, what does the term 'pleiotropism' signify?",
+      options: [
+        "Multiple cytokines performing an identical, overlapping biological function",
+        "A single cytokine acting on multiple different cell types to produce distinct phenotypic effects",
+        "The complete absence of receptor signaling during antigen encounter",
+        "The unidirectional migration of lymphocytes across High Endothelial Venules"
+      ],
+      correct: 1,
+      explanation: "Pleiotropism refers to the ability of one cytokine to exert diverse actions on multiple target cell types (e.g., IL-4 acting on B cells, T cells, and macrophages)."
+    },
+    {
+      q: "Which property explains why blocking only one cytokine with a monoclonal antibody might fail to prevent a biological pathway?",
+      options: [
+        "Pleiotropism",
+        "Transient expression",
+        "Cytokine redundancy",
+        "Antigenic drift"
+      ],
+      correct: 2,
+      explanation: "Cytokine redundancy means that different cytokines share biological activities (e.g., both IL-4 and IL-13 activate alternative macrophages), compensating if one is blocked."
+    },
+    {
+      q: "Which CD8+ T cell subset parallels Th1 cells by secreting IFN-γ and TNF-α under the influence of IL-12?",
+      options: [
+        "Tc1",
+        "Tc2",
+        "Tc9",
+        "Tc17"
+      ],
+      correct: 0,
+      explanation: "Tc1 cells are induced by IL-12 and secrete classic Type 1 cytokines (IFN-γ and TNF-α) to kill viral and intracellular pathogens."
+    },
+    {
+      q: "During CTL granule exocytosis, what is the specific role of perforin?",
+      options: [
+        "Directly cleaving nuclear lamins and nuclear DNA",
+        "Forming transmembrane pores in the target cell membrane to facilitate granzyme entry",
+        "Binding to MHC Class I to recruit ZAP-70",
+        "Neutralizing viral capsids in the extracellular space"
+      ],
+      correct: 1,
+      explanation: "Perforin polymerizes within the lipid bilayer of the target cell membrane, creating aqueous pores that allow cytotoxic granzymes to enter."
+    },
+    {
+      q: "How do granzymes released from CTL granules execute apoptosis in target cells?",
+      options: [
+        "By enzymatically cleaving and activating cellular caspases",
+        "By hydrolyzing extracellular ATP to inhibit cellular respiration",
+        "By destroying the cellular peptidoglycan cell wall",
+        "By activating the calcineurin phosphatase complex"
+      ],
+      correct: 0,
+      explanation: "Granzymes are serine proteases that cleave intracellular substrates, activating caspases (such as caspase-3) that initiate programmed cell death (apoptosis)."
+    },
+    {
+      q: "In the alternative CTL death-receptor killing pathway, what molecular interaction triggers target cell apoptosis?",
+      options: [
+        "LFA-1 on the CTL binding to ICAM-1 on the target cell",
+        "Fas Ligand (FasL) on the CTL binding to Fas (CD95) on the target cell",
+        "CD40L on the CTL binding to CD40 on the target cell",
+        "B7-1 on the CTL binding to CTLA-4 on the target cell"
+      ],
+      correct: 1,
+      explanation: "CTLs expressing FasL engage Fas (CD95) on susceptible target cells, inducing receptor trimerization, caspase activation, and apoptosis."
+    },
+    {
+      q: "Which immune mechanism eliminates pathogens that are sequestered within phagosomes versus pathogens that escape into the host cell cytoplasm?",
+      options: [
+        "Both are eradicated solely by circulating pentameric IgM antibodies",
+        "Phagosomal pathogens are killed by Th1-activated macrophages; cytosolic pathogens are eliminated by CD8+ CTL killing of the infected cell",
+        "Phagosomal pathogens are destroyed by CTLs; cytosolic pathogens are digested by alternative M2 macrophages",
+        "Cytosolic pathogens are eliminated by eosinophil granule major basic protein"
+      ],
+      correct: 1,
+      explanation: "Pathogens inside phagosomes are destroyed by M1 macrophages activated by CD4+ Th1 cells. Pathogens that escape into the cytosol are eradicated when CD8+ CTLs lyse the host cell."
+    },
+    {
+      q: "How does Herpes Simplex Virus (HSV) evade CD8+ CTL recognition?",
+      options: [
+        "By producing a protein that blocks the TAP transporter, preventing peptide delivery to MHC Class I in the ER",
+        "By inhibiting phagosome-lysosome fusion inside neutrophils",
+        "By directly degrading circulating IL-2 receptors",
+        "By upregulating host L-selectin on naive T cells"
+      ],
+      correct: 0,
+      explanation: "HSV synthesizes a cytosolic protein (ICP47) that binds to and blocks TAP, preventing viral peptides from being transported into the ER to load onto MHC Class I."
+    },
+    {
+      q: "How does Mycobacterium tuberculosis persist and survive chronically inside host macrophages?",
+      options: [
+        "By forming transmembrane pores with perforin homologs",
+        "By inhibiting the fusion of phagosomes with lysosomes",
+        "By switching host B cell antibodies to IgE",
+        "By cleaving CD28 from the T cell surface"
+      ],
+      correct: 1,
+      explanation: "M. tuberculosis interferes with phagosome maturation and blocks phagosome-lysosome fusion, thereby evading the acidic, enzyme-rich environment of the lysosome."
+    },
+    {
+      q: "What viral evasion strategy is utilized by Poxviruses to blunt cytokine-mediated signaling?",
+      options: [
+        "Producing soluble decoy cytokine receptors that sequester cytokines like IFN-γ before they reach target cells",
+        "Hyperactivating calcineurin to exhaust intracellular calcium stores",
+        "Inducing massive polyclonal TCR activation without MHC interaction",
+        "Cleaving target cell ICAM-1 molecules"
+      ],
+      correct: 0,
+      explanation: "Poxviruses encode soluble homologues of cytokine receptors (e.g., IFN-γ and TNF decoy receptors) that bind and neutralize extracellular cytokines before they reach host receptors."
+    },
+    {
+      q: "What immunological state occurs in chronic viral infections (e.g., HIV, Hepatitis C) characterized by sustained high antigen loads and high PD-1 expression?",
+      options: [
+        "Central memory differentiation",
+        "T cell exhaustion",
+        "Acute lymphoblastic leukemia",
+        "Superantigen toxic shock"
+      ],
+      correct: 1,
+      explanation: "Prolonged, persistent TCR stimulation during chronic viral infections induces T cell exhaustion, characterized by high inhibitory receptor expression (PD-1, CTLA-4) and progressive loss of effector function."
+    }
+  ];
+
+  let currentIdx = 0;
+  const userAnswers = Array(quizData.length).fill(null);
+
+  // DOM Elements
+  const currentCounter = document.getElementById("currentCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressFill = document.getElementById("progressFill");
+  const stemText = document.getElementById("stemText");
+  const optionsGrid = document.getElementById("optionsGrid");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const cardBody = document.getElementById("cardBody");
+  const scorecard = document.getElementById("scorecard");
+  const navBar = document.getElementById("navBar");
+  const restartBtn = document.getElementById("restartBtn");
+  const openDrawerBtn = document.getElementById("openDrawerBtn");
+  const closeDrawerBtn = document.getElementById("closeDrawerBtn");
+  const gridDrawer = document.getElementById("gridDrawer");
+  const questionsGrid = document.getElementById("questionsGrid");
+  const scorePct = document.getElementById("scorePct");
+  const totalCorrect = document.getElementById("totalCorrect");
+  const totalIncorrect = document.getElementById("totalIncorrect");
+
+  const optionLetters = ["A", "B", "C", "D"];
+
+  function initQuiz() {
+    renderGridDrawer();
+    loadQuestion(0);
+    updateProgress();
+  }
+
+  function renderGridDrawer() {
+    questionsGrid.innerHTML = "";
+    quizData.forEach((_, idx) => {
+      const bubble = document.createElement("button");
+      bubble.className = "q-bubble";
+      bubble.textContent = idx + 1;
+      bubble.id = `bubble-${idx}`;
+      bubble.addEventListener("click", () => {
+        gridDrawer.classList.remove("open");
+        loadQuestion(idx);
+      });
+      questionsGrid.appendChild(bubble);
+    });
+  }
+
+  function updateGridStatus() {
+    quizData.forEach((_, idx) => {
+      const bubble = document.getElementById(`bubble-${idx}`);
+      if (!bubble) return;
+      bubble.className = "q-bubble";
+      if (userAnswers[idx] !== null) {
+        bubble.classList.add("answered");
+      }
+      if (idx === currentIdx) {
+        bubble.classList.add("current");
+      }
+    });
+  }
+
+  function updateProgress() {
+    const answeredCount = userAnswers.filter(a => a !== null).length;
+    const pct = Math.round((answeredCount / quizData.length) * 100);
+    progressFill.style.width = `${pct}%`;
+    answeredCounter.textContent = `${answeredCount} / ${quizData.length} Answered`;
+    currentCounter.textContent = `Question ${currentIdx + 1} of ${quizData.length}`;
+    updateGridStatus();
+  }
+
+  function loadQuestion(idx) {
+    currentIdx = idx;
+    const data = quizData[idx];
+
+    // Reset view
+    stemText.textContent = `${idx + 1}. ${data.q}`;
+    optionsGrid.innerHTML = "";
+
+    const isAnswered = userAnswers[idx] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerHTML = `<span class="option-badge">${optionLetters[optIdx]}</span><span>${optText}</span>`;
+
+      if (isAnswered) {
+        btn.disabled = true;
+        const selected = userAnswers[idx];
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          if (selected === optIdx) {
+            btn.innerHTML += `<span class="status-tag">CORRECT</span>`;
+          }
+        } else if (selected === optIdx) {
+          btn.classList.add("incorrect");
+          btn.innerHTML += `<span class="status-tag">INCORRECT</span>`;
+        }
+      } else {
+        btn.addEventListener("click", () => handleSelectOption(optIdx));
+      }
+
+      optionsGrid.appendChild(btn);
+    });
+
+    if (isAnswered) {
+      rationaleText.textContent = data.explanation;
+      rationaleCard.style.display = "block";
+    } else {
+      rationaleCard.style.display = "none";
+    }
+
+    // Navigation buttons
+    prevBtn.disabled = currentIdx === 0;
+    if (currentIdx === quizData.length - 1) {
+      nextBtn.textContent = "Finish Test";
+    } else {
+      nextBtn.textContent = "Next";
+    }
+
+    updateProgress();
+  }
+
+  function handleSelectOption(selectedIdx) {
+    if (userAnswers[currentIdx] !== null) return;
+
+    userAnswers[currentIdx] = selectedIdx;
+    loadQuestion(currentIdx);
+  }
+
+  function showScorecard() {
+    cardBody.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.style.display = "flex";
+
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const incorrectCount = quizData.length - correctCount;
+    const finalPct = Math.round((correctCount / quizData.length) * 100);
+
+    scorePct.textContent = `${finalPct}%`;
+    totalCorrect.textContent = correctCount;
+    totalIncorrect.textContent = incorrectCount;
+  }
+
+  // Event Listeners
+  prevBtn.addEventListener("click", () => {
+    if (currentIdx > 0) loadQuestion(currentIdx - 1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (currentIdx < quizData.length - 1) {
+      loadQuestion(currentIdx + 1);
+    } else {
+      showScorecard();
+    }
+  });
+
+  restartBtn.addEventListener("click", () => {
+    for (let i = 0; i < userAnswers.length; i++) {
+      userAnswers[i] = null;
+    }
+    scorecard.style.display = "none";
+    cardBody.style.display = "block";
+    navBar.style.display = "flex";
+    loadQuestion(0);
+  });
+
+  openDrawerBtn.addEventListener("click", () => {
+    gridDrawer.classList.add("open");
+  });
+
+  closeDrawerBtn.addEventListener("click", () => {
+    gridDrawer.classList.remove("open");
+  });
+
+  // Start quiz on load
+  initQuiz();
+</script>
+
+</body>
+</html>
