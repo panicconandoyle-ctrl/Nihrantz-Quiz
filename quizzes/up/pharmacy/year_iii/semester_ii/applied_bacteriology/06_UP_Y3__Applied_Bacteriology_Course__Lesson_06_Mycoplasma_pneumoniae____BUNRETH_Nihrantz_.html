@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology: Family Enterobacteriaceae - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Applied Bacteriology — Lesson 06: Family Enterobacteriaceae</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Lesson 06 content
+  const quizData = [
+    {
+      q: "What Greek root provides the etymological origin for the family name 'Enterobacteriaceae', reflecting their primary ecological niche?",
+      options: [
+        "'Enteron', meaning intestine",
+        "'Enterikos', meaning respiratory canal",
+        "'Entomon', meaning insect",
+        "'Entos', meaning kidney"
+      ],
+      correct: 0,
+      explanation: "The name 'Enterobacteriaceae' is derived from the Greek 'enteron', meaning intestine, reflecting their primary habitat as commensals or pathogens in the gastrointestinal tracts of humans and warm-blooded animals."
+    },
+    {
+      q: "Approximately what proportion of all bacterial isolates recovered in hospital clinical microbiology laboratories belong to the family Enterobacteriaceae?",
+      options: [
+        "Around 10%",
+        "Approximately 25%",
+        "Around 75% (three-quarters)",
+        "Over 99%"
+      ],
+      correct: 2,
+      explanation: "Members of the Enterobacteriaceae account for approximately 75% (three-quarters) of all clinically isolated Gram-negative bacilli and routine bacterial pathogens in medical microbiology laboratories."
+    },
+    {
+      q: "According to modern genomic taxonomy, why is the inclusion of Yersinia pestis within the family Enterobacteriaceae considered outdated?",
+      options: [
+        "Yersinia pestis was reclassified as a spore-forming Gram-positive rod",
+        "Whole-genome sequencing and phylogenomics reclassified Yersinia into its own distinct family, Yersiniaceae",
+        "Yersinia pestis is now classified as an obligate intracellular virus",
+        "Yersinia pestis was moved into the family Vibrionaceae"
+      ],
+      correct: 1,
+      explanation: "Modern genomic and 16S rRNA reclassification split the broad order Enterobacterales into multiple families, moving the genus Yersinia into the distinct family Yersiniaceae."
+    },
+    {
+      q: "Which member of the Enterobacteriaceae is universally monitored as the primary indicator organism for fecal contamination in municipal drinking water testing?",
+      options: [
+        "Serratia marcescens",
+        "Escherichia coli",
+        "Proteus mirabilis",
+        "Morganella morganii"
+      ],
+      correct: 1,
+      explanation: "Escherichia coli is the classic coliform indicator of fecal pollution in water supplies because it is an abundant, obligate inhabitant of mammalian gastrointestinal tracts."
+    },
+    {
+      q: "Which of the following genera of Enterobacteriaceae is predominantly an environmental organism found in soil and water rather than an obligate gut inhabitant?",
+      options: [
+        "Shigella",
+        "Serratia",
+        "Salmonella",
+        "Escherichia"
+      ],
+      correct: 1,
+      explanation: "While most Enterobacteriaceae are primarily intestinal, Serratia species (such as Serratia marcescens) are widely distributed environmental saprophytes found in water, soil, and plant surfaces."
+    },
+    {
+      q: "Which pair of Enterobacteriaceae genera represent true primary (specific) pathogens capable of causing severe invasive disease in healthy, immunocompetent hosts?",
+      options: [
+        "Citrobacter and Hafnia",
+        "Salmonella (e.g., S. Typhi) and Shigella",
+        "Enterobacter and Serratia",
+        "Proteus and Providencia"
+      ],
+      correct: 1,
+      explanation: "Salmonella enterica serovar Typhi (causing typhoid fever) and Shigella species (causing bacillary dysentery) possess specific virulence factors enabling primary invasive disease in healthy individuals."
+    },
+    {
+      q: "What is the typical microscopic morphology and Gram reaction of members of the Enterobacteriaceae?",
+      options: [
+        "Gram-positive spore-forming bacilli in chains",
+        "Gram-negative bacilli (rods), approximately 2–3 µm long by 0.6 µm wide, often exhibiting bipolar staining",
+        "Gram-negative helical spirochetes with periplasmic flagella",
+        "Gram-positive pleomorphic coccobacilli in palisades"
+      ],
+      correct: 1,
+      explanation: "Enterobacteriaceae are non-spore-forming Gram-negative bacilli (BGN) measuring approximately 2–3 µm in length and 0.6 µm in diameter, sometimes displaying subtle bipolar staining."
+    },
+    {
+      q: "Which arrangement of flagella mediates active motility across the vast majority of motile Enterobacteriaceae species?",
+      options: [
+        "A single polar monotrichous flagellum",
+        "Peritrichous flagella distributed uniformly around the entire cell surface",
+        "Lophotrichous tufts restricted to both poles",
+        "Axial filaments located inside the periplasmic space"
+      ],
+      correct: 1,
+      explanation: "Motile Enterobacteriaceae typically express peritrichous flagella, projecting in all directions over the entire cell perimeter."
+    },
+    {
+      q: "Which two major clinically significant genera of Enterobacteriaceae are characteristically NON-MOTILE under all physiological conditions?",
+      options: [
+        "Escherichia and Proteus",
+        "Klebsiella and Shigella",
+        "Salmonella and Serratia",
+        "Enterobacter and Citrobacter"
+      ],
+      correct: 1,
+      explanation: "Klebsiella (which expresses a heavy polysaccharide capsule) and Shigella are famously non-motile under all standard conditions, serving as a primary diagnostic discriminator."
+    },
+    {
+      q: "Which species of the Enterobacterales demonstrates temperature-dependent motility, being non-motile at human body temperature (37°C) but actively motile at room temperature (22–25°C)?",
+      options: [
+        "Escherichia coli",
+        "Yersinia enterocolitica",
+        "Klebsiella pneumoniae",
+        "Salmonella Typhi"
+      ],
+      correct: 1,
+      explanation: "Yersinia enterocolitica (and Hafnia alvei) synthesizes flagella and exhibits motility at lower ambient temperatures (22–25°C), but represses flagellar production at 37°C."
+    },
+    {
+      q: "What are the atmospheric oxygen requirements of the family Enterobacteriaceae?",
+      options: [
+        "Strict obligate aerobes",
+        "Facultative anaerobes (capable of growing with or without oxygen)",
+        "Strict obligate anaerobes",
+        "Microaerophilic (requiring exactly 5% oxygen)"
+      ],
+      correct: 1,
+      explanation: "All members of Enterobacteriaceae are facultative anaerobes (Aéro-Anaérobies Facultatifs = AAF), switching between aerobic respiration and mixed-acid fermentation."
+    },
+    {
+      q: "What is the typical generation time of Enterobacteriaceae (such as E. coli) under optimal nutritional and temperature conditions (37°C)?",
+      options: [
+        "1 to 2 minutes",
+        "20 to 40 minutes",
+        "24 to 48 hours",
+        "2 to 6 weeks"
+      ],
+      correct: 1,
+      explanation: "Enterobacteriaceae divide rapidly in nutrient-rich media, with an average doubling (generation) time of approximately 20 to 40 minutes at 37°C."
+    },
+    {
+      q: "What macroscopic appearance is typically produced when Enterobacteriaceae grow in nutrient liquid broth?",
+      options: [
+        "A thick dry surface pellicle with crystal-clear underlying liquid",
+        "Homogeneous, uniform turbidity throughout the entire tube",
+        "Heavy granular sediment confined strictly to the bottom of the tube",
+        "Complete failure of liquid media to support replication"
+      ],
+      correct: 1,
+      explanation: "Because Enterobacteriaceae are facultative anaerobes that replicate evenly throughout liquid broth, they produce uniform, dispersed cloudiness (turbidity) without surface pellicles."
+    },
+    {
+      q: "On standard non-inhibitory solid agar (e.g., blood agar), what is the typical colonial diameter of Enterobacteriaceae after overnight (18–24 h) incubation at 37°C?",
+      options: [
+        "Pinpoint colonies (<0.1 mm)",
+        "Smooth, circular, convex colonies approximately 2 to 3 mm in diameter",
+        "Giant expansive plaques greater than 5 cm across",
+        "Dry wrinkled colonies requiring 14 days"
+      ],
+      correct: 1,
+      explanation: "After 18–24 hours at 37°C, typical Enterobacteriaceae colonies are smooth, circular, moist, grayish-white, and approximately 2–3 mm in diameter."
+    },
+    {
+      q: "Which genus within the Enterobacteriaceae exhibits dramatic 'swarming' motility, producing successive concentric rings of growth across non-inhibitory agar plates?",
+      options: [
+        "Klebsiella",
+        "Proteus",
+        "Shigella",
+        "Serratia"
+      ],
+      correct: 1,
+      explanation: "Proteus species (such as P. mirabilis and P. vulgaris) exhibit cyclical swarming behavior on non-inhibitory solid media, rapidly spreading in concentric waves of hyper-flagellated swarmer cells."
+    },
+    {
+      q: "Why do colonies of Klebsiella pneumoniae appear distinctly mucoid, dome-shaped, glistening, and sticky ('string-test positive') on solid agar?",
+      options: [
+        "They synthesize a thick, prominent extracellular polysaccharide capsule",
+        "They secrete copious amounts of mineral oil into the medium",
+        "They completely lack an outer membrane",
+        "They express thousands of long pili that absorb ambient water"
+      ],
+      correct: 0,
+      explanation: "Klebsiella species produce a copious, viscous polysaccharide capsule that gives colonies a characteristically wet, glistening, mucoid, dome-like appearance."
+    },
+    {
+      q: "Which triad of biochemical reactions defines the family Enterobacteriaceae and separates them from other Gram-negative bacilli (such as Pseudomonas)?",
+      options: [
+        "Glucose fermented, Oxidase-negative, and Nitrate reduced to nitrite",
+        "Glucose non-fermented, Oxidase-positive, and Nitrate non-reduced",
+        "Lactose non-fermenter, Catalase-negative, and Urease-positive",
+        "Oxidase-positive, strict aerobe, and Vibriostatic agent O/129 sensitive"
+      ],
+      correct: 0,
+      explanation: "The classic defining biochemical criteria for Enterobacteriaceae are: (1) fermentation of glucose (with or without gas), (2) negative cytochrome oxidase test, and (3) reduction of nitrates to nitrites."
+    },
+    {
+      q: "How does the cytochrome oxidase test differentiate Enterobacteriaceae from Pseudomonas aeruginosa?",
+      options: [
+        "Enterobacteriaceae are oxidase-positive, whereas Pseudomonas is oxidase-negative",
+        "Enterobacteriaceae are oxidase-negative, whereas Pseudomonas is oxidase-positive",
+        "Both organisms are uniformly oxidase-positive",
+        "Both organisms are uniformly oxidase-negative"
+      ],
+      correct: 1,
+      explanation: "Enterobacteriaceae lack cytochrome c oxidase (oxidase-negative), whereas Pseudomonas species possess cytochrome c oxidase and rapidly turn the oxidase reagent deep purple (oxidase-positive)."
+    },
+    {
+      q: "How do members of the Enterobacteriaceae behave when exposed to the vibriostatic agent O/129 (2,4-diamino-6,7-diisopropylpteridine)?",
+      options: [
+        "They are completely sensitive, displaying a wide zone of inhibition",
+        "They are inherently resistant to O/129 (differentiating them from Vibrio species, which are sensitive)",
+        "They utilize O/129 as their sole carbon source",
+        "O/129 converts Enterobacteriaceae into Gram-positive cocci"
+      ],
+      correct: 1,
+      explanation: "Enterobacteriaceae are inherently resistant to the vibriostatic pteridine compound O/129, whereas Vibrio species are susceptible to it."
+    },
+    {
+      q: "In standardized multi-test identification galleries (such as the API 20E system), what percentage of clinical Enterobacteriaceae strains are typically identified correctly on the first attempt when performed properly?",
+      options: [
+        "Around 20%",
+        "Around 50%",
+        "Approximately 90%",
+        "Exactly 100% without exception"
+      ],
+      correct: 2,
+      explanation: "When following standardized protocol, commercial standardized microtubes like the API 20E identify approximately 90% of routine clinical Enterobacteriaceae strains correctly on the first attempt."
+    },
+    {
+      q: "Which specific serovar of Salmonella enterica is the causative agent of systemic, life-threatening typhoid (enteric) fever?",
+      options: [
+        "Salmonella enterica serovar Typhimurium",
+        "Salmonella enterica serovar Typhi",
+        "Salmonella enterica serovar Enteritidis",
+        "Salmonella enterica serovar Arizonae"
+      ],
+      correct: 1,
+      explanation: "Salmonella enterica serovar Typhi (S. Typhi) causes typhoid fever, a severe systemic bloodstream infection characterized by prolonged high fever, abdominal pain, hepatosplenomegaly, and rose spots."
+    },
+    {
+      q: "What is the classical clinical syndrome produced by acute Shigella infection?",
+      options: [
+        "Ascending flaccid paralysis",
+        "Bacillary dysentery, characterized by severe abdominal cramping, fever, tenesmus, and frequent small-volume bloody, mucoid stools",
+        "Lobar pneumonia with currant-jelly sputum",
+        "Chronic arthritis of the knee joint"
+      ],
+      correct: 1,
+      explanation: "Shigella species invade the colonic epithelium, causing acute bacillary dysentery marked by intense mucosal ulceration, tenesmus, fever, and blood- and mucus-laden diarrheal stools."
+    },
+    {
+      q: "Why is Proteus mirabilis a frequent cause of urinary tract stones (struvite nephrolithiasis / staghorn calculi)?",
+      options: [
+        "It secretes insoluble calcium crystals directly from its capsule",
+        "It produces potent urease enzymes that hydrolyze urea into ammonia and CO2, raising urine pH and precipitating magnesium ammonium phosphate",
+        "It ferments glucose into solid oxalic acid polymers",
+        "It consumes all urinary citrate within 2 hours"
+      ],
+      correct: 1,
+      explanation: "Proteus produces high levels of urease, which cleaves urea into ammonia. The resulting alkalization of urine (pH > 8.0) precipitates magnesium, ammonium, and phosphate into struvite staghorn calculi."
+    },
+    {
+      q: "What classic pulmonary manifestation is traditionally associated with severe, necrotizing Klebsiella pneumoniae pneumonia in alcoholics and compromised hosts?",
+      options: [
+        "Copious, thick, brick-red 'currant-jelly' sputum resulting from alveolar necrosis and massive capsular mucus",
+        "Thin, dry, non-productive nocturnal cough lasting 6 months",
+        "Isolated apical cavitary disease mimicking tuberculosis exclusively",
+        "Sudden formation of pulmonary pleural pearls"
+      ],
+      correct: 0,
+      explanation: "Klebsiella pneumoniae causes destructive necrotizing lobar pneumonia, classically generating thick, blood-tinged, viscous sputum described as 'currant-jelly sputum'."
+    },
+    {
+      q: "Which member of the Enterobacteriaceae is a well-documented cause of neonatal bacteremia and neonatal purulent meningitis often associated with brain abscesses?",
+      options: [
+        "Citrobacter freundii (and Citrobacter koseri)",
+        "Proteus mirabilis",
+        "Yersinia pestis",
+        "Hafnia alvei"
+      ],
+      correct: 0,
+      explanation: "Citrobacter species (notably C. koseri and C. freundii) are notorious causes of severe neonatal meningitis frequently complicated by necrotizing encephalitis and cerebral abscesses."
+    },
+    {
+      q: "How does Yersinia enterocolitica infection characteristically present in children and adolescents, frequently mimicking acute appendicitis ('pseudoappendicitis')?",
+      options: [
+        "Acute gastroenteritis and acute mesenteric lymphadenitis with right lower quadrant abdominal pain",
+        "Subacute bacterial endocarditis with Osler nodes",
+        "Malignant bull neck and pseudomembranous angina",
+        "Bilateral facial nerve palsy"
+      ],
+      correct: 0,
+      explanation: "Y. enterocolitica invades terminal ileal Peyer's patches, producing acute mesenteric adenitis and terminal ileitis with right iliac fossa pain that closely mimics acute surgical appendicitis."
+    },
+    {
+      q: "Which opportunistic genus of Enterobacteriaceae frequently causes nosocomial catheter-related bacteremia and displays red-pigmented (prodigiosin) colonies in some strains?",
+      options: [
+        "Escherichia",
+        "Serratia",
+        "Shigella",
+        "Salmonella"
+      ],
+      correct: 1,
+      explanation: "Serratia (specifically Serratia marcescens) is a notorious opportunistic hospital pathogen causing catheter-related sepsis and UTIs; wild-type strains often produce the bright red pigment prodigiosin."
+    },
+    {
+      q: "Which common opportunistic species of Enterobacter is heavily implicated in hospital-acquired respiratory tract infections and device-associated sepsis?",
+      options: [
+        "Enterobacter cloacae",
+        "Shigella sonnei",
+        "Spirillum minus",
+        "Listeria monocytogenes"
+      ],
+      correct: 0,
+      explanation: "Enterobacter cloacae is a prominent member of the ESKAPE group of pathogens, frequently causing nosocomial pneumonia, surgical site infections, and bloodstream infections in intensive care units."
+    },
+    {
+      q: "How do modern chromogenic culture media distinguish Escherichia coli from other coliforms (e.g., Klebsiella or Enterobacter) within 24 hours?",
+      options: [
+        "By utilizing specific chromogenic enzyme substrates (such as beta-glucuronidase for E. coli) that release distinctive colored pigments upon cleavage",
+        "By measuring bacterial heat production with micro-thermocouples",
+        "By counting the exact number of flagella under electron microscopy",
+        "By sequencing the entire genome on the agar plate"
+      ],
+      correct: 0,
+      explanation: "Chromogenic media incorporate enzyme-specific synthetic substrates (e.g., targeting E. coli beta-D-glucuronidase) that yield distinct color precipitates (e.g., blue/purple for E. coli vs. pink for Klebsiella/Enterobacter)."
+    },
+    {
+      q: "While most members of the family Enterobacteriaceae are catalase-positive, which specific pathogen is a notable exception that can test catalase-negative or weak?",
+      options: [
+        "Escherichia coli",
+        "Shigella dysenteriae type 1",
+        "Proteus vulgaris",
+        "Enterobacter aerogenes"
+      ],
+      correct: 1,
+      explanation: "Almost all Enterobacteriaceae possess the catalase enzyme, but Shigella dysenteriae type 1 is a well-recognized diagnostic exception that is often catalase-negative or weakly reactive."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize Quiz
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
