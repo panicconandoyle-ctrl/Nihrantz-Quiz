@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immunology Ch. 10: Immune Responses Against Tumors & Transplants - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Immunology — Chapter 10: Immune Responses Against Tumors and Transplants</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Chapter 10 content
+  const quizData = [
+    {
+      q: "What is the primary physiological concept describing the adaptive immune system's continuous monitoring and destruction of transformed malignant cells before tumors establish?",
+      options: [
+        "Adoptive cell therapy",
+        "Immune surveillance",
+        "Central tolerance",
+        "Clonal ignorance"
+      ],
+      correct: 1,
+      explanation: "Immune surveillance is the continuous physiologic process by which the immune system, particularly T cells, identifies and eliminates precancerous or transformed cells before they form clinically evident malignancies."
+    },
+    {
+      q: "Which specific leukocyte subset serves as the principal immune executioner responsible for directly recognizing and killing tumor cells?",
+      options: [
+        "CD4+ Th2 lymphocytes",
+        "CD8+ Cytotoxic T Lymphocytes (CTLs)",
+        "B-1 peritoneal lymphocytes",
+        "Basophils"
+      ],
+      correct: 1,
+      explanation: "CD8+ Cytotoxic T Lymphocytes (CTLs) are the primary effector cells that recognize tumor antigen peptides presented on MHC Class I molecules and kill malignant target cells via perforin/granzyme and Fas/FasL pathways."
+    },
+    {
+      q: "What defines 'driver mutations' as a source of tumor-specific antigens?",
+      options: [
+        "Mutations in non-coding intronic DNA with no effect on protein synthesis",
+        "Mutations in proto-oncogenes or tumor suppressor genes that directly drive malignancy and generate unique, immunogenic neoantigens",
+        "Passenger mutations caused solely by thermal tissue damage",
+        "Synthetic chemical modifications applied to therapeutic monoclonal antibodies"
+      ],
+      correct: 1,
+      explanation: "Driver mutations occur in critical growth-regulating genes (oncogenes or tumor suppressor genes). The altered protein products are unique to the cancer cell and can be processed into neoantigen peptides presented on MHC Class I."
+    },
+    {
+      q: "Which viral pathogen is correctly paired with the human malignancy it induces, providing foreign viral antigens targeted by CTLs?",
+      options: [
+        "Hepatitis B Virus (HBV) — Hepatocellular carcinoma",
+        "Influenza A virus — Glioblastoma multiforme",
+        "Rotavirus — Clear cell renal carcinoma",
+        "Rabies virus — Osteosarcoma"
+      ],
+      correct: 0,
+      explanation: "Oncogenic viruses such as Hepatitis B Virus (HBV) cause liver cancer, and Human Papillomavirus (HPV) causes cervical cancer. Tumor cells express viral proteins that serve as potent, highly foreign antigens."
+    },
+    {
+      q: "How do naive CD8+ T cells in draining lymph nodes become activated against tumor antigens originating from solid tissue malignancies?",
+      options: [
+        "Dendritic cells ingest apoptotic tumor cells and present tumor antigens on MHC Class I via cross-presentation",
+        "Tumor cells migrate into the thymic cortex to directly prime naive T cells",
+        "Erythrocytes transport intact tumor cells into the splenic marginal zone",
+        "Basophils synthesize MHC Class I molecules containing whole tumor proteins"
+      ],
+      correct: 0,
+      explanation: "Professional APCs (mainly dendritic cells) capture fragments of dying tumor cells in peripheral tissues, migrate to lymph nodes, and present internalized tumor antigens on MHC Class I (cross-presentation) with B7 co-stimulation to prime naive CD8+ T cells."
+    },
+    {
+      q: "In clinical oncology, how does the prognosis of a 'hot tumor' compare to that of a 'cold tumor'?",
+      options: [
+        "Hot tumors have few infiltrating T cells and carry a worse prognosis",
+        "Hot tumors feature dense infiltration of CD8+ CTLs into the tumor microenvironment (TME) and correlate with significantly better survival outcomes",
+        "Cold tumors respond far better to anti-PD-1 checkpoint inhibitors",
+        "Hot and cold designations refer strictly to the temperature of surgical tissue specimens"
+      ],
+      correct: 1,
+      explanation: "'Hot tumors' (T cell-inflamed) are characterized by robust infiltration of CD8+ CTLs and correlate with improved clinical responses to immunotherapies and superior overall patient survival compared to immune-excluded or 'cold' tumors."
+    },
+    {
+      q: "When a tumor cell downregulates or completely loses its surface MHC Class I expression to escape CTL killing, which immune cell type can recognize and kill it?",
+      options: [
+        "CD4+ Th2 cells",
+        "Natural Killer (NK) cells",
+        "Follicular B cells",
+        "Follicular dendritic cells"
+      ],
+      correct: 1,
+      explanation: "Downregulation of MHC Class I allows tumor cells to evade CD8+ CTLs, but triggers Natural Killer (NK) cell activation via the 'missing self' mechanism, as inhibitory killer Ig-like receptors (KIRs) on NK cells no longer engage self-MHC I."
+    },
+    {
+      q: "How does tumor cell upregulation of PD-L1 promote immune evasion within the tumor microenvironment (TME)?",
+      options: [
+        "PD-L1 directly cleaves circulating IgG into Fab fragments",
+        "PD-L1 binds to the inhibitory receptor PD-1 on tumor-infiltrating T cells, delivering a negative signal that turns off CTL effector function",
+        "PD-L1 forces CTLs to hypersecrete perforin away from the tumor synapse",
+        "PD-L1 upregulates MHC Class II on vascular endothelial cells"
+      ],
+      correct: 1,
+      explanation: "Tumors frequently upregulate PD-L1 (Programmed Death-Ligand 1), which binds PD-1 on activated CD8+ T cells, recruiting phosphatases (SHP-2) that dephosphorylate TCR signaling intermediates, inducing T cell exhaustion and inactivation."
+    },
+    {
+      q: "Which suppressive cytokines are characteristically secreted by tumor cells and tumor-associated stroma to inhibit anti-tumor immunity?",
+      options: [
+        "IL-12 and IFN-γ",
+        "Transforming Growth Factor-beta (TGF-β) and Interleukin-10 (IL-10)",
+        "Interleukin-2 and Interleukin-15",
+        "Tumor Necrosis Factor (TNF) and IL-1"
+      ],
+      correct: 1,
+      explanation: "The immunosuppressive tumor microenvironment is enriched with TGF-β and IL-10, which suppress CTL proliferation and dendritic cell activation while actively promoting the differentiation and survival of Regulatory T cells (Tregs)."
+    },
+    {
+      q: "What is the therapeutic mechanism of action of checkpoint inhibitor antibodies such as Pembrolizumab (anti-PD-1) and Ipilimumab (anti-CTLA-4)?",
+      options: [
+        "Direct chemical lysis of the tumor lipid membrane within 15 minutes",
+        "Blocking inhibitory checkpoint receptors or their ligands to 'release the brakes' on exhausted tumor-infiltrating T cells, restoring anti-tumor cytotoxicity",
+        "Administering massive doses of donor antibodies against fetal trophoblasts",
+        "Irreversibly inhibiting calcineurin inside all peripheral T cells"
+      ],
+      correct: 1,
+      explanation: "Checkpoint inhibitors do not kill tumor cells directly; instead, they block inhibitory interactions (PD-1/PD-L1 or CTLA-4/B7), thereby releasing the inhibitory brakes on host T cells and unleashing active cytotoxic anti-tumor immunity."
+    },
+    {
+      q: "How are Chimeric Antigen Receptor (CAR) T cells engineered to target malignancies in Adoptive Cell Therapy (ACT)?",
+      options: [
+        "Patient T cells are extracted and genetically engineered to express a synthetic receptor pairing a tumor-binding antibody fragment (scFv) with intracellular T cell signaling domains (e.g., CD3ζ and CD28)",
+        "Donor B cells are fused with human myeloma cells to form immortalized hybridomas",
+        "Host dendritic cells are cultured with live rabies virus to induce interferon",
+        "Patient CD8+ cells are treated with cyclosporine to prevent alloreactivity"
+      ],
+      correct: 0,
+      explanation: "CAR-T therapy extracts autologous T cells and introduces a viral vector encoding a chimeric receptor composed of an extracellular single-chain variable antibody fragment (scFv) linked to intracellular signaling motifs (CD3ζ and co-stimulatory domains like 4-1BB or CD28), enabling MHC-independent tumor recognition."
+    },
+    {
+      q: "What defines the difference between passive cancer immunotherapy and active cancer immunotherapy?",
+      options: [
+        "Passive immunotherapy supplies pre-formed immune components (e.g., mAbs, CAR-T cells); active immunotherapy stimulates the patient’s own immune system (e.g., cancer vaccines)",
+        "Passive immunotherapy always uses live bacteria; active immunotherapy uses only synthetic sugars",
+        "Passive immunotherapy creates lifelong T cell memory; active provides temporary immunity lasting only 2 days",
+        "Passive immunotherapy is only used for solid organ rejection; active is used exclusively in the fetus"
+      ],
+      correct: 0,
+      explanation: "Passive immunotherapy transfers pre-made therapeutic agents (monoclonal antibodies like Trastuzumab, adoptive CAR-T cells) to the patient. Active immunotherapy stimulates the host's own immune system to generate a de novo response (preventive vaccines like HPV/HBV, therapeutic tumor vaccines)."
+    },
+    {
+      q: "Which preventive cancer vaccines are currently standard clinical tools for reducing the global incidence of hepatocellular carcinoma and cervical cancer, respectively?",
+      options: [
+        "Measles and Polio (Salk) vaccines",
+        "Hepatitis B Virus (HBV) and Human Papillomavirus (HPV) vaccines",
+        "BCG and Tetanus toxoid vaccines",
+        "Pneumococcal conjugate and Hib vaccines"
+      ],
+      correct: 1,
+      explanation: "HBV vaccination prevents chronic viral hepatitis and subsequent liver cancer; HPV vaccination prevents persistent high-risk oncogenic viral infections, drastically lowering rates of cervical and anogenital carcinomas."
+    },
+    {
+      q: "What is an 'alloantigen' in the context of clinical transplantation?",
+      options: [
+        "An antigen shared identically across every mammalian species",
+        "An antigen that differs genetically between individuals of the same species, such as polymorphic MHC molecules",
+        "A synthetic polymer used exclusively in vaccine adjuvants",
+        "A mutated viral capsid protein produced during lytic infection"
+      ],
+      correct: 1,
+      explanation: "Alloantigens are polymorphic self-antigens that vary genetically among members of the same species. The most potent and polymorphic alloantigens are Major Histocompatibility Complex (MHC/HLA) molecules."
+    },
+    {
+      q: "Why is alloreactivity remarkably strong, causing up to 2–10% of a recipient's circulating T cells to respond to an allogeneic graft?",
+      options: [
+        "Allogeneic donor MHC molecules structurally mimic the shape of self-MHC plus foreign peptide complexes for which host T cells were selected",
+        "Recipient T cells undergo rapid somatic hypermutation inside the graft stroma",
+        "Donor MHC molecules degrade all host CTLA-4 receptors within minutes",
+        "Foreign grafts secrete enormous amounts of bacterial lipopolysaccharide"
+      ],
+      correct: 0,
+      explanation: "Because T cells are selected in the thymus to bind self-MHC with weak affinity, a huge proportion of recipient TCRs cross-react with foreign (allogeneic) MHC molecules whose foreign shapes resemble self-MHC molecules presenting foreign microbial peptides."
+    },
+    {
+      q: "In transplantation immunology, what characterizes the 'Direct Pathway' of allorecognition?",
+      options: [
+        "Recipient APCs process shed donor proteins and present them on recipient MHC Class II",
+        "Donor dendritic cells (passenger leukocytes) present intact donor MHC molecules directly to recipient T cells in draining lymph nodes",
+        "Recipient plasma cells produce IgE antibodies that directly bind to vascular smooth muscle",
+        "Host natural killer cells directly convert into regulatory T cells inside the graft"
+      ],
+      correct: 1,
+      explanation: "In the direct pathway, donor APCs present inside the graft (passenger leukocytes) migrate to host lymphoid tissues and present intact donor MHC molecules directly to recipient T cells, driving intense acute rejection."
+    },
+    {
+      q: "What characterizes the 'Indirect Pathway' of allorecognition?",
+      options: [
+        "Donor T cells enter the host bone marrow and replace recipient stem cells",
+        "Recipient APCs uptake, process, and present donor allogeneic MHC peptides on host self-MHC Class II molecules to recipient CD4+ T cells",
+        "Graft endothelial cells directly secrete perforin into host lymphatic vessels",
+        "Host macrophages directly engulf donor red cells via FcRn"
+      ],
+      correct: 1,
+      explanation: "In the indirect pathway, host (recipient) APCs infiltrate the graft or capture shed donor proteins, processing them into linear peptides displayed on recipient self-MHC Class II molecules, largely driving chronic vascular rejection and alloantibody production."
+    },
+    {
+      q: "What is the underlying immunological cause of Hyperacute Graft Rejection occurring within minutes to hours after transplant revascularization?",
+      options: [
+        "De novo differentiation of naive CD8+ CTLs into effector killer cells",
+        "Pre-existing circulating antibodies (e.g., anti-ABO or anti-HLA) in recipient blood binding to graft vascular endothelium, activating complement and causing rapid thrombosis",
+        "Progressive smooth muscle proliferation and intimal arterial fibrosis over 10 years",
+        "Overproduction of TGF-β by graft-infiltrating regulatory T cells"
+      ],
+      correct: 1,
+      explanation: "Hyperacute rejection is mediated by pre-existing circulating alloantibodies (from prior blood transfusions, pregnancies, or previous transplants). Upon anastomosis, antibodies bind graft endothelial antigens, activating the classical complement cascade, leading to endothelial damage, thrombosis, ischemia, and necrosis."
+    },
+    {
+      q: "Which histological feature and immunological mechanisms define Acute Cellular Graft Rejection occurring days to weeks post-transplantation?",
+      options: [
+        "Endothelialitis and parenchymal tissue injury mediated by infiltrating CD8+ CTLs and CD4+ Th1 cytokine-activated macrophages",
+        "Extensive collagen scarring without inflammatory cell infiltration",
+        "Complete absence of all leukocyte infiltration due to high cyclosporine levels",
+        "Total destruction of the recipient's endogenous spleen"
+      ],
+      correct: 0,
+      explanation: "Acute cellular rejection is driven by a primary adaptive immune response where CD8+ CTLs directly lyse graft parenchymal and endothelial cells, while CD4+ Th1 cells secrete IFN-γ to recruit and activate destructive macrophages (endothelialitis)."
+    },
+    {
+      q: "What is the hallmark pathological lesion of Chronic Graft Rejection occurring over months to years?",
+      options: [
+        "Instant ischemic necrosis within 30 minutes of blood vessel declamping",
+        "Graft arteriosclerosis (accelerated vascular occlusion due to intimal smooth muscle proliferation) and progressive parenchymal fibrosis",
+        "Generalized mast cell degranulation and acute systemic anaphylaxis",
+        "Spontaneous malignant conversion of donor cells into acute lymphoblastic leukemia"
+      ],
+      correct: 1,
+      explanation: "Chronic rejection is characterized by progressive, irreversible organ dysfunction secondary to intimal smooth muscle hyperplasia, luminal narrowing (graft arteriosclerosis), and progressive interstitial parenchymal fibrosis mediated by chronic T cell and cytokine signaling."
+    },
+    {
+      q: "What is the molecular mechanism of action of the widely used immunosuppressive calcineurin inhibitors Cyclosporine and Tacrolimus (FK506)?",
+      options: [
+        "They inhibit calcineurin phosphatase activity, blocking the dephosphorylation and nuclear translocation of NFAT, thereby preventing IL-2 transcription in T cells",
+        "They degrade all circulating IgG antibodies using intrinsic peptidase activity",
+        "They irreversibly cross-link donor MHC Class I molecules",
+        "They directly stimulate CTLA-4 expression on host neutrophils"
+      ],
+      correct: 0,
+      explanation: "Cyclosporine and Tacrolimus bind intracellular immunophilins (cyclophilin and FKBP12) to form complexes that inhibit the phosphatase calcineurin. This halts NFAT dephosphorylation, shutting down IL-2 gene transcription and arresting T cell activation."
+    },
+    {
+      q: "How does the immunosuppressive agent Rapamycin (Sirolimus) inhibit T lymphocyte proliferation?",
+      options: [
+        "By binding and blocking the mechanistic target of rapamycin (mTOR), arresting T cell cycle progression downstream of the IL-2 receptor",
+        "By enzymatically destroying thymic stromal lymphopoietin",
+        "By neutralizing pre-formed histamine in mast cell granules",
+        "By acting as a direct agonist on the Fas death receptor"
+      ],
+      correct: 0,
+      explanation: "Rapamycin complexes with FKBP12 to inhibit the serine/threonine kinase mTOR, blocking critical downstream proliferative signaling cascades triggered by IL-2 binding to its receptor."
+    },
+    {
+      q: "Why is corticosteroid therapy (e.g., Prednisone) broadly effective in reversing acute allograft rejection episodes?",
+      options: [
+        "Corticosteroids selectively mutate donor HLA genes in situ",
+        "Corticosteroids diffuse across cell membranes and bind glucocorticoid receptors, broadly suppressing inflammatory cytokine transcription (IL-1, TNF) and blocking macrophage activation",
+        "Corticosteroids polymerize C9 into inactive soluble forms",
+        "Corticosteroids eliminate recipient erythrocytes to prevent blood flow to the graft"
+      ],
+      correct: 1,
+      explanation: "Corticosteroids are powerful anti-inflammatory agents that bind intracellular glucocorticoid receptors, translocating to the nucleus to inhibit NF-κB and AP-1, downregulating pro-inflammatory cytokines, adhesion molecules, and macrophage function."
+    },
+    {
+      q: "What is the fundamental immunologic cause of Graft-versus-Host Disease (GVHD) following allogeneic hematopoietic stem cell (HSC) transplantation?",
+      options: [
+        "Host plasma cells produce anti-ABO antibodies that destroy donor bone marrow stroma",
+        "Mature, immunocompetent donor T cells transferred in the graft recognize recipient host tissues as foreign and attack the skin, liver, and gastrointestinal tract",
+        "The transplanted stem cells fail to synthesize beta-2 microglobulin",
+        "Recipient regulatory T cells overproduce IL-10 and cause organ fibrosis"
+      ],
+      correct: 1,
+      explanation: "GVHD occurs because allogeneic HSC grafts contain mature, immunocompetent donor T lymphocytes. These donor T cells recognize the conditioned, allogeneic recipient's host cells as foreign, mounting destructive attacks against recipient skin, bile ducts, and gut epithelium."
+    },
+    {
+      q: "Why are patients undergoing allogeneic hematopoietic stem cell transplantation at extreme risk for life-threatening infectious complications during the early post-transplant period?",
+      options: [
+        "The donor stem cells actively synthesize bacterial exotoxins",
+        "Conditioning regimens (high-dose chemotherapy and total body radiation) eradicate host bone marrow and immune cells, leaving an extended time lag before donor HSCs reconstitute mature leukocytes",
+        "Antibodies against HIV are routinely injected during the conditioning protocol",
+        "Hematopoietic stem cells permanently inhibit the alternative complement pathway"
+      ],
+      correct: 1,
+      explanation: "Myeloablative conditioning obliterates the recipient's immune and hematological system. It takes several weeks to months for engrafted donor stem cells to differentiate into functional neutrophils, T cells, and B cells, creating an extended period of severe immunodeficiency."
+    },
+    {
+      q: "Among biological siblings, what is the statistical probability of being a complete (two-haplotype) HLA match, assuming typical Mendelian codominant inheritance?",
+      options: [
+        "100%",
+        "25%",
+        "50%",
+        "5%"
+      ],
+      correct: 1,
+      explanation: "Each child inherits one maternal and one paternal HLA haplotype. Under standard Mendelian genetics, siblings have a 25% (1 in 4) chance of inheriting the identical two haplotypes, making full siblings the preferred allogeneic donors."
+    },
+    {
+      q: "Which clinical diagnostic strategy is essential prior to organ transplantation to prevent catastrophic hyperacute rejection?",
+      options: [
+        "Pre-transplant cross-matching to detect pre-existing recipient antibodies against donor HLA and ABO antigens",
+        "Injecting the recipient with active BCG vaccine 24 hours prior to surgery",
+        "Administering lethal doses of ionizing radiation to the donor organ",
+        "Measuring recipient serum IgE levels against dust mites"
+      ],
+      correct: 0,
+      explanation: "Cross-matching mixes recipient serum with donor lymphocytes to test for pre-existing cytotoxic antibodies against donor HLA (or checking ABO compatibility). A positive cross-match indicates high risk for hyperacute rejection and contraindicates transplant."
+    },
+    {
+      q: "What is the immunological role of Tumor-Infiltrating Lymphocytes (TILs) when utilized in adoptive cell therapy for metastatic melanoma?",
+      options: [
+        "TILs are extracted from surgical tumor resections, expanded ex vivo with IL-2 to massive numbers, and re-infused into the lymphodepleted patient to target tumor antigens",
+        "TILs are injected into healthy donors to generate anti-MHC antibodies",
+        "TILs are used exclusively to absorb circulating histamine in blood banks",
+        "TILs are fixed with formalin to act as diagnostic vaccines"
+      ],
+      correct: 0,
+      explanation: "TIL therapy isolates naturally occurring anti-tumor T lymphocytes from resected tumor tissue, expands and activates them in vitro with high-dose IL-2, and re-infuses them into the patient following lymphodepletion."
+    },
+    {
+      q: "How does the tumor microenvironment (TME) utilize Regulatory T cells (Tregs) to inhibit anti-tumor immunity?",
+      options: [
+        "Tregs within the TME secrete perforin to destroy tumor cells",
+        "Tregs accumulate in response to tumor chemotactic signals and suppress CD8+ CTL activity via IL-10, TGF-β, and CTLA-4-mediated costimulatory blockade",
+        "Tregs stimulate rapid somatic hypermutation of oncogenic drivers",
+        "Tregs downregulate CD25 to flood the TME with autocrine IL-2"
+      ],
+      correct: 1,
+      explanation: "Tumors recruit and expand immunosuppressive FoxP3+ Tregs into the TME. These Tregs suppress tumor-infiltrating effector CTLs and helper T cells through the release of TGF-β/IL-10, IL-2 deprivation, and CTLA-4-mediated consumption of B7 co-stimulators."
+    },
+    {
+      q: "Why are monoclonal antibodies directed against CTLA-4 (such as Ipilimumab) effective in enhancing anti-tumor immune responses?",
+      options: [
+        "They permanently destroy all secondary lymphoid organs in the host",
+        "They block CTLA-4 from outcompeting CD28 for B7 co-stimulators, sustaining the activation and proliferation of naive and memory tumor-specific T cells",
+        "They bind directly to oncogenes in the nucleus and prevent DNA replication",
+        "They act as synthetic enzymes that assemble the Membrane Attack Complex"
+      ],
+      correct: 1,
+      explanation: "CTLA-4 acts as a physiological off-switch during the initial priming phase of T cells by outcompeting CD28 for B7 ligands on APCs. Anti-CTLA-4 antibodies block this inhibition, lowering the activation threshold and allowing vigorous priming of anti-tumor T cells."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
