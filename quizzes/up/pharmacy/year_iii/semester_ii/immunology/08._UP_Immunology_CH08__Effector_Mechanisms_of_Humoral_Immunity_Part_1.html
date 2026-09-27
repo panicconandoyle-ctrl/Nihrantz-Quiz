@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immunology Ch. 8: Effector Mechanisms of Humoral Immunity (Part 1) - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Immunology — Chapter 8: Effector Mechanisms of Humoral Immunity (Part 1)</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Chapter 8 (Part 1) content
+  const quizData = [
+    {
+      q: "Which specific anatomical site represents the most preferred long-term residence for antibody-secreting long-lived plasma cells?",
+      options: [
+        "Spleen red pulp cords",
+        "Bone marrow",
+        "Thymic medulla",
+        "Peripheral lymph node subcapsular sinus"
+      ],
+      correct: 1,
+      explanation: "Following their generation in secondary lymphoid organs, long-lived plasma cells preferentially migrate to survival niches within the bone marrow, where they produce circulating antibodies for years to decades."
+    },
+    {
+      q: "Which structural region of an antibody molecule physically binds directly to microbial surfaces or exotoxins to mediate neutralization?",
+      options: [
+        "Fragment antigen-binding (Fab) region",
+        "Fragment crystallizable (Fc) region",
+        "CH2:CH3 interface hinge loop",
+        "J chain polypeptide"
+      ],
+      correct: 0,
+      explanation: "The Fab region contains the variable antigen-binding domains that directly recognize and bind epitopes, sterically blocking microbial adhesion to host receptors or neutralizing toxins."
+    },
+    {
+      q: "What is the primary function of the Fc (Fragment crystallizable) region of an antibody molecule?",
+      options: [
+        "Binding to microbial repetitive carbohydrates via hypervariable CDRs",
+        "Engaging immune effector mechanisms, such as activating complement and binding Fc receptors on leukocytes",
+        "Direct enzymatic cleavage of microbial capsular polysaccharides",
+        "Inducing somatic point mutations in heavy-chain variable exons"
+      ],
+      correct: 1,
+      explanation: "The Fc region serves as the effector communication hub of the antibody, engaging Fc receptors on phagocytes/NK cells and initiating the classical complement pathway via C1q binding."
+    },
+    {
+      q: "Which antibody isotype is the only one capable of crossing the maternal placenta to provide natural passive systemic immunity to the developing fetus?",
+      options: [
+        "IgM",
+        "Secretory IgA",
+        "IgG",
+        "IgE"
+      ],
+      correct: 2,
+      explanation: "IgG (specifically subclasses IgG1, IgG2, and IgG4) is actively transported across the placenta into fetal circulation via the neonatal Fc receptor (FcRn)."
+    },
+    {
+      q: "What is the structural heterodimeric composition of the neonatal Fc receptor (FcRn)?",
+      options: [
+        "Two invariant Ig-like CD3 chains",
+        "A β2-microglobulin (β2M) light chain non-covalently linked to an MHC Class I-like heavy chain",
+        "A J chain linked to two IgA alpha heavy chains",
+        "A C1q hexameric stalk bound to C1r serine proteases"
+      ],
+      correct: 1,
+      explanation: "FcRn is structurally related to MHC Class I, consisting of an MHC Class I-like alpha heavy chain non-covalently associated with a β2-microglobulin (β2M) light chain."
+    },
+    {
+      q: "How does FcRn protect circulating IgG antibodies from lysosomal degradation within endothelial endosomes?",
+      options: [
+        "It cleaves IgG Fab fragments to render them resistant to acidic hydrolases",
+        "It binds IgG at acidic pH (4–6) in the endosome, diverting it into recycling vesicles that release it at neutral extracellular pH (~7.4)",
+        "It transports IgG directly into the nucleus where it acts as a transcription factor",
+        "It coats IgG with sialic acid to permanently prevent pinocytosis"
+      ],
+      correct: 1,
+      explanation: "In acidic endosomes (pH 4–6), protonated histidines facilitate tight IgG-FcRn binding. The complex avoids lysosomal routing and travels in recycling endosomes back to the cell surface, releasing intact IgG into the neutral pH (~7.4) bloodstream."
+    },
+    {
+      q: "Which specific amino acid residues at the CH2:CH3 interface of the IgG heavy chain are responsible for the pH-dependent binding to FcRn?",
+      options: [
+        "Cysteine residues forming disulfide bridges",
+        "Histidine residues (notably H310 and H435)",
+        "Aspartate residues binding calcium ions",
+        "Proline residues in the hinge region"
+      ],
+      correct: 1,
+      explanation: "Histidine residues (H310 and H435) become protonated and positively charged in the acidic endosome, mediating the interaction with FcRn, and become deprotonated at neutral physiological pH to release the antibody."
+    },
+    {
+      q: "Why does IgG3 possess a markedly shorter serum half-life (~7 days) compared to IgG1, IgG2, and IgG4 (~21 days)?",
+      options: [
+        "IgG3 lacks a functional Fab binding region",
+        "IgG3 lacks critical histidine residues at its CH2:CH3 interface, resulting in inefficient FcRn binding and increased lysosomal degradation",
+        "IgG3 is spontaneously recognized as foreign by splenic macrophages",
+        "IgG3 is rapidly filtered and excreted by renal glomeruli due to a missing light chain"
+      ],
+      correct: 1,
+      explanation: "Due to allotypic amino acid variations, IgG3 lacks the specific histidine residues required for optimal FcRn interaction. Consequently, endocytosed IgG3 is poorly rescued and is largely routed to lysosomes for degradation."
+    },
+    {
+      q: "What is the rationale behind engineering therapeutic fusion proteins such as TNFR-IgG Fc (Etanercept)?",
+      options: [
+        "The Fc tail directly lyses bacterial cell walls via perforin-like channels",
+        "The soluble receptor neutralizes TNF, while the fused IgG Fc domain binds FcRn to dramatically prolong circulating half-life",
+        "The Fc domain converts TNF into an anti-inflammatory agonist cytokine",
+        "The fusion protein enters host cells to repair damaged genomic DNA"
+      ],
+      correct: 1,
+      explanation: "Soluble TNF receptors alone are rapidly cleared by the kidneys. Fusing the extracellular ligand-binding domain of TNFR to an IgG Fc domain enables FcRn-mediated recycling, extending the drug's circulating half-life to several weeks."
+    },
+    {
+      q: "In pharmacology, what defines an 'agonist' versus an 'antagonist' antibody or drug?",
+      options: [
+        "An agonist binds and activates a receptor to trigger a response; an antagonist binds to block receptor activation",
+        "An agonist degrades membrane lipids; an antagonist builds up cellular peptidoglycan",
+        "An agonist transfers passive immunity; an antagonist produces active cellular memory",
+        "An agonist is always a peptide; an antagonist is always a polysaccharide"
+      ],
+      correct: 0,
+      explanation: "An agonist mimics the natural ligand to activate receptor signaling, whereas an antagonist binds to the receptor without activating it, physically preventing the endogenous agonist from binding."
+    },
+    {
+      q: "How does antibody-mediated neutralization protect epithelial barriers against viral infection?",
+      options: [
+        "By enzymatically dissolving the viral lipid envelope",
+        "By binding viral surface envelope proteins and sterically blocking their attachment to host cellular receptors",
+        "By triggering immediate apoptosis of uninfected adjacent epithelial cells",
+        "By stimulating mucosal epithelial cells to halt all protein synthesis"
+      ],
+      correct: 1,
+      explanation: "Neutralizing antibodies bind surface molecules (e.g., viral spikes or hemagglutinin), physically blocking their contact with host receptors and preventing entry and infection."
+    },
+    {
+      q: "What is a major biological difference between bacterial exotoxins and endotoxins?",
+      options: [
+        "Exotoxins are secreted soluble proteins that can be neutralized by antibodies; endotoxins are structural lipopolysaccharides (LPS) in the outer membrane of Gram-negative bacteria",
+        "Exotoxins are only found in viruses; endotoxins are strictly fungal sterols",
+        "Exotoxins are structural wall components; endotoxins are enzymatic proteins secreted by Gram-positive bacilli",
+        "Exotoxins cannot be inactivated to form toxoids; endotoxins are readily converted to toxoids"
+      ],
+      correct: 0,
+      explanation: "Exotoxins are highly poisonous proteins actively secreted by bacteria (and can be converted to toxoids for vaccines), whereas endotoxins are structural lipopolysaccharides (LPS) within the outer membrane of Gram-negative bacteria."
+    },
+    {
+      q: "Which historical milestone is associated with Emil von Behring and Shibasaburo Kitasato in the development of humoral immunology?",
+      options: [
+        "Discovery of the MHC Class I crystal structure",
+        "Demonstration of serum therapy (passive immunization) against diphtheria, earning the first Nobel Prize in 1901",
+        "First chemical synthesis of penicillin G",
+        "Identification of RAG-1 and RAG-2 recombination activating genes"
+      ],
+      correct: 1,
+      explanation: "Emil von Behring and Shibasaburo Kitasato pioneered serum therapy by showing that serum from immunized animals conferred passive protective immunity against diphtheria and tetanus, earning Behring the 1901 Nobel Prize."
+    },
+    {
+      q: "What is one established mechanism by which high-dose Intravenous Immunoglobulin (IVIG) suppresses systemic inflammation?",
+      options: [
+        "Complete irreversible destruction of host bone marrow hematopoiesis",
+        "Fc domains in pooled IgG engage inhibitory FcγRIIB receptors on immune cells, delivering negative feedback signals",
+        "IVIG clears all circulating complement proteins through covalent precipitation",
+        "IVIG irreversibly degrades endogenous T cell receptors"
+      ],
+      correct: 1,
+      explanation: "IVIG consists of pooled IgG from thousands of donors; one major anti-inflammatory mechanism involves its Fc portions binding to the inhibitory receptor FcγRIIB (CD32), suppressing hyperactive macrophages, dendritic cells, and B cells."
+    },
+    {
+      q: "In Antibody-Dependent Cellular Cytotoxicity (ADCC), which leukocyte acts as the primary effector killer cell, and which surface Fc receptor does it utilize?",
+      options: [
+        "Neutrophils using FcαRI (CD89)",
+        "Natural Killer (NK) cells using FcγRIII (CD16)",
+        "Mast cells using FcεRI",
+        "Basophils using CR1 (CD35)"
+      ],
+      correct: 1,
+      explanation: "ADCC against antibody-coated target cells is predominantly mediated by NK cells, which recognize the Fc portion of bound IgG1 or IgG3 via the low-affinity receptor FcγRIII (CD16)."
+    },
+    {
+      q: "What are the lethal mediators discharged by Natural Killer cells during ADCC to execute apoptotic target cell death?",
+      options: [
+        "Major basic protein and eosinophil cationic protein",
+        "Perforin (which forms membrane channels) and Granzymes (which cleave procaspases)",
+        "Histamine and prostaglandin D2",
+        "Lysozyme and cathelicidins"
+      ],
+      correct: 1,
+      explanation: "Cross-linking of CD16 on NK cells induces directed exocytosis of cytotoxic granules containing perforin (pore former) and granzymes (serine proteases), triggering target cell apoptosis."
+    },
+    {
+      q: "Why does the human immune system rely on extracellular degranulation by eosinophils and mast cells rather than phagocytosis to combat helminths?",
+      options: [
+        "Helminths actively secrete enzymes that digest phagocyte lysosomes from a distance",
+        "Helminths are multicellular parasites that are physically far too large to be ingested by macrophages or neutrophils",
+        "Helminths do not express protein antigens",
+        "Phagocytes completely lack receptors for any parasitic carbohydrates"
+      ],
+      correct: 1,
+      explanation: "Helminths are macroscopic multicellular worms whose physical size precludes phagocytic engulfment. The immune system coats them in IgE, recruiting eosinophils to discharge toxic granule contents onto their cuticles."
+    },
+    {
+      q: "Which high-affinity Fc receptor on eosinophils and mast cells mediates binding to the Fc portion of IgE antibodies during anti-helminth defense?",
+      options: [
+        "FcγRIIB",
+        "FcεRI",
+        "FcγRI (CD64)",
+        "Poly-Ig receptor (pIgR)"
+      ],
+      correct: 1,
+      explanation: "FcεRI is the high-affinity receptor for IgE constitutively expressed on mast cells, basophils, and activated eosinophils, mediating granule release upon antigen cross-linking."
+    },
+    {
+      q: "Which Th2-derived cytokine synergizes with IgE to promote eosinophil differentiation, activation, and degranulation against parasitic worms?",
+      options: [
+        "Interferon-gamma (IFN-γ)",
+        "Interleukin-5 (IL-5)",
+        "Interleukin-12 (IL-12)",
+        "Tumor Necrosis Factor (TNF)"
+      ],
+      correct: 1,
+      explanation: "IL-5 is produced by Th2 cells and innate lymphoid cells type 2 (ILC2); it specifically stimulates the bone marrow production, activation, and enhanced killing capacity of eosinophils."
+    },
+    {
+      q: "What defines the triggering specificity of membrane IgD signaling on mature naive B cells compared to membrane IgM?",
+      options: [
+        "IgD responds exclusively to small soluble monomeric proteins",
+        "IgD signaling is strictly triggered by repetitive multivalent immunogens, whereas IgM can respond to both monomeric and multivalent antigens",
+        "IgD signaling requires direct TCR-CD3 cross-linking",
+        "IgD only signals in the presence of high concentrations of IL-2"
+      ],
+      correct: 1,
+      explanation: "As shown in recent studies (Übelhart et al.), membrane IgD is selectively triggered by structured, repetitive multivalent antigens (such as bacterial surface arrays), whereas IgM is more versatile and responds to soluble monomers as well."
+    },
+    {
+      q: "What unexpected systemic immunological changes were observed in IgD-deficient (Cδ knockout) mice?",
+      options: [
+        "Total absence of mature B cells and immediate death from bacteremia",
+        "Reduced peripheral B cell counts, decreased serum IgE levels, and an impaired primary IgG1 response",
+        "Spontaneous development of systemic lupus erythematosus and massive kidney failure",
+        "Complete loss of MHC Class II expression on dendritic cells"
+      ],
+      correct: 1,
+      explanation: "IgD-knockout mice display normal early B cell development but exhibit reduced peripheral B cell pools, diminished serum IgE levels, and defective primary IgG1 antibody responses, revealing IgD's role in immune homeostasis and basophil signaling."
+    },
+    {
+      q: "Which molecular complex constitutes the active C3 convertase of the Alternative complement pathway?",
+      options: [
+        "C4b2a",
+        "C3bBb",
+        "C4b2a3b",
+        "(C3b)2Bb"
+      ],
+      correct: 1,
+      explanation: "Spontaneous C3 hydrolysis generates C3b which binds Factor B. Cleavage of Factor B by Factor D yields Bb, forming C3bBb, the alternative pathway C3 convertase (stabilized by Properdin)."
+    },
+    {
+      q: "Which component of the C1 complex serves as the recognition unit that binds directly to the Fc domains of antigen-bound IgM or IgG antibodies?",
+      options: [
+        "C1r serine protease",
+        "C1s esterase",
+        "C1q",
+        "Mannose-binding lectin (MBL)"
+      ],
+      correct: 2,
+      explanation: "C1q consists of a hexameric tulip-like bundle whose globular heads bind directly to the Fc regions of antigen-complexed IgM or clustered IgG antibodies to trigger classical pathway activation."
+    },
+    {
+      q: "What is the molecular composition of the Classical and Lectin pathway C3 convertase?",
+      options: [
+        "C3bBb",
+        "C4b2a",
+        "C5b678",
+        "Properdin-Factor D"
+      ],
+      correct: 1,
+      explanation: "Activated C1s (or MASP-2) cleaves C4 into C4b and C2 into C2a. C4b and C2a associate on the microbial surface to form the classical/lectin C3 convertase, C4b2a."
+    },
+    {
+      q: "Which positive regulatory protein binds to and stabilizes the alternative pathway C3 convertase (C3bBb), preventing its spontaneous decay?",
+      options: [
+        "Factor H",
+        "Factor I",
+        "Properdin (Factor P)",
+        "C4-binding protein (C4BP)"
+      ],
+      correct: 2,
+      explanation: "Properdin (Factor P) is the only known positive regulator of complement; it binds to C3bBb on microbial surfaces, stabilizing the convertase and extending its half-life to drive the amplification loop."
+    },
+    {
+      q: "In the assembly of the Membrane Attack Complex (MAC), which terminal complement protein polymerizes into a ring-like transmembrane pore to induce osmotic lysis?",
+      options: [
+        "C5b",
+        "C7",
+        "C8",
+        "C9"
+      ],
+      correct: 3,
+      explanation: "After C5b recruits C6, C7, and C8, up to 10–16 molecules of C9 bind and polymerize into a hydrophilic cylindrical channel (10 nm pore) spanning the lipid bilayer, causing osmotic swelling and lysis."
+    },
+    {
+      q: "Which two small peptide cleavage fragments generated during complement activation act as powerful anaphylatoxins that recruit and activate leukocytes?",
+      options: [
+        "C3b and C4b",
+        "C3a and C5a",
+        "Ba and C2b",
+        "C5b and C6"
+      ],
+      correct: 1,
+      explanation: "C3a and C5a are soluble anaphylatoxins that bind GPCRs on mast cells, neutrophils, and endothelial cells, inducing chemotaxis, histamine release, smooth muscle contraction, and vascular permeability."
+    },
+    {
+      q: "Which cell surface regulatory protein protects host erythrocytes and somatic cells from MAC-mediated lysis by blocking C9 binding and polymerization?",
+      options: [
+        "CD59 (Protectin)",
+        "CD55 (Decay-Accelerating Factor)",
+        "CD46 (Membrane Cofactor Protein)",
+        "CD35 (Complement Receptor 1)"
+      ],
+      correct: 0,
+      explanation: "CD59 (Protectin) is a GPI-anchored membrane protein on host cells that binds to C8 in the assembled C5b-8 complex, physically blocking the incorporation and polymerization of C9 into a pore."
+    },
+    {
+      q: "During the transepithelial transport of dimeric IgA into the gut lumen, which structural element remains covalently attached to protect IgA from degradation by luminal proteases?",
+      options: [
+        "The entire poly-Ig receptor cytoplasmic tail",
+        "The Secretory Component (cleaved extracellular domain of pIgR)",
+        "The maternal FcRn alpha chain",
+        "A cluster of C1q globular heads"
+      ],
+      correct: 1,
+      explanation: "As the dimeric IgA-pIgR complex reaches the apical mucosal membrane, proteases cleave pIgR. The cleaved extracellular portion remains bound as the Secretory Component, shielding the antibody from proteolytic degradation in the digestive tract."
+    },
+    {
+      q: "How does Streptococcus pyogenes utilize its hyaluronic acid capsule to evade detection by the humoral immune system?",
+      options: [
+        "The capsule enzymatically degrades all circulating IgG into single amino acids",
+        "Hyaluronic acid is a normal component of host connective tissues, allowing the bacteria to mimic 'self' and avoid immune detection and complement activation",
+        "The capsule secretes soluble IL-4 to paralyze cytotoxic T lymphocytes",
+        "It acts as an antagonist on FcRn, preventing maternal antibody uptake"
+      ],
+      correct: 1,
+      explanation: "Hyaluronic acid is chemically identical to ground substance found in human connective tissues. By coating itself in host-like hyaluronic acid (molecular mimicry), Streptococcus hides from complement and antibody recognition."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize Quiz
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
