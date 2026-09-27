@@ -28,8 +28,13 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
   isDynamicMode,
   onToggleDynamicMode,
 }) => {
-  const [owner, setOwner] = useState(currentOwnerRepo.owner || 'google-ai-studio');
-  const [repo, setRepo] = useState(currentOwnerRepo.repo || 'winquiz-portal');
+  const [owner, setOwner] = useState(currentOwnerRepo.owner || 'panicconandoyle-ctrl');
+  const [repo, setRepo] = useState(currentOwnerRepo.repo || 'Nihrantz-Quiz');
+
+  React.useEffect(() => {
+    if (currentOwnerRepo.owner) setOwner(currentOwnerRepo.owner);
+    if (currentOwnerRepo.repo) setRepo(currentOwnerRepo.repo);
+  }, [currentOwnerRepo.owner, currentOwnerRepo.repo]);
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 

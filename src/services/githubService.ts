@@ -23,7 +23,7 @@ const STORAGE_KEYS = {
 // Default fallback repository if none is configured
 export const DEFAULT_GH_CONFIG: GitHubConfig = {
   owner: 'panicconandoyle-ctrl',
-  repo: 'Nihrantz-Quiz-Explorer',
+  repo: 'Nihrantz-Quiz',
   branch: 'main',
   token: '',
 };
@@ -33,14 +33,22 @@ export function getStoredGithubConfig(): GitHubConfig {
     const storedOwner = localStorage.getItem(STORAGE_KEYS.OWNER);
     const storedRepo = localStorage.getItem(STORAGE_KEYS.REPO);
 
-    // If unset or matching legacy dummy values, migrate to official repo
+    // If unset or matching legacy dummy values or previous repo, migrate to official new repo
     const owner = (storedOwner && storedOwner !== 'google-ai-studio' && storedOwner !== 'Nihrantz')
       ? storedOwner
       : DEFAULT_GH_CONFIG.owner;
 
-    const repo = (storedRepo && storedRepo !== 'winquiz-portal')
+    const repo = (storedRepo && storedRepo !== 'winquiz-portal' && storedRepo !== 'Nihrantz-Quiz-Explorer')
       ? storedRepo
       : DEFAULT_GH_CONFIG.repo;
+
+    // Keep localStorage in sync if previously had old repo or old owner
+    if (storedRepo === 'Nihrantz-Quiz-Explorer' || storedRepo === 'winquiz-portal') {
+      localStorage.setItem(STORAGE_KEYS.REPO, DEFAULT_GH_CONFIG.repo);
+    }
+    if (storedOwner === 'google-ai-studio' || storedOwner === 'Nihrantz') {
+      localStorage.setItem(STORAGE_KEYS.OWNER, DEFAULT_GH_CONFIG.owner);
+    }
 
     return {
       owner,

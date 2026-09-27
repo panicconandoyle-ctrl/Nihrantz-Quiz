@@ -102,9 +102,9 @@ export default function App() {
 
   // Dynamic GitHub Sync State
   const [isDynamicMode, setIsDynamicMode] = useState<boolean>(false);
-  const [githubRepoInfo, setGithubRepoInfo] = useState<{ owner: string; repo: string }>({
-    owner: 'Nihrantz',
-    repo: 'winquiz-portal'
+  const [githubRepoInfo, setGithubRepoInfo] = useState<{ owner: string; repo: string }>(() => {
+    const cfg = getStoredGithubConfig();
+    return { owner: cfg.owner, repo: cfg.repo };
   });
 
   // Dynamic Repository Fetching: Reads from GitHub REST API (Public or Authenticated)
@@ -114,6 +114,7 @@ export default function App() {
     setIsLoadingRepo(true);
     const currentCfg = getStoredGithubConfig();
     setGhConfig(currentCfg);
+    setGithubRepoInfo({ owner: currentCfg.owner, repo: currentCfg.repo });
     setIsAdminActive(hasAdminToken());
 
     // Attempt to fetch live repository tree from GitHub REST API

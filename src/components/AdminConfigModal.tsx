@@ -69,8 +69,8 @@ export const AdminConfigModal: React.FC<AdminConfigModalProps> = ({
     playNavSound();
     clearGithubConfig();
     const emptyConfig: GitHubConfig = {
-      owner: 'google-ai-studio',
-      repo: 'winquiz-portal',
+      owner: 'panicconandoyle-ctrl',
+      repo: 'Nihrantz-Quiz',
       branch: 'main',
       token: '',
     };
