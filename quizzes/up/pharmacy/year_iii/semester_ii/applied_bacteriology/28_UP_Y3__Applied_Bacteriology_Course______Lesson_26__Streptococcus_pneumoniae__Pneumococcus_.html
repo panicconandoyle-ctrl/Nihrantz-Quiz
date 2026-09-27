@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 28: Mycobacterium tuberculosis Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 28: Mycobacterium & Tuberculosis</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What fundamental chemical property of the cell wall accounts for the 'acid-fastness' of Mycobacterium species?",
+        options: [
+          "An unusually thick peptidoglycan polymer rich in teichoic acid",
+          "A high lipid content composed of approximately 60% long-chain mycolic acids",
+          "A surface coat of hyaluronic acid mimicking host connective tissue",
+          "An outer membrane consisting strictly of calcium dipicolinate"
+        ],
+        correct: 1,
+        explanation: "Acid-fastness is directly conferred by the abundance of high-molecular-weight branched lipids called mycolic acids (comprising up to 60% of the dry cell wall weight). This hydrophobic waxy barrier tightly binds aryl-methane dyes and resists destaining by powerful acid-alcohol solutions."
+      },
+      {
+        q: "How does Mycobacterium tuberculosis typically appear on light microscopy following a classic Ziehl-Neelsen acid-fast stain?",
+        options: [
+          "Uniform dark-purple cocci arranged in grape-like clusters",
+          "Slim, straight or slightly curved red/pink rods, often with an irregularly beaded or granular appearance",
+          "Bright blue comma-shaped curved bacilli",
+          "Colorless transparent spirals visible only under darkfield illumination"
+        ],
+        correct: 1,
+        explanation: "Under the Ziehl-Neelsen stain, M. tuberculosis retains carbolfuchsin and appears as slender, straight or slightly curved red/pink bacilli (0.2–0.6 µm by 1–10 µm) often displaying an irregular beaded or banded appearance against a blue background."
+      },
+      {
+        q: "What is the typical generation time of Mycobacterium tuberculosis, reflecting its notoriously slow replication rate?",
+        options: [
+          "20 minutes",
+          "1 to 2 hours",
+          "12 to 24 hours",
+          "7 to 10 days"
+        ],
+        correct: 2,
+        explanation: "M. tuberculosis divides very slowly, possessing a mean generation time of 12 to 24 hours (compared to ~20 minutes for E. coli). Visible colonies on solid media typically take 3 to 8 weeks to develop."
+      },
+      {
+        q: "What is the atmospheric oxygen requirement of Mycobacterium tuberculosis?",
+        options: [
+          "Obligate aerobe",
+          "Facultative anaerobe",
+          "Obligate strict anaerobe",
+          "Aerotolerant fermenter"
+        ],
+        correct: 0,
+        explanation: "M. tuberculosis is an obligate aerobe requiring atmospheric oxygen for respiration and ATP production. This strict aerobic preference explains its strong predilection for well-ventilated, high-oxygen regions of the human host (e.g., lung apices)."
+      },
+      {
+        q: "Which specific modified sugar replaces N-acetylmuramic acid in the peptidoglycan backbone of Mycobacterium tuberculosis?",
+        options: [
+          "N-acetylglucosamine",
+          "N-glycolylmuramic acid",
+          "D-glucuronic acid",
+          "N-acetylneuraminic acid"
+        ],
+        correct: 1,
+        explanation: "Uniquely among bacteria, mycobacteria synthesize N-glycolylmuramic acid instead of the standard N-acetylmuramic acid in their peptidoglycan layer, contributing to greater resistance to enzymatic digestion."
+      },
+      {
+        q: "What is the virulence role of 'Cord Factor' (Trehalose 6,6'-dimycolate) in Mycobacterium tuberculosis?",
+        options: [
+          "It acts as a neurotoxin blocking neuromuscular junctions",
+          "It causes bacilli to align in parallel serpentine cords in culture, is toxic to host cells, and inhibits neutrophil migration",
+          "It degrades mucosal secretory IgA antibodies",
+          "It enzymatically synthesizes human hyaluronic acid"
+        ],
+        correct: 1,
+        explanation: "Cord factor (trehalose 6,6'-dimycolate) is a glycolipid that causes virulent strains of M. tuberculosis to grow in distinctive parallel microscopic 'serpentine cords'. It is directly toxic to mitochondrial membranes, induces granuloma formation, and inhibits leukocyte migration."
+      },
+      {
+        q: "What is the function of Lipoarabinomannan (LAM) in the pathogenesis of tuberculosis?",
+        options: [
+          "It is a key cell-wall virulence glycolipid that inhibits macrophage activation and scavenges cytotoxic oxygen radicals",
+          "It is a pilus adhesin that binds directly to dental enamel",
+          "It is an autolytic enzyme that hydrolyzes peptidoglycan crosslinks",
+          "It activates adenylate cyclase to produce watery secretory diarrhea"
+        ],
+        correct: 0,
+        explanation: "Lipoarabinomannan (LAM) is an abundant surface lipoglycan functionally analogous to the LPS of Gram-negative bacteria. It suppresses macrophage activation, blocks the biological actions of IFN-gamma, and neutralizes toxic reactive oxygen intermediates."
+      },
+      {
+        q: "What classic egg-based culture medium containing malachite green is traditionally used to isolate M. tuberculosis?",
+        options: [
+          "MacConkey Agar",
+          "Löwenstein-Jensen (LJ) Medium",
+          "Thayer-Martin Chocolate Agar",
+          "Bile-Esculin-Azide Medium"
+        ],
+        correct: 1,
+        explanation: "Löwenstein-Jensen (LJ) medium is the classic whole-egg and glycerol-based selective solid medium. It incorporates malachite green dye to inhibit rapidly growing contaminating bacteria and fungi during the prolonged multi-week incubation."
+      },
+      {
+        q: "How are colonies of Mycobacterium tuberculosis characteristically described on Löwenstein-Jensen medium?",
+        options: [
+          "Smooth, glistening, bright yellow colonies",
+          "Dry, rough, crumbly, buff or cream-colored colonies with a 'cauliflower-like' texture",
+          "Spreading colonies with wide zones of clear beta-hemolysis",
+          "Mucoid green colonies with dark black centers"
+        ],
+        correct: 1,
+        explanation: "On LJ medium, M. tuberculosis colonies are non-pigmented (buff, cream, or light tan), elevated, dry, crumbly, and warty with a rough surface classically compared to a head of cauliflower."
+      },
+      {
+        q: "Under the Runyon classification of non-tuberculous mycobacteria, how are 'Photochromogens' defined?",
+        options: [
+          "Mycobacteria that produce yellow-orange carotenoid pigment only when exposed to light (e.g., M. kansasii)",
+          "Mycobacteria that synthesize pigment continuously in the dark as well as in the light",
+          "Mycobacteria that never produce pigment under any condition",
+          "Mycobacteria that form mature colonies within 48 hours"
+        ],
+        correct: 0,
+        explanation: "Photochromogens (Runyon Group I, such as M. kansasii and M. marinum) form non-pigmented colonies when incubated in the dark, but produce vibrant yellow-orange carotenoid pigments upon brief photo-induction (exposure to light)."
+      },
+      {
+        q: "Which biochemical test result is highly characteristic and essentially unique to Mycobacterium tuberculosis compared to almost all other mycobacteria?",
+        options: [
+          "Strongly Niacin-positive (accumulation of nicotinic acid)",
+          "Rapid gelatinase liquefaction within 2 hours",
+          "Complete lack of catalase at 37°C",
+          "Inability to reduce nitrates to nitrites"
+        ],
+        correct: 0,
+        explanation: "M. tuberculosis lacks the enzyme to convert free niacin to nicotinamide adenine dinucleotide, leading to massive excretion and accumulation of free niacin (nicotinic acid) in the culture medium. A positive niacin test is a hallmark identification test for M. tuberculosis."
+      },
+      {
+        q: "What primary mechanism allows Mycobacterium tuberculosis to survive and replicate intracellularly within alveolar macrophages?",
+        options: [
+          "It rapidly breaks out of the phagosome into the nucleus within 10 seconds",
+          "It inhibits phagosome-lysosome fusion by blocking endosomal tethering molecules such as EEA1",
+          "It forms heat-resistant spores inside macrophage mitochondria",
+          "It secretes penicillinase that destroys eukaryotic lysosomes"
+        ],
+        correct: 1,
+        explanation: "Upon phagocytosis, M. tuberculosis prevents the maturation and fusion of the phagosome with acidic, enzyme-rich lysosomes (partly by inhibiting early endosome autoantigen 1 [EEA1]), creating an intracellular niche in which it replicates undisturbed."
+      },
+      {
+        q: "Which key cytokine released by CD4+ Th1 lymphocytes is essential for activating infected macrophages to kill intracellular M. tuberculosis?",
+        options: [
+          "Interleukin-4 (IL-4)",
+          "Interferon-gamma (IFN-γ)",
+          "Interleukin-10 (IL-10)",
+          "Transforming growth factor-beta (TGF-β)"
+        ],
+        correct: 1,
+        explanation: "Infected macrophages secrete IL-12 to stimulate CD4+ Th1 lymphocytes and NK cells to release Interferon-gamma (IFN-γ). IFN-γ activates macrophages, inducing phagolysosomal maturation and nitric oxide (NO) generation to kill intracellular bacilli."
+      },
+      {
+        q: "What histological structure forms to wall off and contain M. tuberculosis when cell-mediated immunity cannot completely eradicate the bacilli?",
+        options: [
+          "A pyogenic abscess with liquefactive necrosis and abundant neutrophils",
+          "A granuloma (tubercle) with central caseous necrosis surrounded by activated macrophages, Langhans giant cells, and lymphocytes",
+          "A keloid scar composed purely of dense type I collagen bundles",
+          "A fibrous atheromatous plaque containing cholesterol crystals"
+        ],
+        correct: 1,
+        explanation: "A chronic tuberculous granuloma (tubercle) consists of a central area of cheese-like 'caseous necrosis' encircled by epithelioid histiocytes, multinucleated Langhans giant cells, CD4+ and CD8+ T lymphocytes, and peripheral fibroblasts."
+      },
+      {
+        q: "What is the natural reservoir and primary mode of transmission of Mycobacterium tuberculosis?",
+        options: [
+          "Exclusively human reservoir; transmitted through airborne droplet nuclei expelled by coughing, sneezing, or talking",
+          "Avian reservoir; transmitted by consuming unwashed wild bird eggs",
+          "Soil reservoir; transmitted via barefoot contact in tropical mud",
+          "Flea vector-borne transmission from domestic dogs"
+        ],
+        correct: 0,
+        explanation: "Humans are the exclusive natural reservoir of M. tuberculosis. Transmission occurs strictly person-to-person via tiny aerosolized droplet nuclei (<5 µm) that remain suspended in indoor air and are inhaled directly into alveoli."
+      },
+      {
+        q: "What radiographic and pathological entity defines the 'Ghon Complex' in primary tuberculosis?",
+        options: [
+          "Bilateral apical cavitary lesions with pleural effusions",
+          "A calcified peripheral subpleural pulmonary lesion accompanied by a calcified draining hilar lymph node",
+          "Massive widening of the anterior mediastinum with subcutaneous emphysema",
+          "Multiple lytic punched-out lesions across the calvarium"
+        ],
+        correct: 1,
+        explanation: "The Ghon complex is the classic hallmark of primary pulmonary tuberculosis: a healed, calcified primary subpleural pulmonary parenchymal focus (Ghon focus) combined with fibrocalcific involvement of the draining ipsilateral hilar lymph node."
+      },
+      {
+        q: "Why does reactivation (secondary) tuberculosis preferentially localize to the apical and posterior segments of the upper lung lobes?",
+        options: [
+          "Because lung apices have the highest local ventilation-to-perfusion ratio and highest partial pressure of oxygen (pO2)",
+          "Because alveolar macrophages are entirely absent from upper lung zones",
+          "Because the lymphatic fluid flows backwards only in the apex",
+          "Because lung apices maintain a continuous temperature of 45°C"
+        ],
+        correct: 0,
+        explanation: "M. tuberculosis is a strict obligate aerobe. The apical segments of the upper lobes have relatively poor blood perfusion but high ventilation, resulting in the highest local oxygen tension (pO2) in the body, providing an ideal growth environment."
+      },
+      {
+        q: "What classic constitutional symptoms characterize active pulmonary reactivation tuberculosis?",
+        options: [
+          "Chronic productive cough, hemoptysis (coughing up blood), low-grade fever, drenching night sweats, and progressive weight loss ('consumption')",
+          "Acute watery 'rice-water' diarrhea, painful muscle spasms, and hypothermia",
+          "Sudden rash on the palms and soles with painless genital ulcers",
+          "Inspiratory stridor with beefy cherry-red swelling of the epiglottis"
+        ],
+        correct: 0,
+        explanation: "Active reactivation TB typically presents insidiously with chronic cough (>3 weeks), hemoptysis, low-grade fevers, prominent drenching night sweats, fatigue, anorexia, and marked wasting/weight loss (the historical 'consumption')."
+      },
+      {
+        q: "What is 'Miliary Tuberculosis'?",
+        options: [
+          "A localized, self-healing skin boil found among military personnel",
+          "Widespread hematogenous dissemination of bacilli producing tiny, seed-like (millet-seed) granulomatous lesions across multiple organs",
+          "A form of tuberculosis transmitted strictly by insect vectors",
+          "Tuberculous inflammation confined solely to the external ear canal"
+        ],
+        correct: 1,
+        explanation: "Miliary tuberculosis occurs when caseous tubercles erode into pulmonary veins or lymphatics, showering millions of bacilli through the systemic bloodstream and seeding almost all organs with uniform 1–2 mm granulomas resembling millet seeds."
+      },
+      {
+        q: "What is the clinical eponym for tuberculous spondylitis affecting the vertebral bodies and intervertebral discs?",
+        options: [
+          "Pott's disease",
+          "Hansen's disease",
+          "Reiter's syndrome",
+          "Fitz-Hugh-Curtis syndrome"
+        ],
+        correct: 0,
+        explanation: "Pott's disease is extrapulmonary tuberculosis of the spine, characterized by progressive destruction of adjacent vertebral bodies and discs, leading to vertebral collapse, kyphosis (gibbus deformity), and spinal cord compression."
+      },
+      {
+        q: "What is 'Scrofula' in the spectrum of tuberculous infections?",
+        options: [
+          "Tuberculous cervical lymphadenitis presenting as painless, swollen neck lymph nodes that may ulcerate",
+          "Tuberculous ulceration of the vocal cords causing aphonia",
+          "Diffuse tuberculous peritonitis with 'violin-string' adhesions",
+          "Tuberculous involvement of the coronary arteries"
+        ],
+        correct: 0,
+        explanation: "Scrofula is tuberculous lymphadenitis of the cervical lymph nodes, classically manifesting as chronic, painless, firm, and matted submandibular or anterior cervical swelling that can form chronic draining sinus tracts."
+      },
+      {
+        q: "How is the Tuberculin Skin Test (Mantoux / PPD test) read and evaluated clinically?",
+        options: [
+          "By measuring the diameter of erythema (redness) immediately after 15 minutes",
+          "By measuring the transverse diameter of palpable induration (hardness) in millimeters after 48 to 72 hours",
+          "By visual inspection of pustule formation after 7 days",
+          "By assessing wheal and flare formation within 30 seconds"
+        ],
+        correct: 1,
+        explanation: "The Mantoux test involves intradermal injection of 5 TU of Purified Protein Derivative (PPD). It is read between 48 and 72 hours by measuring strictly the transverse diameter of palpable, indurated swelling (hardness) in millimeters, completely ignoring erythema alone."
+      },
+      {
+        q: "What is a major diagnostic advantage of Interferon-Gamma Release Assays (IGRAs, e.g., QuantiFERON-TB Gold) over the Tuberculin Skin Test?",
+        options: [
+          "IGRAs are not confounded by prior BCG vaccination because they use antigens (ESAT-6, CFP-10) absent from BCG strains",
+          "IGRAs directly culture live bacilli in blood within 20 minutes",
+          "IGRAs can distinguish active disease from latent infection with 100% certainty",
+          "IGRAs test for antibiotic susceptibility directly without requiring blood draw"
+        ],
+        correct: 0,
+        explanation: "IGRAs measure in vitro T-cell IFN-γ release in response to specific M. tuberculosis antigens (ESAT-6 and CFP-10). Because these genes are deleted from all BCG strains and most non-tuberculous mycobacteria, IGRAs do not produce false-positive results from prior BCG vaccination."
+      },
+      {
+        q: "What are the four first-line antimicrobial drugs included in the standard intensive-phase treatment of active tuberculosis ('RIPE')?",
+        options: [
+          "Rifampin, Isoniazid, Pyrazinamide, and Ethambutol",
+          "Rifampin, Indomethacin, Penicillin, and Erythromycin",
+          "Ribavirin, Isoniazid, Polymyxin, and Enrofloxacin",
+          "Rifabutin, Imipenem, Piperacillin, and Ertapenem"
+        ],
+        correct: 0,
+        explanation: "The standard frontline regimen for drug-susceptible active TB is the 'RIPE' four-drug combination: Rifampin (RIF), Isoniazid (INH), Pyrazinamide (PZA), and Ethambutol (EMB)."
+      },
+      {
+        q: "What is the standard duration and phase breakdown of the first-line treatment regimen for active drug-susceptible pulmonary tuberculosis?",
+        options: [
+          "A single 5-day course of high-dose oral ampicillin",
+          "A 2-month intensive phase with 4 drugs (RIPE), followed by a 4-month continuation phase with 2 drugs (INH + RIF), totaling 6 months",
+          "12 consecutive months of pyrazinamide monotherapy",
+          "Daily intravenous ceftriaxone for exactly 14 days"
+        ],
+        correct: 1,
+        explanation: "Standard therapy spans 6 months: an initial 2-month intensive phase with 4 drugs (INH + RIF + PZA + EMB) to rapidly reduce bacterial burden, followed by a 4-month continuation phase with 2 drugs (INH + RIF) to eradicate persistent dormant organisms."
+      },
+      {
+        q: "What constitutes the microbiological definition of Multi-Drug Resistant Tuberculosis (MDR-TB)?",
+        options: [
+          "Resistance to all known cephalosporins and penicillins",
+          "Resistance to at least Isoniazid (INH) and Rifampin (RIF), the two most potent first-line anti-TB drugs",
+          "Resistance to pyrazinamide and ethambutol only",
+          "Resistance to any single second-line injectable aminoglycoside"
+        ],
+        correct: 1,
+        explanation: "MDR-TB is strictly defined as disease caused by an isolate of M. tuberculosis that demonstrates in vitro resistance to at least Isoniazid (INH) and Rifampin (RIF), whether resistance to other anti-TB drugs is present or not."
+      },
+      {
+        q: "What what does the acronym 'DOT' stand for in tuberculosis public health management, and why is it vital?",
+        options: [
+          "Delayed Organ Toxicity; tracking drug side effects after 1 year",
+          "Directly Observed Therapy; healthcare personnel physically watch the patient swallow every dose to ensure adherence and prevent drug resistance",
+          "Daily Oxygen Titration; monitoring arterial blood gases in outpatients",
+          "Diagnostic Optical Transillumination; examining lymph nodes with laser pens"
+        ],
+        correct: 1,
+        explanation: "Directly Observed Therapy (DOT) is a WHO-endorsed public health strategy in which a healthcare worker or designated observer watches the patient swallow each dose of anti-TB medication, ensuring full adherence and halting the development of MDR-TB."
+      },
+      {
+        q: "What is the composition and clinical role of the BCG (Bacille Calmette-Guérin) vaccine?",
+        options: [
+          "A live attenuated strain of Mycobacterium bovis; primarily protects infants and young children against severe, life-threatening disseminated TB and TB meningitis",
+          "A recombinant protein subunit vaccine derived from M. leprae; universally eliminates adult pulmonary infection",
+          "Killed whole cells of M. tuberculosis mixed with diphtheria toxoid",
+          "A DNA plasmid vaccine injected directly into mediastinal lymph nodes"
+        ],
+        correct: 0,
+        explanation: "The BCG vaccine is a live attenuated strain of Mycobacterium bovis. Administered at birth in high-burden countries, its primary value is providing reliable protection in infants and young children against lethal systemic forms of primary TB (miliary TB and tuberculous meningitis)."
+      },
+      {
+        q: "Why is an asymptomatic close household contact with a newly positive PPD skin test and a completely normal chest X-ray prescribed preventive therapy (e.g., Isoniazid for 6–9 months)?",
+        options: [
+          "To treat an undiagnosed viral upper respiratory tract infection",
+          "To treat Latent Tuberculosis Infection (LTBI) and kill dormant bacilli before they can reactivate into active, contagious disease",
+          "To permanently neutralize the BCG vaccine strain",
+          "To prevent the development of primary dental caries"
+        ],
+        correct: 1,
+        explanation: "A positive PPD with a normal chest X-ray and no symptoms indicates Latent Tuberculosis Infection (LTBI). Prophylactic monotherapy (traditionally Isoniazid for 6 to 9 months) eradicates quiescent, dormant bacilli, preventing lifetime reactivation into active pulmonary disease."
+      },
+      {
+        q: "How does rapid molecular testing (e.g., GeneXpert MTB/RIF assay) revolutionize the diagnosis of pulmonary tuberculosis?",
+        options: [
+          "It measures patient blood pressure and serum hemoglobin within 10 seconds",
+          "It simultaneously identifies M. tuberculosis DNA and detects mutations conferring Rifampin resistance directly from raw sputum in approximately 2 hours",
+          "It replaces all clinical need for antibiotic treatment",
+          "It stains the bacteria with bright fluorescent dyes visible without a microscope"
+        ],
+        correct: 1,
+        explanation: "The GeneXpert MTB/RIF test is an automated real-time PCR assay that detects M. tuberculosis complex DNA and concurrently identifies rpoB gene mutations associated with rifampin resistance directly from unprocessed sputum samples in under 2 hours."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
