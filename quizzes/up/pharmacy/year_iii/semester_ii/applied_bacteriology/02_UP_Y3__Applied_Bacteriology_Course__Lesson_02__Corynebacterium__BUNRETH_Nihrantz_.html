@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology: Corynebacterium diphtheriae - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Applied Bacteriology — Lesson 02: Corynebacterium diphtheriae</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Lesson 02 content
+  const quizData = [
+    {
+      q: "Under microscopic examination, what characteristic morphological arrangement is typically exhibited by Corynebacterium diphtheriae?",
+      options: [
+        "Chains of large, square-ended rods with central spores",
+        "Pleomorphic, club-shaped rods arranged in 'Chinese letter' or palisade clusters",
+        "Gram-negative helical rods with polar flagella",
+        "Encapsulated diplococci in pairs"
+      ],
+      correct: 1,
+      explanation: "Corynebacterium diphtheriae is a pleomorphic, non-motile, non-spore-forming Gram-positive rod with clubbed ends that classically aligns in angular, palisade, or 'Chinese letter' patterns."
+    },
+    {
+      q: "Why can Corynebacterium diphtheriae sometimes appear Gram-variable or easily decolorize during the Gram staining procedure?",
+      options: [
+        "It lacks peptidoglycan in its cell wall",
+        "Its cell wall contains corynemycolic acids (lipids)",
+        "It undergoes spontaneous autolysis within 30 seconds of fixation",
+        "It expresses an outer membrane rich in lipopolysaccharide (LPS)"
+      ],
+      correct: 1,
+      explanation: "The cell wall of Corynebacterium species contains short-chain mycolic acids (corynemycolic acids) and arabinogalactans, which can cause uneven retention of crystal violet and lead to Gram-variable staining."
+    },
+    {
+      q: "Who was the French physician who first provided the comprehensive clinical description of diphtheria in 1812 and established it as a distinct nosological entity?",
+      options: [
+        "Pierre Bretonneau",
+        "Alexandre Yersin",
+        "Gaston Ramon",
+        "Emil von Behring"
+      ],
+      correct: 0,
+      explanation: "Pierre Bretonneau first clinically characterized and coined the term 'diphtheria' (from the Greek for leather/hide) in 1812, identifying it as a specific contagious disease."
+    },
+    {
+      q: "Which major scientific milestone in diphtheria research was achieved in 1888 by Emile Roux and Alexandre Yersin at the Pasteur Institute?",
+      options: [
+        "Discovery of the bacterial chromosome sequence",
+        "Discovery and demonstration of the soluble, diffusible diphtheria exotoxin",
+        "First cultivation of C. diphtheriae on chocolate agar",
+        "Invention of the modern automated blood culture system"
+      ],
+      correct: 1,
+      explanation: "Roux and Yersin showed that sterile culture filtrates of C. diphtheriae injected into animals produced all systemic manifestations of diphtheria, demonstrating that a diffusible exotoxin drives the systemic disease."
+    },
+    {
+      q: "What breakthrough discovery made by Gaston Ramon in 1923 formed the foundation of modern worldwide diphtheria immunization?",
+      options: [
+        "Isolation of penicillin G from Penicillium notatum",
+        "Development of the diphtheria toxoid by inactivating the exotoxin with formalin and heat",
+        "Creation of the first live attenuated viral vector vaccine",
+        "Synthesis of monoclonal antibodies against fragment B"
+      ],
+      correct: 1,
+      explanation: "Gaston Ramon demonstrated that treating diphtheria toxin with formaldehyde and heat created a non-toxic but fully immunogenic derivative ('anatoxine' or toxoid), enabling active immunization."
+    },
+    {
+      q: "What is the natural reservoir and source of infection for Corynebacterium diphtheriae?",
+      options: [
+        "Domestic farm animals (cattle, pigs, and sheep)",
+        "Exclusively humans, including symptomatic patients and asymptomatic carriers",
+        "Soil and aquatic sediments in agricultural regions",
+        "Contaminated unpasteurized poultry eggs"
+      ],
+      correct: 1,
+      explanation: "Diphtheria is an exclusively human disease with no animal or environmental reservoir; asymptomatic carriers and infected individuals are the sole source of transmission."
+    },
+    {
+      q: "What factor was primarily responsible for the large-scale resurgence of diphtheria epidemics in former Soviet Union countries during the mid-1990s?",
+      options: [
+        "Emergence of a new species of Corynebacterium completely resistant to penicillin",
+        "Lapse in public health vaccination programs, waning adult immunity, and low booster uptake",
+        "Contamination of the municipal water supply with bovine feces",
+        "Genetic deletion of Elongation Factor-2 across the Eastern European population"
+      ],
+      correct: 1,
+      explanation: "The dramatic 1990s outbreak in the newly independent states of the former USSR resulted from social disruption, collapse of immunization infrastructures, waning immunity in adults lacking periodic booster doses, and delayed public health response."
+    },
+    {
+      q: "Which genetic element carries the structural 'tox' gene encoding the diphtheria exotoxin in pathogenic strains of Corynebacterium diphtheriae?",
+      options: [
+        "A self-transmissible F-plasmid",
+        "A lysogenic corynephage (bacteriophage beta)",
+        "The bacterial core ribosomal RNA operon",
+        "A pathogenicity island on the bacterial flagellar regulon"
+      ],
+      correct: 1,
+      explanation: "The tox gene is not native to the bacterial chromosome; it is carried by a temperate lysogenic bacteriophage (such as corynephage β). Only strains lysogenized by this phage produce diphtheria toxin."
+    },
+    {
+      q: "What is the typical incubation period of respiratory diphtheria following exposure to an infected person or carrier?",
+      options: [
+        "12 to 24 hours",
+        "2 to 6 days",
+        "3 to 4 weeks",
+        "2 to 3 months"
+      ],
+      correct: 1,
+      explanation: "The incubation period of respiratory diphtheria is typically 2 to 6 days (range 1–10 days) with an insidious onset of sore throat, malaise, low-grade fever, and pharyngeal exudate."
+    },
+    {
+      q: "What is the hallmark clinical finding of typical respiratory diphtheria upon physical examination of the oropharynx?",
+      options: [
+        "Strawberry red tongue with diffuse mucosal vesicles",
+        "A thick, grayish-white, tough pseudomembrane firmly adherent to the tonsils, uvula, and soft palate",
+        "Extensive dental enamel caries with purulent gingival pockets",
+        "Bilateral parotid gland enlargement without mucosal exudate"
+      ],
+      correct: 1,
+      explanation: "The hallmark of respiratory diphtheria is a thick, adherent, dirty-gray or white pseudomembrane over the tonsils, pharynx, or palate, formed by necrotic epithelial cells, fibrin, neutrophils, and bacteria."
+    },
+    {
+      q: "What clinical consequence occurs if a physician attempts to forcibly scrape or peel off the diphtheria pseudomembrane?",
+      options: [
+        "Instant complete recovery with no further toxin production",
+        "Submucosal tearing and profuse capillary bleeding due to dense fibrin anchoring",
+        "Rapid spread of bacteria into the maxillary sinus within seconds",
+        "Immediate calcification of the underlying soft tissue"
+      ],
+      correct: 1,
+      explanation: "The diphtheritic pseudomembrane is anchored into the underlying mucosa by an extensive fibrin meshwork. Forcible detachment tears bleeding capillaries in the submucosa."
+    },
+    {
+      q: "What causes the severe, life-threatening anatomical neck deformity termed 'bull neck' in malignant diphtheria?",
+      options: [
+        "Bilateral masseter muscle hypertrophy",
+        "Marked cervical lymphadenopathy accompanied by extensive subcutaneous soft-tissue edema",
+        "A giant thyroid goiter resulting from iodine deficiency",
+        "Cervical spinal osteomyelitis with vertebral collapse"
+      ],
+      correct: 1,
+      explanation: "'Bull neck' (cervical collarette) reflects extensive local toxin damage leading to prominent cervical lymphadenitis surrounded by massive peri-glandular subcutaneous edema extending from the mandible to the clavicles."
+    },
+    {
+      q: "What is the leading cause of early death in severe respiratory diphtheria?",
+      options: [
+        "Chronic renal failure after 5 years",
+        "Mechanical airway obstruction by the dislodged or expanding pseudomembrane and laryngeal edema",
+        "Disseminated intravascular hemolysis from snake venom",
+        "Massive intestinal perforation"
+      ],
+      correct: 1,
+      explanation: "Early death in severe respiratory diphtheria often results from mechanical asphyxia caused by extensive pseudomembranous extension into the larynx and tracheobronchial tree (diphtheritic croup)."
+    },
+    {
+      q: "Which organ system is the primary systemic target of circulating diphtheria toxin, responsible for up to 10–20% of clinical complications and the majority of late deaths?",
+      options: [
+        "The musculoskeletal system (rhabdomyolysis)",
+        "The cardiovascular system, causing acute toxic myocarditis and conduction blocks",
+        "The endocrine pancreas, causing type 1 diabetes",
+        "The skeletal bone matrix, causing acute osteomalacia"
+      ],
+      correct: 1,
+      explanation: "Diphtheria toxin has high affinity for cardiac tissue. Toxic myocarditis occurs in 10–20% of patients, presenting with arrhythmias, AV blocks, heart failure, and cardiogenic shock, which represents the primary cause of toxin-related mortality."
+    },
+    {
+      q: "Which neurological manifestation is typically observed several weeks after the onset of severe respiratory diphtheria due to toxin-induced demyelination?",
+      options: [
+        "Rapid onset of chorea and intention tremor",
+        "Cranial nerve palsies (such as soft palate paralysis and oculomotor dysfunction) and peripheral polyneuropathy",
+        "Permanent bilateral sensory hearing loss within 24 hours",
+        "Loss of memory without motor involvement"
+      ],
+      correct: 1,
+      explanation: "Toxin-mediated neurotoxicity manifests as demyelinating neuropathy, first affecting local cranial nerves (e.g., palatal paralysis causing nasal regurgitation of fluids, oculomotor paralysis) and later progressing to symmetric peripheral polyneuropathy."
+    },
+    {
+      q: "How does typical anterior nasal diphtheria present, and why does it represent an important epidemiologic transmission risk?",
+      options: [
+        "High-grade fever with total blindness",
+        "Unilateral or bilateral serosanguinous, purulent nasal discharge with a visible nasal pseudomembrane and mild systemic toxicity, frequently missed or misdiagnosed",
+        "Massive epistaxis requiring immediate bilateral carotid ligation",
+        "Bilateral sensorineural deafness with no nasal secretions"
+      ],
+      correct: 1,
+      explanation: "Nasal diphtheria typically runs a mild, chronic course with unilateral or bilateral excoriating, bloody nasal discharge and mucosal crusting. Because systemic symptoms are minimal, diagnosis is often delayed, prolonging transmission to close contacts."
+    },
+    {
+      q: "In tropical climates, what is the characteristic clinical presentation of cutaneous diphtheria?",
+      options: [
+        "Diffuse maculopapular rash covering the entire body without skin breakdown",
+        "Chronic, 'punched-out' indolent ulcerative lesions with a rolled violaceous border and a grayish necrotic pseudomembranous base",
+        "Painful erythematous bullae that rupture without scarring",
+        "Subcutaneous fluctuating boils in axillary regions"
+      ],
+      correct: 1,
+      explanation: "Cutaneous diphtheria typically manifests as chronic, sharply demarcated, punched-out skin ulcers covered by a grayish-brown pseudomembrane, acting as an important community reservoir of toxigenic bacteria."
+    },
+    {
+      q: "Diphtheria toxin is classified structurally and functionally as which type of microbial toxin?",
+      options: [
+        "Pore-forming cholesterol-dependent cytolysin",
+        "Two-component A-B exotoxin",
+        "Cell-wall lipopolysaccharide endotoxin",
+        "Superantigen cross-linking TCR and MHC Class II"
+      ],
+      correct: 1,
+      explanation: "Diphtheria toxin is a prototypical AB exotoxin synthesized as a single 58 kDa polypeptide that is cleaved into an enzymatically active A fragment and a receptor-binding B fragment held together by a disulfide bond."
+    },
+    {
+      q: "Which specific human cell surface receptor does Fragment B of the diphtheria toxin bind to mediate endocytosis?",
+      options: [
+        "E-cadherin",
+        "Heparin-binding epidermal growth factor-like growth factor (HB-EGF) precursor",
+        "CD4 glycoprotein",
+        "Complement receptor 1 (CR1/CD35)"
+      ],
+      correct: 1,
+      explanation: "Fragment B binds specifically to the membrane-anchored precursor of heparin-binding epidermal growth factor-like growth factor (HB-EGF), widely expressed on cardiac and neural cells."
+    },
+    {
+      q: "Once inside the host cell cytoplasm, what precise enzymatic reaction is catalyzed by Fragment A of the diphtheria toxin?",
+      options: [
+        "Cleaving cellular genomic DNA into 200 base-pair segments",
+        "Transferring an ADP-ribose group from NAD+ onto host Elongation Factor-2 (EF-2), inactivating it",
+        "Dephosphorylating nuclear factor of activated T cells (NFAT)",
+        "Degrading the 28S ribosomal RNA subunit directly"
+      ],
+      correct: 1,
+      explanation: "Fragment A catalyzes the covalent transfer of the ADP-ribose moiety from intracellular NAD+ onto a modified histidine residue (diphthamide) on host Elongation Factor-2 (EF-2), permanently halting polypeptide chain translocation."
+    },
+    {
+      q: "What is the ultimate cellular and biological consequence of the ADP-ribosylation of Elongation Factor-2 by diphtheria toxin?",
+      options: [
+        "Immediate cessation of host protein synthesis, leading to cellular necrosis and tissue death",
+        "Massive uncontrolled secretion of water into the mucosal lumen",
+        "Hyperactivation of intracellular adenylate cyclase to produce cAMP",
+        "Spontaneous malignant transformation into sarcoma"
+      ],
+      correct: 0,
+      explanation: "Inactivation of EF-2 halts host protein synthesis. A single molecule of Fragment A in the cytosol can completely shut down protein translation and trigger cell death within hours."
+    },
+    {
+      q: "From which exact anatomical zone of the diphtheritic lesion should a diagnostic swab be collected?",
+      options: [
+        "The necrotic, non-viable center of the membrane",
+        "The advancing edge or underside of the pseudomembrane and inflamed underlying mucosa",
+        "The surface of healthy buccal mucosa 5 cm away from the lesion",
+        "External skin of the anterior neck"
+      ],
+      correct: 1,
+      explanation: "Swabs should be collected firmly from the advancing edges or just beneath the pseudomembrane, where viable, actively dividing organisms reside, rather than from dead superficial debris in the center."
+    },
+    {
+      q: "Which enriched culture medium is classically inoculated for rapid (15–18 hour) cultivation of C. diphtheriae and demonstration of metachromatic granules?",
+      options: [
+        "MacConkey agar",
+        "Loeffler coagulated serum slant",
+        "Sabouraud dextrose agar",
+        "Thayer-Martin agar"
+      ],
+      correct: 1,
+      explanation: "Loeffler coagulated serum slant is an enriched medium that supports rapid growth of Corynebacterium within 12–18 hours and promotes the formation of prominent intracellular metachromatic (polyphosphate/volutin) granules."
+    },
+    {
+      q: "What distinctive colonial appearance does Corynebacterium diphtheriae produce on selective Tinsdale medium (containing potassium tellurite)?",
+      options: [
+        "Bright metallic green sheen",
+        "Black or brownish-gray colonies surrounded by a dark brown halo",
+        "Brilliant yellow mucoid colonies",
+        "Colorless non-lactose fermenting colonies"
+      ],
+      correct: 1,
+      explanation: "On Tinsdale tellurite agar, C. diphtheriae reduces potassium tellurite (K2TeO3) to metallic tellurium, producing gray-to-black colonies; cysteine metabolism produces a distinctive surrounding dark brown-black halo."
+    },
+    {
+      q: "Which laboratory method is the traditional phenotypic gold standard for confirming that an isolated C. diphtheriae strain is truly toxigenic?",
+      options: [
+        "Elek immunodiffusion test (gel precipitation)",
+        "Widal agglutination test",
+        "Coagulase plasma tube test",
+        "Optochin disk diffusion assay"
+      ],
+      correct: 0,
+      explanation: "The Elek test is an in vitro precipitin agar test: an antitoxin-impregnated paper strip is placed on agar perpendicular to bacterial streaks; toxigenic strains produce toxin that precipitates with antitoxin, creating visible white precipitin lines at 45° angles."
+    },
+    {
+      q: "What are the key biochemical reactions that characterize Corynebacterium diphtheriae?",
+      options: [
+        "Catalase positive, Urease negative, and Nitrate reduction positive (most strains)",
+        "Catalase negative, Urease positive, and Oxidase positive",
+        "Catalase negative, Lactose fermenter, and Citrate positive",
+        "Coagulase positive, Indole positive, and Urease positive"
+      ],
+      correct: 0,
+      explanation: "C. diphtheriae is catalase-positive, urease-negative (differentiating it from C. ulcerans and C. pseudotuberculosis, which are urease-positive), and typically reduces nitrate to nitrite."
+    },
+    {
+      q: "Why is the immediate administration of Diphtheria Antitoxin (DAT) of paramount clinical urgency when diphtheria is suspected, even before laboratory culture confirmation?",
+      options: [
+        "Antitoxin has bactericidal activity and lyses the bacterial cell wall",
+        "Antitoxin only neutralizes free, circulating toxin in the bloodstream and interstitial fluids; it CANNOT reverse toxin that has already bound to or entered host cells",
+        "Antitoxin serves as a general anesthetic for airway intubation",
+        "Antitoxin provides active lifelong immunological memory to the patient"
+      ],
+      correct: 1,
+      explanation: "Diphtheria antitoxin (equine hyperimmune serum) neutralizes unbound circulating toxin before tissue uptake. Once Fragment B binds HB-EGF and Fragment A enters the cytoplasm, antitoxin is completely ineffective, meaning clinical delay drastically increases mortality."
+    },
+    {
+      q: "What is the primary role of antibiotic therapy (such as intravenous Penicillin G or oral Erythromycin) in the management of acute diphtheria?",
+      options: [
+        "Directly neutralizing intracellular toxin molecules in cardiomyocytes",
+        "Eradicating the bacteria to stop further toxin production, halting transmission, and treating carrier states",
+        "Dissolving the pseudomembrane via enzymatic degradation within 10 minutes",
+        "Preventing anaphylactic reactions to equine antitoxin"
+      ],
+      correct: 1,
+      explanation: "Antibiotics do not alter the course of existing toxic damage; their purpose is to kill C. diphtheriae, terminate further production of exotoxin, clear local infection, and eliminate carriage to protect contacts."
+    },
+    {
+      q: "According to standard public health protocols, what is the appropriate management of asymptomatic close contacts of a confirmed diphtheria case?",
+      options: [
+        "No intervention is required unless they develop a high fever above 39°C",
+        "Surveillance, throat swab culture, prophylactic antibiotic therapy (e.g., oral Erythromycin or IM Penicillin), and administration of a diphtheria toxoid booster if unimmunized or overdue",
+        "Immediate surgical tonsillectomy within 4 hours",
+        "Lifetime oral vancomycin therapy"
+      ],
+      correct: 1,
+      explanation: "Close contacts must be placed under close clinical surveillance, have pharyngeal and nasal swabs cultured, receive post-exposure antibiotic prophylaxis (erythromycin or benzathine penicillin G), and receive a toxoid booster according to their immunization history."
+    },
+    {
+      q: "Why must patients recovering from clinical diphtheria still receive a complete course of diphtheria toxoid vaccination?",
+      options: [
+        "The bacteria genetically mutate into Streptococcus pneumoniae during recovery",
+        "The lethal dose of diphtheria toxin is lower than the immunogenic threshold; clinical infection does NOT reliably induce protective neutralizing antibody titers",
+        "Equine antitoxin permanently wipes out all natural immunological memory",
+        "Vaccination is necessary to prevent allergic reactions to food proteins"
+      ],
+      correct: 1,
+      explanation: "Diphtheria toxin is so potent that lethal toxicity occurs at nanogram concentrations—well below the threshold required to stimulate a protective neutralizing antibody response. Natural infection does not confer reliable immunity; full toxoid vaccination during convalescence is mandatory."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
