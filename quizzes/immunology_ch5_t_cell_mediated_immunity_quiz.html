@@ -17,25 +17,28 @@
       color: #2e3856;
       display: flex;
       justify-content: center;
-      padding: 24px 16px 40px;
+      align-items: flex-start;
       min-height: 100vh;
+      padding: 24px 16px;
     }
 
-    .app-container {
+    .quiz-container {
+      background: #ffffff;
       width: 100%;
       max-width: 820px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    /* Header & Progress */
-    .header-card {
-      background: #ffffff;
-      padding: 20px 24px;
       border-radius: 12px;
       border: 1px solid #e6e9f2;
       box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Top Bar & Progress */
+    .header-bar {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e6e9f2;
     }
 
     .title-row {
@@ -43,8 +46,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 10px;
     }
 
     .quiz-title {
@@ -53,157 +54,80 @@
       color: #2e3856;
     }
 
-    .quiz-subtitle {
-      font-size: 13px;
-      color: #646f90;
-      margin-top: 2px;
-    }
-
     .list-toggle-btn {
-      background-color: #eef1ff;
+      background: #eef1ff;
       color: #4255ff;
-      border: 1px solid #d5dcff;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
       font-size: 13px;
-      transition: all 0.15s ease;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
     }
 
     .list-toggle-btn:hover {
-      background-color: #4255ff;
-      color: #ffffff;
+      background: #dce2ff;
     }
 
-    .progress-bar-bg {
-      background-color: #e6e9f2;
-      height: 8px;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .progress-bar-fill {
-      background-color: #4255ff;
-      height: 100%;
-      width: 0%;
-      transition: width 0.25s ease;
-    }
-
-    .stats-row {
+    .progress-meta {
       display: flex;
       justify-content: space-between;
       font-size: 13px;
+      color: #646f90;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #646f90;
     }
 
-    /* Modal / Drawer for Question Grid */
-    .grid-modal {
-      display: none;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid #e6e9f2;
-      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    .progress-track {
+      background: #e6e9f2;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
     }
 
-    .grid-modal.open {
-      display: block;
+    .progress-fill {
+      background: #4255ff;
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
     }
 
-    .grid-modal-header {
-      font-size: 14px;
-      font-weight: 700;
-      color: #2e3856;
-      margin-bottom: 12px;
+    /* Card Question Area */
+    .card-body {
+      padding: 28px 24px;
+      flex-grow: 1;
+      min-height: 400px;
     }
 
-    .question-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
-      gap: 8px;
-    }
-
-    .grid-item {
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ffffff;
-      border: 1px solid #d5dcff;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-      color: #2e3856;
-      transition: all 0.15s ease;
-    }
-
-    .grid-item:hover {
-      background-color: #eef1ff;
-      border-color: #4255ff;
-    }
-
-    .grid-item.active {
-      border: 2px solid #4255ff;
-      color: #4255ff;
-      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
-    }
-
-    .grid-item.answered {
-      background-color: #eef1ff;
-      border-color: #4255ff;
-      color: #4255ff;
-    }
-
-    /* Question Study Card */
-    .card {
-      background: #ffffff;
-      padding: 28px;
-      border-radius: 12px;
-      border: 1px solid #e6e9f2;
-      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .q-number-tag {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #646f90;
-      font-weight: 700;
-    }
-
-    .q-text {
+    .stem {
       font-size: 17px;
       font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 22px;
       color: #2e3856;
-      line-height: 1.45;
     }
 
-    .options-list {
+    .options-grid {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
     .option-btn {
-      background: #ffffff;
-      border: 1px solid #e6e9f2;
-      border-radius: 10px;
-      padding: 14px 16px;
       display: flex;
-      align-items: center;
-      gap: 14px;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 16px;
       cursor: pointer;
       text-align: left;
-      font-size: 14.5px;
+      font-size: 15px;
       color: #2e3856;
-      transition: all 0.15s ease;
+      line-height: 1.4;
+      transition: all 0.15s ease-in-out;
     }
 
     .option-btn:hover:not(:disabled) {
@@ -212,154 +136,201 @@
       transform: translateY(-1px);
     }
 
-    .badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background-color: #f6f7fb;
-      color: #646f90;
-      display: flex;
+    .option-badge {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: #f6f7fb;
+      border: 1px solid #dcdfe8;
+      font-size: 12px;
       font-weight: 700;
-      font-size: 13px;
+      color: #646f90;
       flex-shrink: 0;
-      border: 1px solid #e6e9f2;
     }
 
-    .option-text {
-      flex: 1;
-      line-height: 1.35;
-    }
-
-    .feedback-pill {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      display: none;
-      text-transform: uppercase;
-    }
-
-    /* Option States */
+    /* Instant Feedback States */
     .option-btn.correct {
-      background-color: #d7f7eb !important;
+      background: #d7f7eb !important;
       border-color: #18ae79 !important;
       color: #0e6948 !important;
     }
-
-    .option-btn.correct .badge {
-      background-color: #18ae79;
+    .option-btn.correct .option-badge {
+      background: #18ae79;
       color: #ffffff;
       border-color: #18ae79;
     }
 
-    .option-btn.correct .feedback-pill {
-      display: inline-block;
-      background-color: #18ae79;
-      color: #ffffff;
-    }
-
     .option-btn.incorrect {
-      background-color: #ffdfe0 !important;
+      background: #ffdfe0 !important;
       border-color: #ff6871 !important;
       color: #b31d27 !important;
     }
-
-    .option-btn.incorrect .badge {
-      background-color: #ff6871;
+    .option-btn.incorrect .option-badge {
+      background: #ff6871;
       color: #ffffff;
       border-color: #ff6871;
     }
 
-    .option-btn.incorrect .feedback-pill {
-      display: inline-block;
-      background-color: #ff6871;
-      color: #ffffff;
-    }
-
-    .option-btn:disabled {
-      cursor: default;
+    .status-tag {
+      font-weight: 800;
+      margin-left: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Explanation Card */
-    .rationale-box {
+    .rationale-card {
+      margin-top: 22px;
+      background: #f9faff;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #2e3856;
       display: none;
-      background: #fcfdfe;
-      border: 1px solid #e6e9f2;
-      border-left: 5px solid #4255ff;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 4px;
     }
 
     .rationale-title {
-      font-size: 12px;
       font-weight: 700;
+      margin-bottom: 6px;
       color: #4255ff;
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 6px;
     }
 
-    .rationale-content {
-      font-size: 14px;
-      color: #2e3856;
-      line-height: 1.5;
-    }
-
-    /* Navigation Bar */
+    /* Nav Area */
     .nav-bar {
+      padding: 16px 24px;
+      border-top: 1px solid #e6e9f2;
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      align-items: center;
+      background: #fafbfe;
     }
 
     .nav-btn {
-      background-color: #ffffff;
-      border: 1px solid #e6e9f2;
-      color: #2e3856;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s;
     }
 
     .nav-btn:hover:not(:disabled) {
-      background-color: #f6f7fb;
-      border-color: #d5dcff;
+      background: #f0f2f7;
     }
 
     .nav-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.45;
       cursor: not-allowed;
     }
 
     .nav-btn.primary {
-      background-color: #4255ff;
+      background: #4255ff;
       color: #ffffff;
-      border: 1px solid #4255ff;
-      margin-left: auto;
+      border-color: #4255ff;
     }
 
     .nav-btn.primary:hover:not(:disabled) {
-      background-color: #2e38c9;
+      background: #2e38c9;
+      border-color: #2e38c9;
     }
 
-    /* Scorecard */
+    /* Drawer / Question Grid Modal */
+    .grid-drawer {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.98);
+      z-index: 10;
+      padding: 24px;
+      flex-direction: column;
+    }
+
+    .grid-drawer.open {
+      display: flex;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .drawer-header h3 {
+      font-size: 18px;
+      color: #2e3856;
+    }
+
+    .close-drawer-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: #646f90;
+      cursor: pointer;
+    }
+
+    .questions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 10px;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+
+    .q-bubble {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 1.5px solid #dcdfe8;
+      background: #ffffff;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .q-bubble:hover {
+      border-color: #4255ff;
+    }
+
+    .q-bubble.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #b7c2ff;
+    }
+
+    .q-bubble.current {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Scorecard / Results View */
     .scorecard {
       display: none;
-      background: #ffffff;
       padding: 40px 24px;
-      border-radius: 12px;
-      border: 1px solid #e6e9f2;
-      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
       text-align: center;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
     }
 
     .score-circle {
@@ -372,72 +343,86 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 10px auto;
+      margin-bottom: 20px;
     }
 
-    .score-percent {
+    .score-pct {
       font-size: 32px;
       font-weight: 800;
       color: #4255ff;
     }
 
     .score-label {
-      font-size: 11px;
+      font-size: 12px;
       color: #646f90;
-      text-transform: uppercase;
       font-weight: 700;
+      text-transform: uppercase;
     }
 
     .score-breakdown {
       display: flex;
       gap: 24px;
-      font-size: 15px;
-      font-weight: 700;
+      margin-bottom: 28px;
     }
 
-    .stat-correct { color: #18ae79; }
-    .stat-incorrect { color: #ff6871; }
+    .score-stat-box {
+      background: #f6f7fb;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .stat-val.correct { color: #18ae79; }
+    .stat-val.incorrect { color: #ff6871; }
+
+    .stat-desc {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: 600;
+    }
 
     /* Footer & Branding */
-    .footer {
-      background: #ffffff;
-      border-radius: 12px;
-      border: 1px solid #e6e9f2;
+    .quiz-footer {
       padding: 16px 24px;
+      background: #ffffff;
+      border-top: 1px solid #e6e9f2;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      gap: 10px;
     }
 
     .attribution {
       font-style: italic;
-      font-weight: 700;
-      font-size: 13px;
+      font-weight: bold;
       color: #2e3856;
+      font-size: 13px;
     }
 
-    .social-links {
+    .social-bar {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
 
     .social-btn {
-      width: 34px;
-      height: 34px;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
       background: #f6f7fb;
-      border: 1px solid #e6e9f2;
-      border-radius: 6px;
+      border: 1px solid #dcdfe8;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #2e3856;
-      font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #4255ff;
       text-decoration: none;
-      transition: all 0.15s ease;
+      transition: all 0.15s;
     }
 
     .social-btn:hover {
@@ -446,589 +431,597 @@
       border-color: #4255ff;
     }
   </style>
-<script src="/_aistudio-iframe.js?v=2c34bde1"></script></head>
+</head>
 <body>
 
-<div class="app-container">
-  <!-- Top Header Card -->
-  <div class="header-card">
+<div class="quiz-container">
+  <!-- Grid Drawer / List Modal -->
+  <div class="grid-drawer" id="gridDrawer">
+    <div class="drawer-header">
+      <h3>Question Overview</h3>
+      <button class="close-drawer-btn" id="closeDrawerBtn">&times;</button>
+    </div>
+    <div class="questions-grid" id="questionsGrid"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="header-bar">
     <div class="title-row">
-      <div>
-        <div class="quiz-title">Immunology: CH5 T Cell-Mediated Immunity</div>
-        <div class="quiz-subtitle">Comprehensive 30 High-Yield MCQ Practice Examination</div>
-      </div>
-      <button class="list-toggle-btn" id="listToggleBtn" onclick="toggleGrid()">View List</button>
+      <div class="quiz-title">Immunology: CH5 T Cell-Mediated Immunity</div>
+      <button class="list-toggle-btn" id="openDrawerBtn">View List</button>
     </div>
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progressBar"></div>
-    </div>
-    <div class="stats-row">
-      <span id="questionCounter">Question 1 of 30</span>
+    <div class="progress-meta">
+      <span id="currentCounter">Question 1 of 30</span>
       <span id="answeredCounter">0 / 30 Answered</span>
     </div>
-  </div>
-
-  <!-- Question Grid Drawer -->
-  <div class="grid-modal" id="gridModal">
-    <div class="grid-modal-header">Jump directly to question:</div>
-    <div class="question-grid" id="questionGrid"></div>
-  </div>
-
-  <!-- Main Question Card -->
-  <div class="card" id="questionCard">
-    <div class="q-number-tag" id="qNumberTag">Question 1</div>
-    <div class="q-text" id="qText">Loading question stem...</div>
-    <div class="options-list" id="optionsList"></div>
-    <div class="rationale-box" id="rationaleBox">
-      <div class="rationale-title">Explanation & Rationales</div>
-      <div class="rationale-content" id="rationaleContent"></div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
     </div>
   </div>
 
-  <!-- Scorecard Result Container -->
-  <div class="scorecard" id="scoreCard">
-    <h2 style="font-size: 22px; font-weight: 800;">Quiz Completed!</h2>
+  <!-- Question Body Card -->
+  <div class="card-body" id="cardBody">
+    <div class="stem" id="stemText">Question stem here</div>
+    <div class="options-grid" id="optionsGrid"></div>
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation / Key Takeaway</div>
+      <div id="rationaleText"></div>
+    </div>
+  </div>
+
+  <!-- Scorecard View -->
+  <div class="scorecard" id="scorecard">
+    <h2 style="margin-bottom: 20px; font-size: 22px;">Test Complete!</h2>
     <div class="score-circle">
-      <div class="score-percent" id="scorePercent">0%</div>
+      <div class="score-pct" id="scorePct">0%</div>
       <div class="score-label">Score</div>
     </div>
     <div class="score-breakdown">
-      <span class="stat-correct" id="scoreCorrect">Correct: 0</span>
-      <span class="stat-incorrect" id="scoreIncorrect">Incorrect: 0</span>
+      <div class="score-stat-box">
+        <div class="stat-val correct" id="totalCorrect">0</div>
+        <div class="stat-desc">Correct</div>
+      </div>
+      <div class="score-stat-box">
+        <div class="stat-val incorrect" id="totalIncorrect">0</div>
+        <div class="stat-desc">Incorrect</div>
+      </div>
     </div>
-    <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    <button class="nav-btn primary" id="restartBtn">Take Test Again</button>
   </div>
 
-  <!-- Navigation Buttons -->
+  <!-- Navigation -->
   <div class="nav-bar" id="navBar">
-    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
-    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+    <button class="nav-btn" id="prevBtn">Previous</button>
+    <button class="nav-btn primary" id="nextBtn">Next</button>
   </div>
 
   <!-- Footer Branding -->
-  <div class="footer">
+  <div class="quiz-footer">
     <div class="attribution">Prepared by BUNRETH Nihrantz</div>
-    <div class="social-links">
-      <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
-      <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
-      <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+    <div class="social-bar">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn">T</a>
     </div>
   </div>
 </div>
 
 <script>
-const quizData = [
-  {
-    q: "Which specific component of the T cell receptor (TCR) complex is directly responsible for recognizing and binding the peptide-MHC complex?",
-    options: [
-      "The CD3 complex (gamma, delta, epsilon chains)",
-      "The TCR alpha-beta heterodimer",
-      "The Zeta (ζ) chain homodimer",
-      "The CD28 co-stimulatory receptor"
-    ],
-    correct: 1,
-    explanation: "The TCR alpha-beta heterodimer possesses the hypervariable regions that specifically bind the peptide-MHC complex. CD3 and zeta chains are invariant and responsible for intracellular signal transduction via their ITAMs."
-  },
-  {
-    q: "What is the primary intracellular function of the invariant CD3 complex and Zeta (ζ) chains upon TCR engagement?",
-    options: [
-      "Direct transcription factor binding in the nucleus",
-      "Signal transduction via phosphorylation of cytoplasmic ITAMs",
-      "Neutralizing extracellular viral capsids",
-      "Presentation of endogenous peptide antigens"
-    ],
-    correct: 1,
-    explanation: "The cytoplasmic tails of CD3 and Zeta chains contain Immunoreceptor Tyrosine-based Activation Motifs (ITAMs). When phosphorylated by Lck, they serve as docking sites to propagate downstream biochemical signals."
-  },
-  {
-    q: "Which protein tyrosine kinase is physically associated with the cytoplasmic tails of CD4 and CD8 co-receptors and initiates early T cell signaling by phosphorylating ITAMs?",
-    options: [
-      "ZAP-70",
-      "Lck",
-      "Calcineurin",
-      "MAP kinase"
-    ],
-    correct: 1,
-    explanation: "Lck (Lymphocyte-specific protein tyrosine kinase) is anchored to CD4 and CD8 tails. Bringing CD4/CD8 into proximity with the TCR-MHC complex allows Lck to phosphorylate ITAMs on CD3 and zeta chains."
-  },
-  {
-    q: "According to the Two-Signal Hypothesis, what critical outcome occurs if a naive T cell engages antigen on an APC (Signal 1) in the complete absence of co-stimulation (Signal 2)?",
-    options: [
-      "Massive clonal expansion into effector CTLs",
-      "Anergy (unresponsiveness) or apoptosis",
-      "Immediate transformation into memory cells",
-      "Spontaneous secretion of high titers of IFN-gamma"
-    ],
-    correct: 1,
-    explanation: "Signal 1 without Signal 2 leads to functional inactivation known as anergy or induces programmed cell death (apoptosis), maintaining peripheral tolerance against harmless antigens."
-  },
-  {
-    q: "What is the primary receptor-ligand pairing responsible for delivering the primary co-stimulatory Signal 2 during naive T cell priming?",
-    options: [
-      "CD28 on the T cell binding to B7-1 (CD80) or B7-2 (CD86) on the APC",
-      "CTLA-4 on the T cell binding to CD40 on the APC",
-      "LFA-1 on the T cell binding to ICAM-1 on endothelium",
-      "PD-1 on the T cell binding to PD-L1 on dendritic cells"
-    ],
-    correct: 0,
-    explanation: "CD28 is constitutively expressed on naive T cells and binds B7-1 (CD80) and B7-2 (CD86) on professional APCs, driving survival, IL-2 synthesis, and proliferation."
-  },
-  {
-    q: "Which cytokine acts as the principal autocrine growth factor driving the clonal expansion and survival of antigen-activated T cells?",
-    options: [
-      "Interleukin-2 (IL-2)",
-      "Interferon-gamma (IFN-γ)",
-      "Interleukin-4 (IL-4)",
-      "Transforming Growth Factor-beta (TGF-β)"
-    ],
-    correct: 0,
-    explanation: "IL-2 is secreted by activated T cells and binds high-affinity IL-2 receptors (containing the CD25/IL-2Rα chain) on the same cell, acting as the primary driver of clonal proliferation."
-  },
-  {
-    q: "Why do CD8+ Cytotoxic T Lymphocytes (CTLs) undergo significantly greater clonal expansion (>10,000-fold) compared to CD4+ Helper T cells (100–1,000-fold)?",
-    options: [
-      "CD8+ cells do not require IL-2 for proliferation",
-      "CTLs must physically contact and destroy every individual infected target cell",
-      "CD4+ cells lack functional T cell receptors",
-      "CD8+ cells do not undergo the contraction phase"
-    ],
-    correct: 1,
-    explanation: "CD8+ CTLs act via one-on-one lethal contacts and must match millions of infected somatic cells to clear infection, whereas CD4+ T cells operate through amplifying cytokine networks and regulatory help."
-  },
-  {
-    q: "Which transcription factor and signature effector cytokine define the differentiation and functional profile of Th1 cells?",
-    options: [
-      "GATA-3 and IL-4",
-      "T-bet and IFN-γ",
-      "RORγt and IL-17",
-      "FoxP3 and IL-10"
-    ],
-    correct: 1,
-    explanation: "Th1 differentiation is governed by the lineage master regulator T-bet, driven by IL-12 and IFN-γ, resulting in high secretion of IFN-γ to activate macrophages."
-  },
-  {
-    q: "Which subset of CD4+ helper T cells specializes in mucosal barrier defense and recruitment of neutrophils against extracellular bacteria and fungi?",
-    options: [
-      "Th1",
-      "Th2",
-      "Th17",
-      "Tfh"
-    ],
-    correct: 2,
-    explanation: "Th17 cells (governed by transcription factor RORγt) secrete IL-17 and IL-22, which recruit neutrophils and induce antimicrobial peptide production at mucosal barriers."
-  },
-  {
-    q: "Which CD4+ T cell subset resides primarily in secondary lymphoid follicles to promote B cell affinity maturation and antibody class switching?",
-    options: [
-      "Follicular Helper T cells (Tfh)",
-      "Central Memory T cells (Tcm)",
-      "Th1 cells",
-      "Cytotoxic T Lymphocytes (CTL)"
-    ],
-    correct: 0,
-    explanation: "Tfh cells express CXCR5, ICOS, and the master regulator Bcl-6; they localize to germinal centers in lymphoid follicles and secrete IL-21 to help B cells mature."
-  },
-  {
-    q: "Which key transcription factor is essential for the development and suppressive function of Regulatory T cells (Tregs)?",
-    options: [
-      "FoxP3",
-      "T-bet",
-      "c-Jun",
-      "GATA-3"
-    ],
-    correct: 0,
-    explanation: "FoxP3 is the hallmark transcription factor of Tregs. Loss or mutation of FoxP3 leads to fatal systemic autoimmune disease (e.g., IPEX syndrome)."
-  },
-  {
-    q: "By which two distinct contact-dependent cytotoxic mechanisms do CD8+ CTLs induce target cell apoptosis?",
-    options: [
-      "Perforin/Granzyme B exocytosis and Fas-FasL engagement",
-      "Complement activation and phagocytosis",
-      "Membrane attack complex (MAC) formation and histamine release",
-      "Antibody neutralization and opsonization"
-    ],
-    correct: 0,
-    explanation: "CTLs kill via perforin (pore formation) delivering granzyme B (protease activating caspases) and surface Fas ligand (FasL) binding target Fas receptor (CD95)."
-  },
-  {
-    q: "Which homing receptor pair directs naive T cells out of systemic circulation into lymph nodes across High Endothelial Venules (HEVs)?",
-    options: [
-      "L-selectin (CD62L) and CCR7",
-      "VLA-4 and CXCR3",
-      "LFA-1 and E-selectin",
-      "CD40L and CD28"
-    ],
-    correct: 0,
-    explanation: "Naive T cells express L-selectin to roll on HEV addressins and CCR7 to sense CCL19/CCL21 in the lymph node cortex."
-  },
-  {
-    q: "How does the surface receptor profile change when an activated T cell differentiates into an effector cell migrating to inflamed tissue?",
-    options: [
-      "Upregulates L-selectin and CCR7; downregulates VLA-4",
-      "Downregulates L-selectin and CCR7; upregulates integrins (VLA-4) and chemokine receptors (CXCR3)",
-      "Downregulates all adhesion molecules to float freely",
-      "Expresses only CD28 and loss of TCR complex"
-    ],
-    correct: 1,
-    explanation: "Effector T cells shed lymph node homing receptors (L-selectin, CCR7) and upregulate VLA-4 (binds VCAM-1 on inflamed endothelium) and chemokine receptors like CXCR3."
-  },
-  {
-    q: "How does CTLA-4 function as an essential negative regulator of T cell activation?",
-    options: [
-      "It binds B7-1/B7-2 with higher affinity than CD28, outcompeting it and delivering inhibitory signals",
-      "It degrades peptide antigens directly within MHC grooves",
-      "It stimulates excess IL-2 production to cause toxicity",
-      "It binds to CD4 and blocks its contact with MHC Class II"
-    ],
-    correct: 0,
-    explanation: "CTLA-4 binds B7 molecules with much higher affinity and avidity than CD28, competitively removing co-stimulation and sending negative signals to arrest proliferation."
-  },
-  {
-    q: "What is the primary mechanism of action of checkpoint inhibitor drugs such as Pembrolizumab and Ipilimumab in oncology?",
-    options: [
-      "They destroy cytotoxic T lymphocytes",
-      "They block inhibitory receptors (CTLA-4 or PD-1/PD-L1), releasing the 'brakes' on antitumor T cells",
-      "They directly act as chemical cytolytic toxins against tumors",
-      "They prevent dendritic cells from entering lymph nodes"
-    ],
-    correct: 1,
-    explanation: "Checkpoint inhibitors block CTLA-4 or PD-1/PD-L1 interactions, reversing T cell exhaustion and allowing tumor-specific CTLs to destroy malignant cells."
-  },
-  {
-    q: "What term describes the rapid decline phase where 90–95% of effector T cells undergo programmed cell death following pathogen clearance?",
-    options: [
-      "Affinity maturation",
-      "Contraction",
-      "Somatic hypermutation",
-      "Positive selection"
-    ],
-    correct: 1,
-    explanation: "Contraction describes the elimination of excess effector cells via apoptosis when survival cytokines (IL-2) and antigens disappear, restoring homeostasis."
-  },
-  {
-    q: "Which two cytokines produced by stromal cells are vital for the long-term survival and basal maintenance of memory T cells?",
-    options: [
-      "IL-7 and IL-15",
-      "IL-1 and TNF-alpha",
-      "IL-6 and IL-12",
-      "IL-3 and GM-CSF"
-    ],
-    correct: 0,
-    explanation: "Stromal cell-derived IL-7 and IL-15 are crucial for the homeostatic renewal and multi-year survival of memory T cell pools without requiring antigen re-exposure."
-  },
-  {
-    q: "What differentiates Central Memory T cells (Tcm) from Effector Memory T cells (Tem)?",
-    options: [
-      "Tcm reside in lymphoid organs and exhibit high proliferative capacity, whereas Tem patrol peripheral tissues for immediate effector defense",
-      "Tcm immediately secrete cytotoxic granules, whereas Tem do not kill",
-      "Tem live for decades while Tcm die within 24 hours",
-      "Tcm express no TCR, whereas Tem express double TCRs"
-    ],
-    correct: 0,
-    explanation: "Tcm express CCR7/L-selectin, reside in lymphoid organs, and proliferate rapidly upon secondary challenge; Tem lack CCR7, patrol peripheral tissues, and display rapid effector function."
-  },
-  {
-    q: "What happens during the interaction between CD40L on an activated T helper cell and CD40 on a dendritic cell?",
-    options: [
-      "The DC immediately undergoes apoptotic death",
-      "The DC is 'licensed'—upregulating B7 co-stimulators and producing IL-12 to stimulate CD8+ CTLs",
-      "The DC switches into an antibody-secreting plasma cell",
-      "The T cell is instantly tolerized"
-    ],
-    correct: 1,
-    explanation: "CD40L-CD40 interaction 'licenses' the antigen-presenting cell, boosting its B7 expression and cytokine output (IL-12), enabling cross-priming and robust CD8+ T cell activation."
-  },
-  {
-    q: "Which cytoplasmic adaptor protein is phosphorylated by ZAP-70 to assemble downstream signaling complexes (signalosome)?",
-    options: [
-      "LAT (Linker for Activation of T cells)",
-      "Perforin",
-      "Interferon regulatory factor",
-      "L-selectin"
-    ],
-    correct: 0,
-    explanation: "Activated ZAP-70 phosphorylates LAT and SLP-76, creating membrane-associated docking scaffolds that recruit phospholipase C-gamma-1 and other cascade enzymes."
-  },
-  {
-    q: "The Calcium-Calcineurin pathway in activated T cells culminates in the nuclear translocation of which critical transcription factor?",
-    options: [
-      "NFAT (Nuclear Factor of Activated T cells)",
-      "GATA-3",
-      "Bcl-6",
-      "Ets-1"
-    ],
-    correct: 0,
-    explanation: "Elevated intracellular calcium activates calmodulin and calcineurin (a phosphatase), which dephosphorylates NFAT, permitting its entry into the nucleus to drive IL-2 transcription."
-  },
-  {
-    q: "Which major signaling pathway leads to the nuclear translocation of transcription factor heterodimer AP-1 (c-Fos and c-Jun)?",
-    options: [
-      "Mitogen-Activated Protein (MAP) Kinase cascade",
-      "Peroxisomal fatty acid oxidation pathway",
-      "Fas-associated death domain (FADD) cascade",
-      "Complement classical pathway"
-    ],
-    correct: 0,
-    explanation: "The Ras/Raf/MEK/ERK MAP kinase cascade drives the induction and phosphorylation of c-Fos and c-Jun, which dimerize to assemble the AP-1 transcription complex."
-  },
-  {
-    q: "What is the general biochemical mechanism of a kinase compared to a phosphatase?",
-    options: [
-      "A kinase adds phosphate groups to activate or modulate proteins; a phosphatase removes phosphate groups",
-      "A kinase degrades amino acids; a phosphatase synthesizes DNA",
-      "A kinase neutralizes viruses; a phosphatase punches holes in target membranes",
-      "A kinase dephosphorylates substrates; a phosphatase phosphorylates substrates"
-    ],
-    correct: 0,
-    explanation: "Protein kinases transfer phosphate groups from ATP to target residues (phosphorylation), while phosphatases cleave and remove phosphate groups (dephosphorylation)."
-  },
-  {
-    q: "What is a 'polyclonal activator' of T cells, such as Phytohemagglutinin (PHA) or microbial superantigens?",
-    options: [
-      "An agent that activates a broad proportion of T cells non-specifically, bypassing normal peptide specificity",
-      "An antigen that activates only a single specific T cell clone",
-      "A cytokine that exclusively kills CD4+ T cells",
-      "A drug that completely paralyzes the immune response"
-    ],
-    correct: 0,
-    explanation: "Polyclonal activators stimulate numerous T cell clones irrespective of individual TCR antigen specificity by cross-linking invariant TCR components or MHC-TCR complexes."
-  },
-  {
-    q: "Which integrin on activated T cells binds to VCAM-1 on cytokine-activated endothelial cells to enable firm arrest and extravasation?",
-    options: [
-      "VLA-4 (alpha-4 beta-1 integrin)",
-      "CCR7",
-      "L-selectin",
-      "CD25"
-    ],
-    correct: 0,
-    explanation: "VLA-4 (Very Late Antigen-4) is upregulated on effector T cells and binds Vascular Cell Adhesion Molecule-1 (VCAM-1) to mediate firm adhesion and transmigration into inflamed tissues."
-  },
-  {
-    q: "Which cytokine secreted by Th2 cells is the primary inducer of heavy-chain class switching to IgE in B lymphocytes?",
-    options: [
-      "Interleukin-4 (IL-4)",
-      "Interleukin-12 (IL-12)",
-      "Transforming Growth Factor-beta (TGF-β)",
-      "Interferon-gamma (IFN-γ)"
-    ],
-    correct: 0,
-    explanation: "IL-4 directs B cells to switch antibody production to IgE, which is essential for host defense against helminthic parasites and plays a major role in allergic disorders."
-  },
-  {
-    q: "Which cell surface molecule is expressed very early following T cell activation and serves to temporarily retain the activated T cell inside the lymph node?",
-    options: [
-      "CD69",
-      "PD-1",
-      "CTLA-4",
-      "CCR7"
-    ],
-    correct: 0,
-    explanation: "CD69 is an early activation marker that internalizes sphingosine-1-phosphate receptor 1 (S1PR1), temporarily retaining the T cell in the lymph node to complete clonal expansion."
-  },
-  {
-    q: "Why are human patients infected with Advanced HIV particularly susceptible to opportunistic intracellular microbial pathogens?",
-    options: [
-      "HIV selectively targets and depletes CD4+ Helper T cells, crippling macrophage activation and CD8+ CTL licensing",
-      "HIV permanently mutates all MHC Class I molecules in the body",
-      "HIV directly eliminates all circulating neutrophils within 24 hours",
-      "HIV produces antibodies that block all T cell receptors"
-    ],
-    correct: 0,
-    explanation: "CD4+ Th cells coordinate cell-mediated immunity via IFN-gamma and CD40L. Loss of CD4+ T cells due to HIV destroys macrophage activation and CTL licensing, predisposing to intracellular infections."
-  },
-  {
-    q: "What defines 'MHC restriction' of T lymphocytes?",
-    options: [
-      "A specific T cell receptor recognizes a foreign peptide antigen ONLY when bound to a specific host MHC molecule",
-      "T cells can only recognize naked soluble peptides free in solution",
-      "MHC molecules are exclusively synthesized inside naive T lymphocytes",
-      "MHC molecules restrict T cells from ever exiting the thymus"
-    ],
-    correct: 0,
-    explanation: "MHC restriction means a TCR does not recognize peptide alone or MHC alone; it recognizes the combined surface of a specific peptide nestled within a self-MHC molecule (Class II for CD4+, Class I for CD8+)."
-  }
-];
-
-let currentIdx = 0;
-let userAnswers = new Array(quizData.length).fill(null);
-
-function initQuiz() {
-  renderGrid();
-  renderQuestion();
-  updateProgress();
-}
-
-function renderGrid() {
-  const grid = document.getElementById("questionGrid");
-  grid.innerHTML = "";
-  quizData.forEach((_, idx) => {
-    const item = document.createElement("div");
-    item.className = "grid-item";
-    item.id = `grid-item-${idx}`;
-    item.innerText = idx + 1;
-    item.onclick = () => jumpToQuestion(idx);
-    grid.appendChild(item);
-  });
-}
-
-function toggleGrid() {
-  const modal = document.getElementById("gridModal");
-  const btn = document.getElementById("listToggleBtn");
-  if (modal.classList.contains("open")) {
-    modal.classList.remove("open");
-    btn.innerText = "View List";
-  } else {
-    modal.classList.add("open");
-    btn.innerText = "Hide List";
-  }
-}
-
-function jumpToQuestion(idx) {
-  currentIdx = idx;
-  renderQuestion();
-}
-
-function renderQuestion() {
-  const q = quizData[currentIdx];
-  document.getElementById("qNumberTag").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
-  document.getElementById("qText").innerText = q.q;
-  document.getElementById("questionCounter").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
-
-  const optionsList = document.getElementById("optionsList");
-  optionsList.innerHTML = "";
-  const rationaleBox = document.getElementById("rationaleBox");
-  const rationaleContent = document.getElementById("rationaleContent");
-
-  const letters = ["A", "B", "C", "D"];
-  const answered = userAnswers[currentIdx] !== null;
-
-  q.options.forEach((optText, optIdx) => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
-    btn.disabled = answered;
-
-    const badge = document.createElement("div");
-    badge.className = "badge";
-    badge.innerText = letters[optIdx];
-
-    const textSpan = document.createElement("div");
-    textSpan.className = "option-text";
-    textSpan.innerText = optText;
-
-    const feedbackPill = document.createElement("div");
-    feedbackPill.className = "feedback-pill";
-
-    btn.appendChild(badge);
-    btn.appendChild(textSpan);
-    btn.appendChild(feedbackPill);
-
-    if (answered) {
-      if (optIdx === q.correct) {
-        btn.classList.add("correct");
-        feedbackPill.innerText = "Correct";
-      } else if (optIdx === userAnswers[currentIdx]) {
-        btn.classList.add("incorrect");
-        feedbackPill.innerText = "Incorrect";
-      }
-    } else {
-      btn.onclick = () => handleSelectOption(optIdx);
+  const quizData = [
+    {
+      q: "Where does the induction phase of T cell-mediated immune responses primarily take place?",
+      options: [
+        "In peripheral non-lymphoid tissues such as the lung or skin",
+        "In secondary lymphoid organs such as the lymph nodes",
+        "Directly inside circulating blood vessels",
+        "Exclusively in the bone marrow and thymus"
+      ],
+      correct: 1,
+      explanation: "The induction phase occurs in secondary lymphoid organs (like lymph nodes) where naive T cells encounter APCs, recognize antigens, and undergo expansion and differentiation."
+    },
+    {
+      q: "What is the primary effector function of CD4+ helper T cells once they migrate to infected tissues?",
+      options: [
+        "Directly perforating and lysing infected host target cells",
+        "Activating macrophages and helping B cells mount immune defenses",
+        "Secreting high titers of serum immunoglobulin G (IgG)",
+        "Engulfing and degrading whole bacteria via phagocytosis"
+      ],
+      correct: 1,
+      explanation: "CD4+ helper T cells activate macrophages to destroy phagocytosed microbes and provide helper signals to B cells. Direct cytotoxicity is the role of CD8+ CTLs."
+    },
+    {
+      q: "What consequence occurs if a naive T cell receives Signal 1 (antigen recognition) in the total absence of Signal 2 (co-stimulation)?",
+      options: [
+        "Massive polyclonal expansion and immediate cytokine storm",
+        "Immediate conversion into a cytotoxic memory cell",
+        "Functional unresponsiveness (anergy) or immune tolerance",
+        "Immediate differentiation into follicular helper T cells (Tfh)"
+      ],
+      correct: 2,
+      explanation: "Signal 1 without co-stimulation (Signal 2) induces anergy or tolerance, ensuring harmless self-antigens do not trigger an autoimmune attack."
+    },
+    {
+      q: "Which specific molecular interaction represents the principal co-stimulatory Signal 2 for naive T cell activation?",
+      options: [
+        "B7-1/B7-2 (CD80/CD86) on the APC binding to CD28 on the T cell",
+        "ICAM-1 on the APC binding to LFA-1 on the T cell",
+        "PD-L1 on the APC binding to PD-1 on the T cell",
+        "MHC Class II on the APC binding to the T cell receptor (TCR)"
+      ],
+      correct: 0,
+      explanation: "B7-1 (CD80) and B7-2 (CD86) on the APC provide the primary co-stimulatory signal by binding CD28 on the T cell."
+    },
+    {
+      q: "Why can the α and β chains of the TCR not transmit intracellular activation signals on their own?",
+      options: [
+        "They are extracellular soluble glycoproteins lacking a transmembrane domain",
+        "They have extremely short cytoplasmic tails that lack signaling motifs like ITAMs",
+        "They lack variable regions necessary for chemical bonding",
+        "They function exclusively as inhibitory receptor units"
+      ],
+      correct: 1,
+      explanation: "The TCR αβ chains recognize peptide-MHC complexes but possess very short cytoplasmic tails that lack ITAMs. Signal transduction requires CD3 and zeta chains."
+    },
+    {
+      q: "Which associated invariant proteins provide the ITAMs required for signal transduction within the TCR complex?",
+      options: [
+        "CD28 homodimers and CTLA-4",
+        "CD3 complex (γε, δε) and ζ (zeta) chains",
+        "LFA-1 α and β chains",
+        "B7-1 and B7-2 chains"
+      ],
+      correct: 1,
+      explanation: "The TCR complex contains invariant signaling subunits: CD3 (γε, δε heterodimers) and ζ (zeta) homodimers, which contain ITAMs."
+    },
+    {
+      q: "Which protein tyrosine kinase is physically associated with the CD4 and CD8 coreceptors and phosphorylates ITAMs?",
+      options: [
+        "Calcineurin",
+        "Protein Kinase C (PKC)",
+        "Lck kinase",
+        "Mitogen-activated protein kinase (MAPK)"
+      ],
+      correct: 2,
+      explanation: "Lck is a Src-family kinase attached to the cytoplasmic tail of CD4/CD8 that phosphorylates ITAMs on the CD3 and zeta chains upon MHC binding."
+    },
+    {
+      q: "Which kinase is recruited to phosphorylated ITAMs on the ζ chains to propagate downstream cascades?",
+      options: [
+        "ZAP-70",
+        "PI3-Kinase",
+        "Akt",
+        "mTOR"
+      ],
+      correct: 0,
+      explanation: "Phosphorylated ITAMs serve as docking sites for the SH2 domains of ZAP-70 kinase, which is subsequently phosphorylated and activated."
+    },
+    {
+      q: "In the PLCγ1 signaling pathway, what is the downstream effect of increased intracellular Calcium (Ca2+)?",
+      options: [
+        "Direct phosphorylation of Akt",
+        "Activation of calcineurin, which dephosphorylates and activates NFAT",
+        "Inhibition of the transcription factor AP-1",
+        "Immediate transcription of CTLA-4"
+      ],
+      correct: 1,
+      explanation: "Elevated intracellular Ca2+ binds calmodulin, activating the phosphatase calcineurin, which dephosphorylates NFAT, allowing it to enter the nucleus and promote IL-2 gene transcription."
+    },
+    {
+      q: "Which heterodimeric transcription factor is formed via the Ras/MAP kinase signaling cascade?",
+      options: [
+        "NF-κB",
+        "NFAT",
+        "AP-1 (composed of c-Jun and c-Fos)",
+        "STAT3"
+      ],
+      correct: 2,
+      explanation: "The Ras/MAPK pathway activates ERK/JNK, driving the transcription and assembly of c-Fos and c-Jun into the AP-1 transcription factor."
+    },
+    {
+      q: "What is the primary biological consequence of retro-signaling mediated by CD40L (on T cells) binding to CD40 (on APCs)?",
+      options: [
+        "Immediate apoptosis of the antigen-presenting cell",
+        "Enhanced APC expression of B7 co-stimulators and production of cytokines like IL-12",
+        "Downregulation of MHC Class II on dendritic cells",
+        "Suppression of helper T cell cytokine secretion"
+      ],
+      correct: 1,
+      explanation: "CD40L-CD40 engagement 'licenses' and activates the APC, upregulating B7 expression and promoting cytokine synthesis (such as IL-12), creating a positive feedback loop."
+    },
+    {
+      q: "Which adhesion molecule pair forms the critical 'glue' that stabilizes the immunological synapse between a T cell and an APC?",
+      options: [
+        "LFA-1 on the T cell binding to ICAM-1 on the APC",
+        "L-selectin on the T cell binding to GlyCAM-1",
+        "VLA-4 on the T cell binding to VCAM-1",
+        "CCR7 on the T cell binding to CCL19"
+      ],
+      correct: 0,
+      explanation: "LFA-1 (an integrin on T cells) binds to ICAM-1 on APCs to form stable adhesion and establish the immunological synapse."
+    },
+    {
+      q: "How does CTLA-4 act as a competitive physiological brake on T cell activation?",
+      options: [
+        "It binds directly to TCR αβ chains to prevent peptide binding",
+        "It binds B7-1 and B7-2 with higher affinity than CD28, depriving CD28 of its ligands",
+        "It degrades intracellular ZAP-70 directly",
+        "It degrades extracellular IL-2 molecules"
+      ],
+      correct: 1,
+      explanation: "CTLA-4 binds B7 molecules with much higher affinity than CD28, outcompeting CD28 and delivering inhibitory signals that shut down activation."
+    },
+    {
+      q: "What is the primary clinical mechanism of immune checkpoint inhibitors used in cancer immunotherapy?",
+      options: [
+        "Blocking inhibitory receptors like CTLA-4 or PD-1 to unleash antitumor T cell responses",
+        "Administering superantigens to induce non-specific inflammation",
+        "Inhibiting Lck kinase to limit immunosuppression",
+        "Blocking IL-2 receptors to prevent lymphocyte proliferation"
+      ],
+      correct: 0,
+      explanation: "Checkpoint inhibitor drugs block inhibitory pathways (CTLA-4 or PD-1/PD-L1), removing inhibitory brakes and enabling effector T cells to eradicate tumors."
+    },
+    {
+      q: "How do superantigens stimulate massive polyclonal T cell activation without normal antigen processing?",
+      options: [
+        "By binding directly inside the peptide-binding cleft of MHC Class I",
+        "By binding simultaneously to MHC Class II and specific Vβ regions of the TCR outside the peptide pocket",
+        "By directly phosphorylating ITAMs in the absence of TCR binding",
+        "By replacing the CD28 co-receptor on naive T cells"
+      ],
+      correct: 1,
+      explanation: "Superantigens link the Vβ domain of TCRs to MHC Class II molecules outside the peptide groove, activating up to 20% of all T cells and sparking toxic cytokine storms."
+    },
+    {
+      q: "Which interleukin is recognized as the principal autocrine growth and survival factor driving clonal expansion?",
+      options: [
+        "IL-2",
+        "IL-4",
+        "IL-10",
+        "IL-12"
+      ],
+      correct: 0,
+      explanation: "IL-2 is the primary growth and autocrine survival factor for T cells, driving cell cycle entry and massive clonal expansion."
+    },
+    {
+      q: "What structural modification converts the low-affinity IL-2 receptor into a high-affinity IL-2 receptor?",
+      options: [
+        "Cleavage of the gamma chain",
+        "Synthesis and addition of the alpha chain (CD25) to form the αβγ complex",
+        "Phosphorylation of the beta chain by calcineurin",
+        "Dimerization of two zeta chains"
+      ],
+      correct: 1,
+      explanation: "Activated T cells transcribe the alpha chain (CD25), which associates with the basal beta and gamma chains to form the high-affinity trimeric IL-2 receptor (αβγ)."
+    },
+    {
+      q: "Why do antigen-specific CD8+ T cells expand to a greater magnitude than CD4+ T cells during an infection?",
+      options: [
+        "CD8+ T cells undergo more rounds of cell division to generate sufficient cytotoxic killers",
+        "CD4+ T cells completely lack the high-affinity IL-2 receptor",
+        "CD8+ T cells do not require Signal 2 for proliferation",
+        "MHC Class II molecules are far more abundant than MHC Class I molecules"
+      ],
+      correct: 0,
+      explanation: "CD8+ T cells can expand >10,000-fold (reaching 10-20% of total lymphocytes) because numerous killer cells are needed to eliminate infected target cells."
+    },
+    {
+      q: "Which specialized subset of CD4+ helper T cells stays in lymphoid follicles to assist B cells with antibody production?",
+      options: [
+        "Th1 cells",
+        "Th2 cells",
+        "Th17 cells",
+        "Tfh (Follicular Helper) cells"
+      ],
+      correct: 3,
+      explanation: "Tfh (Follicular Helper) cells remain within the lymphoid follicles/germinal centers of lymph nodes to provide CD40L and cytokine help to B cells."
+    },
+    {
+      q: "What cytokines are essential for the long-term survival and homeostatic maintenance of memory T cells?",
+      options: [
+        "IL-1 and TNF-α",
+        "IL-7 and IL-15",
+        "IL-4 and IL-13",
+        "IFN-γ and IL-12"
+      ],
+      correct: 1,
+      explanation: "Memory T cells do not require antigen to persist; they are maintained over years or decades by stromal-derived cytokines IL-7 and IL-15."
+    },
+    {
+      q: "Which property distinguishes Central Memory T cells (TCM) from Effector Memory T cells (TEM)?",
+      options: [
+        "TCM reside in peripheral tissues, whereas TEM stay exclusively in the bone marrow",
+        "TCM express CCR7 and home to lymph nodes with high proliferative capacity",
+        "TEM cannot produce cytokines upon restimulation",
+        "TCM require high levels of B7-CD28 co-stimulation to reactivate"
+      ],
+      correct: 1,
+      explanation: "Central Memory T cells (TCM) express CCR7 and L-selectin, reside in secondary lymphoid organs, and proliferate rapidly upon restimulation. TEM reside in mucosal and peripheral tissues."
+    },
+    {
+      q: "Which homing receptor pair directs naive T cells to enter lymph nodes across High Endothelial Venules (HEVs)?",
+      options: [
+        "CXCR3 and CXCL10",
+        "L-selectin (CD62L) and CCR7",
+        "VLA-4 and VCAM-1",
+        "E-selectin ligand and P-selectin"
+      ],
+      correct: 1,
+      explanation: "Naive T cells express L-selectin (which mediates rolling on HEVs) and CCR7 (which recognizes CCL19/CCL21 presented on HEVs), directing them into lymph nodes."
+    },
+    {
+      q: "What phenotypic change allows differentiated effector T cells to exit lymph nodes and home to inflamed tissues?",
+      options: [
+        "Upregulation of L-selectin and CCR7",
+        "Downregulation of L-selectin/CCR7 and upregulation of integrins (VLA-4) and CXCR3",
+        "Loss of all integrin adhesion molecules",
+        "Complete degradation of the TCR complex"
+      ],
+      correct: 1,
+      explanation: "Effector T cells downregulate lymph node homing molecules (L-selectin, CCR7) and upregulate inflammatory tissue homing molecules like VLA-4, E/P-selectin ligands, and CXCR3."
+    },
+    {
+      q: "What regulates the egress of activated effector T cells out of lymph nodes into the circulation?",
+      options: [
+        "A gradient of Sphingosine 1-Phosphate (S1P) sensed by S1PR1",
+        "Downregulation of all cellular chemokine receptors",
+        "Constant secretion of perforin and granzymes",
+        "Direct binding of CTLA-4 to endothelial cells"
+      ],
+      correct: 0,
+      explanation: "The lipid chemoattractant Sphingosine 1-Phosphate (S1P) is higher in blood and lymph than in the node parenchyma; signaling via S1PR1 draws T cells out into circulation."
+    },
+    {
+      q: "What primarily causes the decline (contraction) phase of an immune response following microbial clearance?",
+      options: [
+        "Loss of antigens, IL-2, and co-stimulation leading to passive apoptosis of effector T cells",
+        "Phagocytosis of healthy T cells by resting B cells",
+        "Transformation of all effector cells into malignant cells",
+        "Massive production of high-affinity antibodies destroying T cells"
+      ],
+      correct: 0,
+      explanation: "As the pathogen is eliminated, survival stimuli (antigen, co-stimulators, IL-2) diminish, causing effector T cells to undergo programmed cell death (apoptosis) and restore homeostasis."
+    },
+    {
+      q: "Which co-stimulatory pair is particularly critical for the development and function of Follicular Helper T cells (Tfh)?",
+      options: [
+        "CD28 ↔ B7-1",
+        "ICOS ↔ ICOS-L",
+        "PD-1 ↔ PD-L1",
+        "LFA-1 ↔ ICAM-1"
+      ],
+      correct: 1,
+      explanation: "Inducible T-cell Costimulator (ICOS) binding to ICOS-Ligand (ICOS-L) on B cells and APCs is vital for the development and function of Tfh cells."
+    },
+    {
+      q: "What is the enzymatic function of protein kinases in intracellular signaling pathways?",
+      options: [
+        "Hydrolyzing membrane phospholipids into diacylglycerol and IP3",
+        "Transferring a phosphate group from ATP to specific amino acid residues on target proteins",
+        "Removing phosphate groups from phosphorylated tyrosine residues",
+        "Directly transcribing mRNA sequences in the nucleus"
+      ],
+      correct: 1,
+      explanation: "Protein kinases covalently attach phosphate groups from ATP to serine, threonine, or tyrosine residues, typically activating the target protein."
+    },
+    {
+      q: "Which early activation marker is expressed on T cells within hours to promote transient retention in lymphoid organs?",
+      options: [
+        "CTLA-4",
+        "CD69",
+        "L-selectin",
+        "PD-1"
+      ],
+      correct: 1,
+      explanation: "CD69 is an early activation marker that internalizes S1PR1, temporarily retaining newly activated T cells inside the lymph node so they can proliferate."
+    },
+    {
+      q: "Which cytokine secreted by CD4+ Th1 effector cells is the principal activator of macrophages?",
+      options: [
+        "IL-4",
+        "IL-5",
+        "IL-17",
+        "IFN-γ (Interferon-gamma)"
+      ],
+      correct: 3,
+      explanation: "Th1 cells produce IFN-γ, which binds to macrophage receptors and synergizes with CD40L stimulation to activate their microbicidal killing mechanisms."
+    },
+    {
+      q: "Why do bystander T cells (which recognize unrelated antigens) fail to expand during an active viral infection?",
+      options: [
+        "They are actively killed by CD8+ CTLs upon viral entry",
+        "They do not receive Signal 1 and Signal 2, failing to synthesize autocrine IL-2 and the high-affinity IL-2R (CD25)",
+        "They are physically excluded from entering lymph nodes",
+        "Their TCRs are permanently blocked by circulating antibodies"
+      ],
+      correct: 1,
+      explanation: "Only antigen-specific clones receive both TCR stimulation (Signal 1) and co-stimulation (Signal 2) needed to produce IL-2 and express the high-affinity alpha chain (CD25)."
     }
+  ];
 
-    optionsList.appendChild(btn);
-  });
+  let currentIdx = 0;
+  const userAnswers = Array(quizData.length).fill(null);
 
-  if (answered) {
-    rationaleBox.style.display = "block";
-    rationaleContent.innerText = q.explanation;
-  } else {
-    rationaleBox.style.display = "none";
-  }
-
-  // Update navigation controls
-  document.getElementById("prevBtn").disabled = currentIdx === 0;
+  // DOM Elements
+  const currentCounter = document.getElementById("currentCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressFill = document.getElementById("progressFill");
+  const stemText = document.getElementById("stemText");
+  const optionsGrid = document.getElementById("optionsGrid");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
-  if (currentIdx === quizData.length - 1) {
-    nextBtn.innerText = "Submit Test";
-  } else {
-    nextBtn.innerText = "Next";
+  const cardBody = document.getElementById("cardBody");
+  const scorecard = document.getElementById("scorecard");
+  const navBar = document.getElementById("navBar");
+  const restartBtn = document.getElementById("restartBtn");
+  const openDrawerBtn = document.getElementById("openDrawerBtn");
+  const closeDrawerBtn = document.getElementById("closeDrawerBtn");
+  const gridDrawer = document.getElementById("gridDrawer");
+  const questionsGrid = document.getElementById("questionsGrid");
+  const scorePct = document.getElementById("scorePct");
+  const totalCorrect = document.getElementById("totalCorrect");
+  const totalIncorrect = document.getElementById("totalIncorrect");
+
+  const optionLetters = ["A", "B", "C", "D"];
+
+  function initQuiz() {
+    renderGridDrawer();
+    loadQuestion(0);
+    updateProgress();
   }
 
-  updateGridStyles();
-}
-
-function handleSelectOption(optIdx) {
-  userAnswers[currentIdx] = optIdx;
-  renderQuestion();
-  updateProgress();
-}
-
-function prevQuestion() {
-  if (currentIdx > 0) {
-    currentIdx--;
-    renderQuestion();
+  function renderGridDrawer() {
+    questionsGrid.innerHTML = "";
+    quizData.forEach((_, idx) => {
+      const bubble = document.createElement("button");
+      bubble.className = "q-bubble";
+      bubble.textContent = idx + 1;
+      bubble.id = `bubble-${idx}`;
+      bubble.addEventListener("click", () => {
+        gridDrawer.classList.remove("open");
+        loadQuestion(idx);
+      });
+      questionsGrid.appendChild(bubble);
+    });
   }
-}
 
-function nextQuestion() {
-  if (currentIdx < quizData.length - 1) {
-    currentIdx++;
-    renderQuestion();
-  } else {
-    submitQuiz();
+  function updateGridStatus() {
+    quizData.forEach((_, idx) => {
+      const bubble = document.getElementById(`bubble-${idx}`);
+      if (!bubble) return;
+      bubble.className = "q-bubble";
+      if (userAnswers[idx] !== null) {
+        bubble.classList.add("answered");
+      }
+      if (idx === currentIdx) {
+        bubble.classList.add("current");
+      }
+    });
   }
-}
 
-function updateProgress() {
-  const answeredCount = userAnswers.filter(a => a !== null).length;
-  const pct = (answeredCount / quizData.length) * 100;
-  document.getElementById("progressBar").style.width = `${pct}%`;
-  document.getElementById("answeredCounter").innerText = `${answeredCount} / ${quizData.length} Answered`;
-}
+  function updateProgress() {
+    const answeredCount = userAnswers.filter(a => a !== null).length;
+    const pct = Math.round((answeredCount / quizData.length) * 100);
+    progressFill.style.width = `${pct}%`;
+    answeredCounter.textContent = `${answeredCount} / ${quizData.length} Answered`;
+    currentCounter.textContent = `Question ${currentIdx + 1} of ${quizData.length}`;
+    updateGridStatus();
+  }
 
-function updateGridStyles() {
-  quizData.forEach((_, idx) => {
-    const el = document.getElementById(`grid-item-${idx}`);
-    if (!el) return;
-    el.className = "grid-item";
-    if (idx === currentIdx) {
-      el.classList.add("active");
+  function loadQuestion(idx) {
+    currentIdx = idx;
+    const data = quizData[idx];
+
+    // Reset card
+    stemText.textContent = `${idx + 1}. ${data.q}`;
+    optionsGrid.innerHTML = "";
+
+    const isAnswered = userAnswers[idx] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerHTML = `<span class="option-badge">${optionLetters[optIdx]}</span><span>${optText}</span>`;
+
+      if (isAnswered) {
+        btn.disabled = true;
+        const selected = userAnswers[idx];
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          if (selected === optIdx) {
+            btn.innerHTML += `<span class="status-tag">CORRECT</span>`;
+          }
+        } else if (selected === optIdx) {
+          btn.classList.add("incorrect");
+          btn.innerHTML += `<span class="status-tag">INCORRECT</span>`;
+        }
+      } else {
+        btn.addEventListener("click", () => handleSelectOption(optIdx));
+      }
+
+      optionsGrid.appendChild(btn);
+    });
+
+    if (isAnswered) {
+      rationaleText.textContent = data.explanation;
+      rationaleCard.style.display = "block";
+    } else {
+      rationaleCard.style.display = "none";
     }
-    if (userAnswers[idx] !== null) {
-      el.classList.add("answered");
+
+    // Navigation buttons
+    prevBtn.disabled = currentIdx === 0;
+    if (currentIdx === quizData.length - 1) {
+      nextBtn.textContent = "Finish Test";
+    } else {
+      nextBtn.textContent = "Next";
+    }
+
+    updateProgress();
+  }
+
+  function handleSelectOption(selectedIdx) {
+    if (userAnswers[currentIdx] !== null) return;
+
+    userAnswers[currentIdx] = selectedIdx;
+    loadQuestion(currentIdx);
+  }
+
+  function showScorecard() {
+    cardBody.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.style.display = "flex";
+
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const incorrectCount = quizData.length - correctCount;
+    const finalPct = Math.round((correctCount / quizData.length) * 100);
+
+    scorePct.textContent = `${finalPct}%`;
+    totalCorrect.textContent = correctCount;
+    totalIncorrect.textContent = incorrectCount;
+  }
+
+  // Event Listeners
+  prevBtn.addEventListener("click", () => {
+    if (currentIdx > 0) loadQuestion(currentIdx - 1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (currentIdx < quizData.length - 1) {
+      loadQuestion(currentIdx + 1);
+    } else {
+      showScorecard();
     }
   });
-}
 
-function submitQuiz() {
-  document.getElementById("questionCard").style.display = "none";
-  document.getElementById("navBar").style.display = "none";
-  document.getElementById("gridModal").classList.remove("open");
-  document.getElementById("listToggleBtn").style.display = "none";
-
-  let correctCount = 0;
-  userAnswers.forEach((ans, idx) => {
-    if (ans === quizData[idx].correct) correctCount++;
+  restartBtn.addEventListener("click", () => {
+    for (let i = 0; i < userAnswers.length; i++) {
+      userAnswers[i] = null;
+    }
+    scorecard.style.display = "none";
+    cardBody.style.display = "block";
+    navBar.style.display = "flex";
+    loadQuestion(0);
   });
 
-  const percent = Math.round((correctCount / quizData.length) * 100);
-  document.getElementById("scorePercent").innerText = `${percent}%`;
-  document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
-  document.getElementById("scoreIncorrect").innerText = `Incorrect: ${quizData.length - correctCount}`;
-  document.getElementById("scoreCard").style.display = "flex";
-}
+  openDrawerBtn.addEventListener("click", () => {
+    gridDrawer.classList.add("open");
+  });
 
-function restartQuiz() {
-  userAnswers = new Array(quizData.length).fill(null);
-  currentIdx = 0;
-  document.getElementById("questionCard").style.display = "flex";
-  document.getElementById("navBar").style.display = "flex";
-  document.getElementById("listToggleBtn").style.display = "inline-block";
-  document.getElementById("scoreCard").style.display = "none";
+  closeDrawerBtn.addEventListener("click", () => {
+    gridDrawer.classList.remove("open");
+  });
+
+  // Start quiz on load
   initQuiz();
-}
-
-window.onload = initQuiz;
 </script>
+
 </body>
 </html>
