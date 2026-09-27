@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immunology Ch. 9: Immunological Tolerance & Autoimmunity - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Immunology — Chapter 9: Immunological Tolerance & Autoimmunity</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Chapter 9 content
+  const quizData = [
+    {
+      q: "What is the immunological definition of 'tolerance'?",
+      options: [
+        "A hyper-reactive state of memory B cells following viral challenge",
+        "A state of unresponsiveness of lymphocytes to an individual's own self-antigens",
+        "The permanent destruction of hematopoietic stem cells in the bone marrow",
+        "The rapid secretion of polyreactive IgM by marginal zone B cells"
+      ],
+      correct: 1,
+      explanation: "Immunological tolerance is the acquired state of antigen-specific unresponsiveness of lymphocytes to self-antigens, ensuring the immune system does not attack host tissues."
+    },
+    {
+      q: "What phenomenon describes when lymphocytes are physically exposed to an antigen in tissues but simply ignore its presence without active suppression or activation?",
+      options: [
+        "Receptor editing",
+        "Immunological ignorance",
+        "Anergy",
+        "Clonal deletion"
+      ],
+      correct: 1,
+      explanation: "Immunological ignorance occurs when self-reactive lymphocytes fail to recognize or respond to an antigen (often because it is sequestered or at very low concentration), neither attacking it nor undergoing active tolerance."
+    },
+    {
+      q: "Where does Central Tolerance take place for T and B lymphocytes respectively?",
+      options: [
+        "Spleen for T cells; Lymph nodes for B cells",
+        "Thymus for T cells; Bone marrow for B cells",
+        "Lamina propria for T cells; Peyer's patches for B cells",
+        "Bloodstream for T cells; Spleen red pulp for B cells"
+      ],
+      correct: 1,
+      explanation: "Central tolerance occurs within generative (primary) lymphoid organs during lymphocyte development: the thymus for T lymphocytes and the bone marrow for B lymphocytes."
+    },
+    {
+      q: "During lymphocyte development in generative lymphoid organs, which stromal-derived cytokine drives the proliferation of lymphoid progenitors?",
+      options: [
+        "Interferon-gamma (IFN-γ)",
+        "Interleukin-7 (IL-7)",
+        "Interleukin-4 (IL-4)",
+        "Transforming Growth Factor-beta (TGF-β)"
+      ],
+      correct: 1,
+      explanation: "IL-7 produced by stromal cells in the bone marrow and thymus provides essential survival and proliferative signals for developing pro- and pre-lymphocytes."
+    },
+    {
+      q: "What is the golden rule for survival during the positive selection of immature T lymphocytes in the thymus?",
+      options: [
+        "Strong, high-affinity recognition of self-peptides presented on MHC",
+        "Weak, low-affinity recognition of self-peptide-MHC complexes",
+        "Complete failure to bind any self-MHC molecule",
+        "Spontaneous secretion of Granzyme B without TCR engagement"
+      ],
+      correct: 1,
+      explanation: "Positive selection requires weak (low-affinity) recognition of self-peptide-MHC complexes, ensuring that mature T cells are MHC-restricted and functional without being overtly autoreactive."
+    },
+    {
+      q: "What are the two major fates of immature CD4+ thymocytes that exhibit high-affinity (strong) recognition of self-antigens during central tolerance?",
+      options: [
+        "Rapid exit to the spleen as naive T cells OR class switching to IgD",
+        "Apoptosis (negative selection/deletion) OR differentiation into Regulatory T cells (Tregs)",
+        "Immediate clonal expansion into memory CTLs OR secretion of IL-2",
+        "Conversion into follicular dendritic cells OR permanent G0 arrest"
+      ],
+      correct: 1,
+      explanation: "Strong self-antigen recognition in the thymic medulla triggers negative selection (apoptotic deletion) or directs some CD4+ thymocytes into immunosuppressive FoxP3+ Regulatory T cells (nTregs)."
+    },
+    {
+      q: "Which tolerance mechanism is unique to immature B lymphocytes in the bone marrow and does NOT occur in developing T cells?",
+      options: [
+        "Apoptotic clonal deletion",
+        "Receptor editing (re-activation of RAG to express a new light chain)",
+        "Anergy induction",
+        "Differentiation into memory cells"
+      ],
+      correct: 1,
+      explanation: "Receptor editing is unique to immature B cells. Upon strongly encountering self-antigens, RAG genes remain active to rearrange upstream V and J light-chain gene segments, creating a new, non-autoreactive BCR."
+    },
+    {
+      q: "What cellular state is induced when a mature naive T cell recognizes antigen (Signal 1) on a resting APC that lacks B7 co-stimulators (Signal 2)?",
+      options: [
+        "Massive autocrine IL-2 secretion and clonal expansion",
+        "Cell-intrinsic anergy (functional unresponsiveness)",
+        "Immediate somatic hypermutation of its TCR alpha chain",
+        "Differentiation into inflammatory Th17 effectors"
+      ],
+      correct: 1,
+      explanation: "Recognition of antigen without co-stimulation (or in the presence of CTLA-4/PD-1 engagement) induces anergy, a prolonged state of biochemical unresponsiveness."
+    },
+    {
+      q: "Which master lineage-defining transcription factor and surface cytokine receptor chain are characteristically expressed by Regulatory T cells (Tregs)?",
+      options: [
+        "T-bet and CD40L",
+        "FoxP3 and CD25 (IL-2Rα)",
+        "GATA-3 and CD16",
+        "RORγt and CD62L"
+      ],
+      correct: 1,
+      explanation: "Tregs are defined by the master transcription factor FoxP3 and high constitutive surface expression of CD25, the alpha chain of the high-affinity IL-2 receptor."
+    },
+    {
+      q: "How do Regulatory T cells consume local IL-2 to suppress the proliferation of conventional effector T cells?",
+      options: [
+        "They secrete proteases that enzymatically degrade extracellular IL-2",
+        "They express high levels of CD25 (IL-2Rα) to competitively absorb and 'starve' effector T cells of IL-2",
+        "They mutate the IL-2 gene locus inside nearby dendritic cells",
+        "They transport IL-2 into lysosomes of vascular endothelial cells"
+      ],
+      correct: 1,
+      explanation: "Tregs express high concentrations of high-affinity IL-2 receptors (CD25) and act as an IL-2 'sink,' depleting this essential survival and proliferation cytokine from nearby conventional T cells."
+    },
+    {
+      q: "Which inhibitory cytokine pair is primarily secreted by Tregs to suppress dendritic cells, macrophages, and effector T lymphocytes?",
+      options: [
+        "IL-12 and IFN-γ",
+        "IL-10 and TGF-β",
+        "IL-4 and IL-5",
+        "IL-17 and IL-22"
+      ],
+      correct: 1,
+      explanation: "Tregs exert broad immunosuppressive effects through the secretion of anti-inflammatory cytokines, specifically Interleukin-10 (IL-10) and Transforming Growth Factor-beta (TGF-β)."
+    },
+    {
+      q: "How does surface CTLA-4 expressed on Regulatory T cells inhibit antigen-presenting cells from activating naive T cells?",
+      options: [
+        "It cleaves peptide fragments off of MHC Class II molecules",
+        "It binds B7-1 (CD80) and B7-2 (CD86) with high affinity, physically blocking co-stimulation via CD28",
+        "It injects perforin directly into the APC cytoplasm",
+        "It upregulates MHC Class I molecules on red blood cells"
+      ],
+      correct: 1,
+      explanation: "CTLA-4 on Tregs binds B7-1 and B7-2 on APCs with much higher affinity and avidity than CD28, blocking the co-stimulatory signal needed to prime conventional naive T cells."
+    },
+    {
+      q: "Which two distinct biochemical pathways can trigger apoptotic deletion during peripheral T cell tolerance?",
+      options: [
+        "The JAK-STAT pathway and the Notch signaling pathway",
+        "The Mitochondrial (intrinsic) pathway and the Death Receptor (Fas/FasL extrinsic) pathway",
+        "The Wnt pathway and the MAP kinase cascade",
+        "The alternative complement cascade and the perforin pathway"
+      ],
+      correct: 1,
+      explanation: "Peripheral deletion occurs via the intrinsic mitochondrial pathway (Bim activation releasing pro-apoptotic cytochrome c/caspases) or the extrinsic death-receptor pathway (Fas-FasL engagement activating Caspase-8)."
+    },
+    {
+      q: "Why do microbial foreign antigens typically trigger robust immunity whereas self-antigens induce tolerance?",
+      options: [
+        "Microbes provide PAMPs that induce strong APC co-stimulation (B7) and are cleared rapidly; self-antigens persist long-term without co-stimulation",
+        "Self-antigens exclusively bind to membrane IgD and bypass all helper T cells",
+        "Microbes lack protein peptides and only express pure polysaccharides",
+        "Self-antigens always activate terminal complement components directly"
+      ],
+      correct: 0,
+      explanation: "Microbes stimulate innate receptors to express co-stimulators and inflammatory cytokines (short, intense exposure), while self-antigens are displayed in steady-state tissues without co-stimulation for a lifetime, driving tolerance."
+    },
+    {
+      q: "In germinal centers, somatic hypermutation (SHM) can accidentally generate autoreactive B cell receptors. How are these dangerous clones eliminated?",
+      options: [
+        "They undergo immediate receptor editing in the spleen",
+        "They fail to receive Tfh survival signals and are killed via Fas-FasL interactions with follicular T cells/Tregs",
+        "They are actively converted into natural killer cells by FDCs",
+        "They downregulate light chains and become mature plasma cells"
+      ],
+      correct: 1,
+      explanation: "Autoreactive GC B cells cannot obtain helper signals from non-autoreactive Tfh cells and express high levels of Fas (CD95), predisposing them to FasL-mediated apoptotic deletion."
+    },
+    {
+      q: "Mutations in the death receptor gene FAS or its ligand FASL lead to which human autoimmune syndrome characterized by defective lymphocyte apoptosis?",
+      options: [
+        "IPEX syndrome",
+        "Autoimmune Lymphoproliferative Syndrome (ALPS)",
+        "Autoimmune Polyendocrine Syndrome type 1 (APS-1)",
+        "X-linked Agammaglobulinemia"
+      ],
+      correct: 1,
+      explanation: "Defects in Fas (CD95) or FasL impair activation-induced cell death of self-reactive mature lymphocytes, resulting in Autoimmune Lymphoproliferative Syndrome (ALPS), lymphadenopathy, and autoimmune cytopenias."
+    },
+    {
+      q: "Which anatomical compartment of the human gastrointestinal tract harbors the highest microbial density (10^9 to 10^12 cells/mL)?",
+      options: [
+        "Stomach lumen",
+        "Duodenum",
+        "Colon (Large Intestine)",
+        "Esophagus"
+      ],
+      correct: 2,
+      explanation: "The colon contains the highest bacterial density (10^9–10^12 per mL), composed of >99% obligate anaerobes that ferment dietary fibers and synthesize essential vitamins."
+    },
+    {
+      q: "How do intestinal dendritic cells maintain tolerance to commensal bacteria under steady-state healthy conditions?",
+      options: [
+        "They express high levels of B7-1 and B7-2 to constantly stimulate CTLs",
+        "Their TLR responsiveness is suppressed, and they stimulate anti-inflammatory Treg differentiation producing IL-10",
+        "They migrate directly into the maternal placenta to eliminate paternal antigens",
+        "They phagocytose all commensal bacteria within the stomach within 10 minutes"
+      ],
+      correct: 1,
+      explanation: "Intestinal APCs exhibit downregulated TLR responsiveness in steady-state, upregulate SOCS proteins, and promote the expansion of IL-10-producing regulatory T cells, preventing pathological inflammation."
+    },
+    {
+      q: "What is the primary immunological challenge regarding maternal tolerance of the mammalian fetus?",
+      options: [
+        "The fetus expresses maternal IgM that triggers autoimmune hemolytic disease",
+        "The fetus expresses paternal antigens that are semi-allogeneic (foreign) to the maternal immune system",
+        "The fetal amnion constantly secretes bacterial LPS into the uterine lumen",
+        "Maternal neutrophils lack MHC Class I molecules entirely during pregnancy"
+      ],
+      correct: 1,
+      explanation: "Because half of the fetal genome is paternal, the fetus is a semi-allogeneic graft that expresses foreign paternal MHC and minor antigens that could theoretically provoke maternal immune rejection."
+    },
+    {
+      q: "Which specialized placental cell layer forms the continuous outer boundary in contact with maternal blood and acts as a physical barrier to maternal cell infiltration?",
+      options: [
+        "Decidual stromal cell",
+        "Syncytiotrophoblast (sTB)",
+        "Amniotic mesenchyme",
+        "Cytotrophoblast progenitor"
+      ],
+      correct: 1,
+      explanation: "The syncytiotrophoblast forms a multinucleated continuous syncytial barrier lacking classical polymorphic MHC Class I/II molecules, preventing maternal immune cell invasion into the fetal stroma."
+    },
+    {
+      q: "Which HLA allele exhibits the highest known relative risk (~90) for developing Ankylosing Spondylitis?",
+      options: [
+        "HLA-DR4",
+        "HLA-B27",
+        "HLA-DQ2",
+        "HLA-A2"
+      ],
+      correct: 1,
+      explanation: "Possession of the MHC Class I allele HLA-B27 confers a relative risk of approximately 90 for the development of Ankylosing Spondylitis."
+    },
+    {
+      q: "A single-gene mutation in the Autoimmune Regulator (AIRE) gene results in which severe clinical autoimmune syndrome?",
+      options: [
+        "IPEX syndrome",
+        "Autoimmune Polyendocrine Syndrome Type 1 (APS-1)",
+        "Severe Combined Immunodeficiency (SCID)",
+        "Systemic Lupus Erythematosus (SLE)"
+      ],
+      correct: 1,
+      explanation: "AIRE directs the promiscuous expression of tissue-specific antigens (e.g., insulin) in medullary thymic epithelial cells. Mutations in AIRE prevent negative selection of self-reactive T cells, causing APS-1."
+    },
+    {
+      q: "Genetic mutations in FOXP3 lead to IPEX syndrome, which is clinically characterized by:",
+      options: [
+        "Absence of mature B cells and lack of all circulating antibodies",
+        "Deficiency of functional Tregs leading to multi-organ autoimmunity (enteropathy, polyendocrinopathy)",
+        "Severe isolated susceptibility to encapsulated bacteria",
+        "Complete failure of thymic development"
+      ],
+      correct: 1,
+      explanation: "FOXP3 is the master regulator for Treg development. Mutations cause IPEX (Immune dysregulation, Polyendocrinopathy, Enteropathy, X-linked syndrome) due to uninhibited autoreactive T cells."
+    },
+    {
+      q: "What is the primary pathogenic mechanism underlying 'Molecular Mimicry' in the development of post-infectious autoimmunity?",
+      options: [
+        "Microbial toxins directly cleave host Fc receptors on regulatory T cells",
+        "Microbial peptides share sequence or conformational homology with self-peptides, causing antimicrobial T cells or antibodies to cross-react with self-tissues",
+        "Infections alter the pH of lysosomes to permanently halt antigen presentation",
+        "Pathogens fuse with host beta-cells to alter their MHC Class II promoter"
+      ],
+      correct: 1,
+      explanation: "Molecular mimicry occurs when microbial antigens share structural homology with host self-peptides; the immune response targeted against the pathogen cross-reacts with and attacks host tissues."
+    },
+    {
+      q: "How can local bacterial or viral infections break self-tolerance through the 'Induction of Co-stimulation' (bystander activation)?",
+      options: [
+        "Microbes trigger local inflammation, inducing tissue APCs to upregulate B7 molecules and present self-antigens with Signal 2 to self-reactive T cells",
+        "Infections destroy all FoxP3 genes in the bone marrow",
+        "Microbes encode synthetic CD28 antagonists that prevent anergy",
+        "Infectious virions convert all peripheral T cells into syncytiotrophoblasts"
+      ],
+      correct: 0,
+      explanation: "Resting APCs displaying self-antigens normally induce anergy. Infectious inflammation stimulates APCs via TLRs to express high levels of B7 and inflammatory cytokines, inappropriately providing Signal 2 to self-reactive T cells."
+    },
+    {
+      q: "A non-MHC polymorphism in the PTPN22 gene is strongly linked to which autoimmune disease by altering the threshold of antigen receptor signaling?",
+      options: [
+        "Rheumatoid Arthritis (RA)",
+        "Pemphigus vulgaris",
+        "Diphtheria",
+        "Congenital thymic aplasia"
+      ],
+      correct: 0,
+      explanation: "PTPN22 encodes a protein tyrosine phosphatase that sets the threshold for TCR/BCR signaling; functional variants are associated with Rheumatoid Arthritis, Type 1 Diabetes, and systemic autoimmunity."
+    },
+    {
+      q: "What role does the cytokine IL-23 and its receptor (IL-23R) play in the genetic susceptibility to chronic inflammatory diseases such as Psoriasis and IBD?",
+      options: [
+        "Promoting the terminal survival and pathogenic maintenance of inflammatory Th17 cells",
+        "Directly activating classical M1 macrophage phagocyte oxidase",
+        "Suppressing CD40L expression on germinal center Tfh cells",
+        "Inducing receptor editing in the bone marrow stroma"
+      ],
+      correct: 0,
+      explanation: "IL-23 signaling through IL-23R is essential for sustaining and amplifying pro-inflammatory Th17 responses, which recruit neutrophils and drive barrier-tissue autoimmunity in psoriasis and Crohn's disease."
+    },
+    {
+      q: "Why are inherited deficiencies in early Classical complement proteins (C1q, C2, C4) paradoxically linked to the development of Systemic Lupus Erythematosus (SLE)?",
+      options: [
+        "Failure of C1/C4/C2 prevents clearance of apoptotic cellular debris and immune complexes, providing persistent self-antigens that break B cell tolerance",
+        "Complement deficiency causes massive overproduction of granzyme B",
+        "Early complement proteins are required to transcribe the FOXP3 gene",
+        "Without C1q, B cells are unable to express surface IgM"
+      ],
+      correct: 0,
+      explanation: "Early classical complement proteins mediate the rapid opsonization and clearance of apoptotic bodies and circulating immune complexes. Their absence leads to prolonged exposure of nuclear self-antigens, promoting SLE."
+    },
+    {
+      q: "In peripheral B cell tolerance, what occurs when a self-reactive mature B cell repeatedly encounters self-antigens in the absence of CD4+ helper T cell help?",
+      options: [
+        "The B cell switches its heavy chain to IgE and migrates to mucosa",
+        "The B cell undergoes functional inactivation (anergy) or apoptotic deletion",
+        "The B cell mutates into an follicular dendritic cell (FDC)",
+        "The B cell immediately forms a germinal center without T cells"
+      ],
+      correct: 1,
+      explanation: "Encountering self-antigens without T cell help (lack of CD40L and cytokines) fails to activate the B cell, resulting in receptor downregulation, anergy, exclusion from lymphoid follicles, and apoptosis."
+    },
+    {
+      q: "Which immunological factor is primarily responsible for shifting the maternal-fetal interface away from destructive inflammatory reactions toward tolerance?",
+      options: [
+        "Maternal production of high-affinity cytotoxic antibodies against fetal HLA-A",
+        "Local recruitment of paternal FoxP3+ Tregs and suppression of inflammatory Th1/CTL pathways",
+        "Complete degradation of the uterine endometrium by basophils",
+        "Continuous lysis of fetal trophoblasts by maternal classical complement"
+      ],
+      correct: 1,
+      explanation: "Maternal tolerance is maintained by local expansion of antigen-specific FoxP3+ Tregs, high levels of anti-inflammatory cytokines, and active suppression of cell-mediated Th1 and CTL responses."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
