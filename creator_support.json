@@ -1,0 +1,11 @@
+{
+  "holderName": "Nihrantz",
+  "accountNumber": "001-984210-883",
+  "bankName": "Educational Quiz Fund",
+  "swiftCode": "",
+  "currency": "USD / International",
+  "message": "Help keep interactive HTML quizzes 100% free & open. All quiz modules are built as standalone, lightweight files without tracking or paywalls. Your generous donation funds curriculum research, hosting, and regular quiz expansions.",
+  "customQrImageUrl": "https://raw.githubusercontent.com/panicconandoyle-ctrl/Nihrantz-Quiz/main/assets/creator_qr.jpg",
+  "githubQrPath": "assets/creator_qr.jpg",
+  "githubCommitUrl": "https://github.com/panicconandoyle-ctrl/Nihrantz-Quiz/commit/dd03a82280035d85eae379eaa9c82c2680e7b4b9"
+}
