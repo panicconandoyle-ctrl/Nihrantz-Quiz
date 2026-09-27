@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 09: Citrobacter–Klebsiella–Enterobacter (CKE) Group Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Progress */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #c8d1ff;
+      color: #4255ff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .meta-counts {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #e6e9f2;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    /* Question Overview Modal / Grid */
+    .grid-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .grid-card.active {
+      display: block;
+    }
+
+    .grid-card h3 {
+      font-size: 0.9rem;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-btn {
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      border-color: #b8c4ff;
+      color: #4255ff;
+    }
+
+    .grid-btn.current {
+      border: 2px solid #4255ff;
+      font-weight: bold;
+      box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.18);
+    }
+
+    /* Main Question Card */
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .q-number-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .question-stem {
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #2e3856;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:hover:not(:disabled) {
+      border-color: #4255ff;
+      background: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .opt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #646f90;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 3px;
+    }
+
+    .opt-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* Feedback styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-tile.correct .opt-badge {
+      background: #18ae79;
+      color: #ffffff;
+    }
+    .option-tile.correct .opt-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-tile.incorrect .opt-badge {
+      background: #ff6871;
+      color: #ffffff;
+    }
+    .option-tile.incorrect .opt-tag {
+      display: inline-block;
+      background: #b31d27;
+      color: #ffffff;
+    }
+
+    /* Explanation Card */
+    .rationale-card {
+      margin-top: 20px;
+      background: #fbfcfe;
+      border: 1px solid #e0e5f2;
+      border-left: 4px solid #4255ff;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4255ff;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #2e3856;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid #d5daf0;
+      color: #2e3856;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-nav.primary:hover:not(:disabled) {
+      background: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Scorecard / Results View */
+    .scorecard {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      display: none;
+    }
+
+    .scorecard.active {
+      display: block;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 4px solid #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4255ff;
+      margin: 0 auto 20px;
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+    }
+
+    .score-breakdown {
+      font-size: 1rem;
+      color: #646f90;
+      margin-bottom: 24px;
+    }
+
+    .score-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #f6f7fb;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 110px;
+    }
+
+    .stat-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .stat-val.correct { color: #0e6948; }
+    .stat-val.incorrect { color: #b31d27; }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: #646f90;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Footer & Branding */
+    .footer-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .attribution {
+      font-style: italic;
+      font-weight: bold;
+      color: #2e3856;
+      font-size: 0.88rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f0f2f7;
+      color: #2e3856;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      border: 1px solid #e0e5f2;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header / Progress Bar -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Lesson 09: Citrobacter–Klebsiella–Enterobacter (CKE) Group Quiz</h1>
+          <p>Applied Bacteriology Course &bull; 30 High-Yield Test Questions</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-toggle-grid" id="toggleGridBtn" onclick="toggleGrid()">View List</button>
+          <div class="meta-counts" id="metaCounter">1 / 30</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Question Overview Grid -->
+    <div class="grid-card" id="gridCard">
+      <h3>Question Navigator</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div class="quiz-card" id="quizCard">
+      <span class="q-number-tag" id="qNumberTag">Question 1</span>
+      <div class="question-stem" id="questionStem">Loading question...</div>
+      
+      <div class="options-group" id="optionsGroup"></div>
+
+      <div class="rationale-card" id="rationaleCard">
+        <div class="rationale-title">Explanation & Rationale</div>
+        <div class="rationale-text" id="rationaleText"></div>
+      </div>
+
+      <div class="nav-controls">
+        <button class="btn-nav" id="prevBtn" onclick="navigate(-1)">Previous</button>
+        <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard Interface -->
+    <div class="scorecard" id="scorecard">
+      <div class="score-circle" id="scoreCircle">0%</div>
+      <h2 class="score-title" id="scoreTitle">Exam Completed!</h2>
+      <p class="score-breakdown" id="scoreBreakdown">You answered 0 out of 30 questions correctly.</p>
+      
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val correct" id="statCorrect">0</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val incorrect" id="statIncorrect">0</div>
+          <div class="stat-lbl">Incorrect</div>
+        </div>
+      </div>
+
+      <button class="btn-nav primary" style="padding: 12px 28px;" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer & Attribution -->
+    <div class="footer-card">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a class="social-btn" href="https://www.facebook.com/nihrantz/" target="_blank" title="Facebook">F</a>
+        <a class="social-btn" href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" title="Instagram">I</a>
+        <a class="social-btn" href="https://t.me/Nihrantz" target="_blank" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Which specific Citrobacter species is notoriously associated with neonatal meningitis complicated by multiple brain abscesses?",
+        options: [
+          "Citrobacter freundii",
+          "Citrobacter amalonaticus",
+          "Citrobacter koseri",
+          "Citrobacter braakii"
+        ],
+        correct: 2,
+        explanation: "Citrobacter koseri (formerly Citrobacter diversus) has a documented predilection for causing severe neonatal meningitis frequently complicated by necrotizing brain abscesses (mnemonic: 'C. koseri = Kills neonates / brain abscesses')."
+      },
+      {
+        q: "What key biochemical reaction readily differentiates Citrobacter freundii from Citrobacter koseri on Triple Sugar Iron (TSI) or Kligler Iron Agar (KIA)?",
+        options: [
+          "C. freundii produces hydrogen sulfide (H₂S+), whereas C. koseri is H₂S negative",
+          "C. freundii is non-motile, whereas C. koseri is motile",
+          "C. freundii is ONPG negative, whereas C. koseri is ONPG positive",
+          "C. freundii is Voges-Proskauer positive, whereas C. koseri is VP negative"
+        ],
+        correct: 0,
+        explanation: "C. freundii produces H₂S (resulting in black precipitate and 'stench' on TSI/KIA), whereas C. koseri and C. amalonaticus are H₂S negative and closely mimic citrate-positive E. coli."
+      },
+      {
+        q: "Which microscopic and motility characteristic is a definitive diagnostic feature of the genus Klebsiella compared to Citrobacter and Enterobacter?",
+        options: [
+          "Presence of peritrichous flagella with rapid darting motility",
+          "Absence of motility (non-motile) and presence of a heavy polysaccharide capsule",
+          "Gram-positive spore-forming rod morphology",
+          "Monotrichous polar flagellation"
+        ],
+        correct: 1,
+        explanation: "Klebsiella species are characteristically non-motile (flagella absent) and possess a prominent polysaccharide capsule that gives colonies a thick, mucoid, viscous appearance on agar."
+      },
+      {
+        q: "What laboratory test evaluates the hypermucoviscosity of heavily capsulated Klebsiella colonies by stretching a viscous filament with an inoculation loop?",
+        options: [
+          "Elek test",
+          "String test",
+          "CAMP test",
+          "Nagler reaction"
+        ],
+        correct: 1,
+        explanation: "The 'string test' is positive when a bacteriological loop touches a mucoid Klebsiella colony and pulls up a viscous string or filament measuring >5 mm."
+      },
+      {
+        q: "Which biochemical test is most reliable for differentiating Klebsiella oxytoca from Klebsiella pneumoniae?",
+        options: [
+          "Voges-Proskauer (VP) test",
+          "Urease test",
+          "Indole test",
+          "Citrate utilization test"
+        ],
+        correct: 2,
+        explanation: "Klebsiella pneumoniae is Indole negative, whereas Klebsiella oxytoca is Indole positive. Both organisms are typically VP positive, citrate positive, and urease positive."
+      },
+      {
+        q: "What distinct respiratory clinical syndrome with 'currant jelly sputum' and lobar cavitation is classically caused by Klebsiella pneumoniae?",
+        options: [
+          "Atypical walking pneumonia",
+          "Necrotizing lobar pneumonia (Friedländer's pneumonia)",
+          "Whooping cough (pertussis syndrome)",
+          "Bronchopulmonary allergic aspergillosis"
+        ],
+        correct: 1,
+        explanation: "K. pneumoniae produces necrotizing lobar pneumonia accompanied by destruction of alveolar tissue, cavity formation, and thick, blood-tinged, mucoid sputum classically termed 'currant jelly sputum'."
+      },
+      {
+        q: "Klebsiella oxytoca is uniquely associated with which gastrointestinal complication following therapy with penicillin-class antibiotics?",
+        options: [
+          "Pseudomembranous colitis mediated by TcdB",
+          "Antibiotic-associated hemorrhagic colitis",
+          "Whipple's disease",
+          "Gluten-sensitive enteropathy"
+        ],
+        correct: 1,
+        explanation: "Klebsiella oxytoca strains that produce cytotoxins can overgrow after penicillin-based antibiotic therapy and induce antibiotic-associated hemorrhagic colitis."
+      },
+      {
+        q: "Which chronic granulomatous disease of the upper respiratory tract is caused by Klebsiella pneumoniae subsp. rhinoscleromatis?",
+        options: [
+          "Ozena (atrophic rhinitis)",
+          "Rhinoscleroma",
+          "Laryngeal diphtheria",
+          "Epiglottitis"
+        ],
+        correct: 1,
+        explanation: "K. pneumoniae subsp. rhinoscleromatis causes rhinoscleroma, a chronic, progressive granulomatous condition that causes nodular induration and swelling of the nasal mucosa, pharynx, and larynx."
+      },
+      {
+        q: "Histopathological evaluation of biopsy tissue from a patient with suspected rhinoscleroma classically demonstrates which pathognomonic cellular finding?",
+        options: [
+          "Aschoff bodies",
+          "Mikulicz cells (foamy histiocytes containing bacteria)",
+          "Reed-Sternberg multinucleated giant cells",
+          "Psammoma calcification bodies"
+        ],
+        correct: 1,
+        explanation: "The histological hallmark of rhinoscleroma is the presence of Mikulicz cells—large foamy macrophages/histiocytes packed with intracellular bacilli."
+      },
+      {
+        q: "What are the primary clinical hallmarks of Ozena caused by Klebsiella pneumoniae subsp. ozaenae?",
+        options: [
+          "Hypertrophic polyps with acute watery rhinorrhea and preserved olfactory acuity",
+          "Destructive, foul-smelling atrophic rhinitis with mucosal crusting and patient anosmia",
+          "Severe necrotizing epiglottic stridor requiring urgent tracheostomy",
+          "Sudden-onset parotid gland enlargement and trismus"
+        ],
+        correct: 1,
+        explanation: "Ozena is characterized by progressive mucosal/turbinate atrophy, crust formation, and an offensive fetid odor (anosmia frequently prevents the patient from smelling their own discharge; 'Ozaenae = Odor + Atrophy')."
+      },
+      {
+        q: "The 'KES' (or KES-H) group within Enterobacteriaceae is grouped together biochemically based on which shared reaction?",
+        options: [
+          "Positive Voges-Proskauer (VP) reaction (acetoin production)",
+          "Positive hydrogen sulfide (H₂S) production on TSI",
+          "Inability to ferment glucose",
+          "Lack of catalase activity"
+        ],
+        correct: 0,
+        explanation: "The KES group (Klebsiella, Enterobacter, and Serratia, along with Hafnia) are characteristically Voges-Proskauer (VP) positive, meaning they utilize the butylene glycol pathway to produce acetoin."
+      },
+      {
+        q: "In the diagnostic algorithm for motile, VP-positive Enterobacteriaceae, which susceptibility test differentiates Enterobacter/Hafnia from Serratia?",
+        options: [
+          "Colistin susceptibility: Enterobacter/Hafnia are susceptible, while Serratia is intrinsically resistant",
+          "Penicillin G disc diffusion: Enterobacter is susceptible, while Serratia is resistant",
+          "Vancomycin disc test: Serratia is susceptible",
+          "Optochin susceptibility test"
+        ],
+        correct: 0,
+        explanation: "In the KES-H diagnostic pathway, motile VP(+) rods are separated by colistin: Enterobacter and Hafnia are colistin-susceptible, whereas Serratia species are intrinsically resistant to colistin."
+      },
+      {
+        q: "Why are Enterobacter species described as 'late lactose fermenters' on MacConkey agar?",
+        options: [
+          "They lack beta-galactosidase (ONPG negative) entirely",
+          "They possess beta-galactosidase but may have slow or deficient beta-galactoside permease activity",
+          "They convert lactose directly into acetic acid within 30 minutes",
+          "They only ferment sucrose and maltose, never lactose"
+        ],
+        correct: 1,
+        explanation: "Enterobacter species are ONPG positive (produce beta-galactosidase) but may have slow lactose transport mechanisms (permease), often remaining colorless at 24 hours and developing pink colonies at 48 hours."
+      },
+      {
+        q: "What is the primary enzymatic mechanism that renders Enterobacter cloacae resistant to third-generation cephalosporins during hospital treatment?",
+        options: [
+          "Constitutive production of metallo-beta-lactamases only",
+          "Inducible chromosomal AmpC beta-lactamase production",
+          "Complete loss of outer membrane peptidoglycan",
+          "Ribosomal methylation via Erm enzymes"
+        ],
+        correct: 1,
+        explanation: "Enterobacter species carry inducible chromosomal AmpC beta-lactamase genes. Exposure to cephalosporins can select for derepressed mutants producing high levels of AmpC, conferring resistance to 3rd-generation cephalosporins."
+      },
+      {
+        q: "Which decarboxylase reaction profile accurately differentiates Enterobacter aerogenes from Enterobacter cloacae?",
+        options: [
+          "E. aerogenes is LDC (+), while E. cloacae is LDC (–)",
+          "E. aerogenes is ODC (–), while E. cloacae is ODC (+)",
+          "E. aerogenes is ADH (–), while E. cloacae is ADH (–)",
+          "Both species are completely negative for all decarboxylases"
+        ],
+        correct: 0,
+        explanation: "Enterobacter aerogenes is Lysine Decarboxylase positive (LDC+), Ornithine positive (ODC+), and Arginine positive (ADH+). Enterobacter cloacae is LDC negative (–), ODC positive (+), and ADH positive (+)."
+      },
+      {
+        q: "Which organism formerly classified as Enterobacter sakazakii produces distinct yellow colonies and causes neonatal sepsis and meningitis associated with powdered formula?",
+        options: [
+          "Pantoea agglomerans",
+          "Cronobacter sakazakii",
+          "Serratia marcescens",
+          "Citrobacter braakii"
+        ],
+        correct: 1,
+        explanation: "Enterobacter sakazakii was reclassified into the genus Cronobacter (Cronobacter sakazakii). It typically produces a yellow carotenoid pigment and causes devastating necrotizing enterocolitis and meningitis in neonates fed contaminated powdered infant formula."
+      },
+      {
+        q: "What visual clue on nutrient agar or MacConkey agar is characteristic of Cronobacter sakazakii?",
+        options: [
+          "Diffusible blue-green pyocyanin pigment",
+          "Yellow-pigmented colonies",
+          "Metallic sheen with black center",
+          "Deep violet-purple pigment"
+        ],
+        correct: 1,
+        explanation: "Cronobacter sakazakii produces distinct yellow pigmentation on agar, serving as a primary visual marker during microbiological identification."
+      },
+      {
+        q: "Which organism was previously designated as Enterobacter agglomerans before being reclassified into its own genus?",
+        options: [
+          "Hafnia alvei",
+          "Pantoea agglomerans",
+          "Edwardsiella tarda",
+          "Morganella morganii"
+        ],
+        correct: 1,
+        explanation: "Enterobacter agglomerans was reclassified into the genus Pantoea as Pantoea agglomerans, a plant-associated organism occasionally causing opportunistic human infections (e.g., thorn-prick synovitis or contaminated IV fluids)."
+      },
+      {
+        q: "Which biochemical test result is typical for the genus Citrobacter regarding Lysine Decarboxylase (LDC)?",
+        options: [
+          "Always LDC positive",
+          "LDC negative (–)",
+          "LDC variable depending solely on ambient oxygen levels",
+          "Rapid positive within 10 seconds"
+        ],
+        correct: 1,
+        explanation: "A key biochemical identification marker for all Citrobacter species is that they are Lysine Decarboxylase negative (LDC –), which helps distinguish them from Salmonella (mostly LDC +)."
+      },
+      {
+        q: "Which of the following describes the Voges-Proskauer (VP) reaction of Citrobacter species?",
+        options: [
+          "Strongly VP positive (+)",
+          "Voges-Proskauer negative (–)",
+          "Variable at 42°C but positive at 4°C",
+          "Only positive in the presence of indole"
+        ],
+        correct: 1,
+        explanation: "Unlike the KES group (Klebsiella, Enterobacter, Serratia), members of the genus Citrobacter are Voges-Proskauer negative (VP –)."
+      },
+      {
+        q: "Which organism within the CKE group is predominantly known to cause pyogenic liver abscesses, particularly reported in Asia and diabetic patients?",
+        options: [
+          "Citrobacter amalonaticus",
+          "Enterobacter cloacae",
+          "Hypervirulent Klebsiella pneumoniae",
+          "Citrobacter koseri"
+        ],
+        correct: 2,
+        explanation: "Hypervirulent strains of Klebsiella pneumoniae (often capsular serotypes K1 and K2) are recognized across Asia as a prominent cause of community-acquired monomicrobial pyogenic liver abscesses, frequently complicated by metastatic endophthalmitis."
+      },
+      {
+        q: "How does the urease activity of typical Klebsiella compare to Enterobacter?",
+        options: [
+          "Klebsiella is typically urease positive (+), while Enterobacter is typically urease negative (–)",
+          "Klebsiella is urease negative, while Enterobacter is strongly urease positive",
+          "Both genera are completely devoid of urease activity under all conditions",
+          "Both genera hydrolyze urea within 1 minute, identical to Proteus mirabilis"
+        ],
+        correct: 0,
+        explanation: "Klebsiella species are typically urease positive (producing ammonia and raising pH, turning Christensen's urea medium pink), whereas Enterobacter species are typically urease negative."
+      },
+      {
+        q: "What TSI (Triple Sugar Iron) slant reaction is classically given by Klebsiella pneumoniae and Enterobacter cloacae?",
+        options: [
+          "Alkaline slant / Alkaline butt (K/K), no gas, H₂S negative",
+          "Acid slant / Acid butt (A/A), gas positive, H₂S negative",
+          "Alkaline slant / Acid butt (K/A), gas negative, H₂S positive",
+          "Acid slant / Acid butt (A/A), gas negative, heavy H₂S positive"
+        ],
+        correct: 1,
+        explanation: "As lactose and glucose fermenters that produce gas during fermentation without producing hydrogen sulfide, Klebsiella and Enterobacter show an Acid/Acid (yellow/yellow) reaction with gas bubbles (gas+) and no blackening (H₂S–) on TSI."
+      },
+      {
+        q: "What test result differentiates Serratia from Enterobacter and Hafnia among the motile, VP-positive rods?",
+        options: [
+          "Gelatinase and DNase production (both positive in Serratia)",
+          "Glucose fermentation (negative in Serratia)",
+          "Catalase test (negative in Serratia)",
+          "Gram reaction (positive in Serratia)"
+        ],
+        correct: 0,
+        explanation: "Serratia is differentiated from Enterobacter and Hafnia by its ability to hydrolyze gelatin (Gelatinase +) and synthesize extracellular deoxyribonuclease (DNase +)."
+      },
+      {
+        q: "Why should incubation at both 22°C and 37°C be considered when biochemical reactions for some Klebsiella or Enterobacteriaceae are equivocal?",
+        options: [
+          "The bacteria die instantly if kept at 37°C for more than 4 hours",
+          "Certain enzymatic traits (e.g., Voges-Proskauer or ONPG) may test negative at 37°C but express clearly at 22°C",
+          "Flagella are exclusively synthesized at 42°C in Klebsiella",
+          "Capsule synthesis only occurs at refrigeration temperatures"
+        ],
+        correct: 1,
+        explanation: "Certain biochemical characteristics in Enterobacteriaceae (such as acetoin production for the VP test and ONPG hydrolysis) may yield false negatives at 37°C but become distinctly positive when incubated at room temperature (22°C)."
+      },
+      {
+        q: "In hospitalized patients with indwelling Foley catheters, what type of infection is most commonly caused by Citrobacter, Klebsiella, and Enterobacter?",
+        options: [
+          "Catheter-associated urinary tract infections (CAUTIs)",
+          "Subacute thyroiditis",
+          "Malignant external otitis",
+          "Trachomatous conjunctivitis"
+        ],
+        correct: 0,
+        explanation: "All three genera (Citrobacter, Klebsiella, Enterobacter) are major nosocomial opportunists that colonize urethral catheters, causing catheter-associated urinary tract infections (CAUTIs)."
+      },
+      {
+        q: "Which carbapenem-hydrolyzing beta-lactamase enzyme was originally discovered and named after Klebsiella pneumoniae?",
+        options: [
+          "TEM-1",
+          "KPC (Klebsiella pneumoniae carbapenemase)",
+          "SHV-1",
+          "CTX-M-15"
+        ],
+        correct: 1,
+        explanation: "KPC (Klebsiella pneumoniae carbapenemase) is a class A carbapenemase originally identified in K. pneumoniae that confers high-level resistance to penicillins, cephalosporins, and carbapenems."
+      },
+      {
+        q: "What is the natural habitat and mode of transmission of Citrobacter species?",
+        options: [
+          "Obligate intracellular parasites transmitted exclusively by arthropod vectors",
+          "Ubiquitous saprophytes in soil, water, and sewage, and commensals of the human GI tract causing opportunistic infections",
+          "Strict marine halophiles transmitted through ingestion of raw oysters",
+          "Avian-restricted respiratory commensals transmitted via aerosolized feathers"
+        ],
+        correct: 1,
+        explanation: "Citrobacter species live saprophytically in soil, water, food, and sewage, and colonize the human GI tract as transient commensals, causing opportunistic infections when host barriers or immunity break down."
+      },
+      {
+        q: "Which clinical specimen is essential to establish the microbiological diagnosis of Klebsiella- or Enterobacter-associated ventilator-associated pneumonia (VAP)?",
+        options: [
+          "Endotracheal aspirate or bronchoalveolar lavage (BAL) culture",
+          "Superficial swab of the external ear canal",
+          "Single random urine dipstick for nitrites",
+          "Stool microscopy for ova and parasites"
+        ],
+        correct: 0,
+        explanation: "Ventilator-associated pneumonia (VAP) is diagnosed via quantitative or semi-quantitative cultures of lower respiratory tract secretions obtained by endotracheal aspiration or bronchoalveolar lavage (BAL)."
+      },
+      {
+        q: "In low- and middle-income hospital environments (such as in Cambodia/ASEAN ICUs), what cornerstone strategy is most impactful to curb CKE outbreaks?",
+        options: [
+          "Routine prophylactic administration of colistin to all admitted patients",
+          "Strict infection prevention and control (hand hygiene, catheter bundles, and antibiotic stewardship)",
+          "Banning all invasive mechanical ventilation and urinary catheters entirely",
+          "Daily fumigation of patient wards with formaldehyde gas"
+        ],
+        correct: 1,
+        explanation: "Because CKE organisms are multidrug-resistant nosocomial pathogens spread via healthcare workers' hands and invasive medical devices, core infection prevention (hand hygiene, aseptic catheter care, and antibiotic stewardship) is far more effective and sustainable than treatment alone."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function init() {
+      buildGrid();
+      loadQuestion(0);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById("questionGrid");
+      grid.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `gridBtn_${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function toggleGrid() {
+      const gridCard = document.getElementById("gridCard");
+      const toggleBtn = document.getElementById("toggleGridBtn");
+      if (gridCard.classList.contains("active")) {
+        gridCard.classList.remove("active");
+        toggleBtn.textContent = "View List";
+      } else {
+        gridCard.classList.add("active");
+        toggleBtn.textContent = "Hide List";
+      }
+    }
+
+    function jumpToQuestion(index) {
+      currentQ = index;
+      loadQuestion(currentQ);
+      document.getElementById("quizCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function loadQuestion(index) {
+      currentQ = index;
+      const data = quizData[index];
+      const answered = userAnswers[index] !== null;
+
+      // Update Header & Counters
+      document.getElementById("qNumberTag").textContent = `Question ${index + 1} of ${quizData.length}`;
+      document.getElementById("metaCounter").textContent = `${index + 1} / ${quizData.length}`;
+      
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      const progressPct = (totalAnswered / quizData.length) * 100;
+      document.getElementById("progressBar").style.width = `${progressPct}%`;
+
+      // Update Question text
+      document.getElementById("questionStem").textContent = data.q;
+
+      // Render Options
+      const optionsGroup = document.getElementById("optionsGroup");
+      optionsGroup.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      data.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-tile";
+        btn.disabled = answered;
+
+        let tagText = "";
+        if (answered) {
+          if (optIdx === data.correct) {
+            btn.classList.add("correct");
+            tagText = "CORRECT";
+          } else if (optIdx === userAnswers[index]) {
+            btn.classList.add("incorrect");
+            tagText = "INCORRECT";
+          }
+        }
+
+        btn.innerHTML = `
+          <span class="opt-badge">${letters[optIdx]}</span>
+          <span class="opt-text">${optText}</span>
+          ${tagText ? `<span class="opt-tag">${tagText}</span>` : ""}
+        `;
+
+        if (!answered) {
+          btn.onclick = () => selectOption(optIdx);
+        }
+
+        optionsGroup.appendChild(btn);
+      });
+
+      // Rationale Box
+      const rationaleCard = document.getElementById("rationaleCard");
+      const rationaleText = document.getElementById("rationaleText");
+      if (answered) {
+        rationaleText.textContent = data.explanation;
+        rationaleCard.classList.add("show");
+      } else {
+        rationaleCard.classList.remove("show");
+      }
+
+      // Update Nav Buttons
+      document.getElementById("prevBtn").disabled = index === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      if (index === quizData.length - 1) {
+        nextBtn.textContent = "Finish & Review";
+      } else {
+        nextBtn.textContent = "Next";
+      }
+
+      // Update Grid Buttons state
+      updateGridUI();
+    }
+
+    function selectOption(selectedIdx) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = selectedIdx;
+      loadQuestion(currentQ);
+    }
+
+    function updateGridUI() {
+      quizData.forEach((_, idx) => {
+        const btn = document.getElementById(`gridBtn_${idx}`);
+        if (!btn) return;
+        btn.className = "grid-btn";
+        if (userAnswers[idx] !== null) {
+          btn.classList.add("answered");
+        }
+        if (idx === currentQ) {
+          btn.classList.add("current");
+        }
+      });
+    }
+
+    function navigate(delta) {
+      const nextIndex = currentQ + delta;
+      if (nextIndex >= 0 && nextIndex < quizData.length) {
+        loadQuestion(nextIndex);
+      } else if (nextIndex >= quizData.length) {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("gridCard").classList.remove("active");
+      document.getElementById("toggleGridBtn").style.display = "none";
+      
+      const scorecard = document.getElementById("scorecard");
+      scorecard.classList.add("active");
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) correctCount++;
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("scoreCircle").textContent = `${percentage}%`;
+      document.getElementById("scoreBreakdown").textContent = `You correctly answered ${correctCount} of ${quizData.length} questions.`;
+      document.getElementById("statCorrect").textContent = correctCount;
+      document.getElementById("statIncorrect").textContent = incorrectCount;
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("metaCounter").textContent = `${quizData.length} / ${quizData.length}`;
+
+      if (percentage >= 80) {
+        document.getElementById("scoreTitle").textContent = "Outstanding Performance!";
+      } else if (percentage >= 60) {
+        document.getElementById("scoreTitle").textContent = "Good Effort - Review Notes!";
+      } else {
+        document.getElementById("scoreTitle").textContent = "Keep Practicing Bacteriology!";
+      }
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById("scorecard").classList.remove("active");
+      document.getElementById("quizCard").style.display = "block";
+      document.getElementById("toggleGridBtn").style.display = "inline-block";
+      document.getElementById("toggleGridBtn").textContent = "View List";
+      loadQuestion(0);
+    }
+
+    // Initialize on page load
+    window.onload = init;
+  </script>
+</body>
+</html>
