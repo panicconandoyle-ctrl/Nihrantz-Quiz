@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology: Borrelia burgdorferi & Spirillum minus - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Applied Bacteriology — Lesson 03: Borrelia burgdorferi & Spirillum minus</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Lesson 03 content
+  const quizData = [
+    {
+      q: "Under microscopic visualization, how is Borrelia burgdorferi morphologically characterized?",
+      options: [
+        "Rigid, comma-shaped Gram-negative bacillus",
+        "Loose, helical (spiral-shaped) flexible and mobile bacterium",
+        "Encapsulated, non-motile coccobacillus",
+        "Spore-forming filamentous Gram-positive rod"
+      ],
+      correct: 1,
+      explanation: "Borrelia burgdorferi is a flexible, helical (spirochete) bacterium characterized by loose coils and active mobility under dark-field or special staining."
+    },
+    {
+      q: "Why is standard Gram staining ineffective for visualizing Borrelia burgdorferi in clinical specimens?",
+      options: [
+        "The bacteria dissolve instantly in 95% ethyl alcohol",
+        "The spirochetes are too slender and stain poorly with standard aniline dyes, appearing 'unstained'",
+        "The bacterial cell wall lacks peptidoglycan entirely",
+        "Borrelia synthesizes a thick silica shell that repels crystal violet"
+      ],
+      correct: 1,
+      explanation: "Spirochetes like Borrelia have very thin cell walls that do not retain standard Gram stain reagents well; they are typically visualized using dark-field microscopy, phase-contrast, or Giemsa/silver stains."
+    },
+    {
+      q: "Which specialized liquid culture medium serves as the recognized gold standard for cultivating Borrelia burgdorferi in vitro?",
+      options: [
+        "Loeffler serum slant",
+        "Barbour-Stoenner-Kelly (BSK) medium",
+        "Tinsdale tellurite agar",
+        "Thayer-Martin selective medium"
+      ],
+      correct: 1,
+      explanation: "Borrelia burgdorferi is a fastidious organism that requires complex liquid growth medium, specifically Barbour-Stoenner-Kelly (BSK) medium (e.g., BSK-II or BSK-H)."
+    },
+    {
+      q: "What is the primary arthropod vector responsible for transmitting Borrelia burgdorferi to humans?",
+      options: [
+        "Body lice (Pediculus humanus)",
+        "Hard-bodied ticks (Ixodes species)",
+        "Aedes mosquitoes",
+        "Rat fleas (Xenopsylla cheopis)"
+      ],
+      correct: 1,
+      explanation: "Borrelia burgdorferi is transmitted to humans through the bite of infected ticks, primarily Ixodes scapularis and Ixodes pacificus in North America, and Ixodes ricinus in Europe."
+    },
+    {
+      q: "What animal serves as the primary natural reservoir host for Borrelia burgdorferi in forested ecosystems?",
+      options: [
+        "Domestic cats",
+        "Wild rodents (e.g., mice)",
+        "Migratory waterfowl",
+        "Honeybees"
+      ],
+      correct: 1,
+      explanation: "Wild rodents (such as white-footed mice) serve as the essential natural reservoir host where the bacteria multiply and persist without causing severe clinical disease."
+    },
+    {
+      q: "Approximately what is the estimated probability of acquiring Lyme disease following an individual tick bite in an endemic area?",
+      options: [
+        "Greater than 80%",
+        "Approximately 50%",
+        "Relatively low, estimated at less than 1% (<1%)",
+        "Exactly 25% across all seasons"
+      ],
+      correct: 2,
+      explanation: "Even in endemic areas, the transmission probability per bite is low (<1%), because not all ticks are infected and spirochete transmission typically requires prolonged tick attachment (usually >24–36 hours)."
+    },
+    {
+      q: "Which outer surface proteins of Borrelia burgdorferi undergo antigenic variation to mediate immune evasion, and where are their genes encoded?",
+      options: [
+        "ActA proteins encoded on the main circular chromosome",
+        "Outer Surface Proteins (Osp), with some genes encoded on linear or circular plasmids",
+        "Fragment A and B ADP-ribosyltransferases",
+        "Pore-forming listeriolysins located on transposons"
+      ],
+      correct: 1,
+      explanation: "Outer Surface Proteins (such as OspA, OspC) undergo differential expression and antigenic variation during tick feeding and mammalian infection; these genes are notably located on the organism's unique linear and circular plasmids."
+    },
+    {
+      q: "What is the hallmark clinical skin lesion of Stage I (Early Localized) Lyme disease?",
+      options: [
+        "Acrodermatitis chronica atrophicans",
+        "Erythema migrans (centrifugally expanding 'bullseye' rash)",
+        "Lymphocytoma cutis on the earlobe",
+        "Purulent impetigo with honey-colored crusts"
+      ],
+      correct: 1,
+      explanation: "Stage I Lyme disease is characterized by Erythema Migrans, an erythematous macular rash that expands centrifugally from the bite site, often demonstrating central clearing ('bullseye' appearance)."
+    },
+    {
+      q: "Which cutaneous manifestation typically observed in Stage II (Early Disseminated) Lyme disease represents a benign, reactive pseudolymphoma?",
+      options: [
+        "Acrodermatitis chronica atrophicans",
+        "Lymphocytoma cutis (lymphadenosis benigna cutis)",
+        "Erythema nodosum",
+        "Ecthyma gangrenosum"
+      ],
+      correct: 1,
+      explanation: "Lymphocytoma cutis is a dense, benign polyclonal accumulation of lymphocytes presenting as a bluish-red nodule or plaque, most commonly on the earlobe, nipple, or scrotum in Stage II Lyme disease."
+    },
+    {
+      q: "What triad of clinical manifestations characterizes Bannwarth syndrome (lymphocytic meningoradiculitis) during Stage II neuroborreliosis?",
+      options: [
+        "Ataxia, nystagmus, and high-output cardiac failure",
+        "Facial nerve (Bell's) palsy, lymphocytic meningitis, and painful radiculoneuritis",
+        "Ascending flaccid paralysis with hypercalcemia",
+        "Retinal detachment, sensorineural deafness, and epistaxis"
+      ],
+      correct: 1,
+      explanation: "Bannwarth syndrome (Stage II European neuroborreliosis) classically presents with severe radicular pain (radiculoneuritis), lymphocytic pleocytosis in the CSF (aseptic meningitis), and cranial nerve palsies (frequently bilateral Bell's palsy)."
+    },
+    {
+      q: "Which cardiac complication is most characteristically associated with Stage II Lyme carditis?",
+      options: [
+        "Aortic dissection",
+        "Atrioventricular (AV) conduction block",
+        "Severe calcific mitral stenosis",
+        "Coronary artery aneurysm"
+      ],
+      correct: 1,
+      explanation: "Lyme carditis most commonly manifests as fluctuating atrioventricular (AV) nodal conduction delays, ranging from first-degree block to complete (third-degree) heart block."
+    },
+    {
+      q: "What is the hallmark cutaneous finding of Stage III (Late Persistent/Chronic) Lyme disease, typically presenting years after infection?",
+      options: [
+        "Erythema migrans",
+        "Acrodermatitis chronica atrophicans (ACA)",
+        "Bullous pemphigoid",
+        "Diffuse petechial purpura"
+      ],
+      correct: 1,
+      explanation: "Acrodermatitis chronica atrophicans (ACA) is a late, persistent cutaneous sign of chronic infection, characterized by bluish-red discoloration, edema, and subsequent progressive atrophy and paper-thin skin on the extremities."
+    },
+    {
+      q: "Which joint manifestation is the most common debilitating long-term feature of Stage III chronic Lyme disease?",
+      options: [
+        "Symmetric polyarthritis of distal interphalangeal finger joints",
+        "Recurrent, asymmetric oligoarthritis, particularly involving large joints like the knee",
+        "Gouty tophi in the first metatarsophalangeal joint",
+        "Ankylosis and fusion of lumbar vertebrae"
+      ],
+      correct: 1,
+      explanation: "Late Lyme disease classically presents as recurrent episodes of marked joint swelling and pain (Lyme arthritis), predominantly affecting the large joints, especially the knee."
+    },
+    {
+      q: "Why is serological antibody testing globally favored over routine microscopy and bacterial culture for diagnosing Lyme disease?",
+      options: [
+        "Borrelia produces abundant gas bubbles in blood tubes within 10 minutes",
+        "B. burgdorferi is extremely fastidious, grows very slowly, and direct microscopic isolation from patient tissues is technically laborious and insensitive",
+        "Borrelia DNA cannot be replicated by Taq polymerase",
+        "Spirochetes are visible only when illuminated with ultraviolet sunlight"
+      ],
+      correct: 1,
+      explanation: "Direct culture of B. burgdorferi is difficult, requires weeks in specialized BSK liquid media, and has poor clinical sensitivity from most tissues (except early skin biopsies), making serology the primary clinical standard."
+    },
+    {
+      q: "Which infectious organism frequently causes false-positive serological screening results for Lyme disease due to shared spirochetal cross-reactive antigens?",
+      options: [
+        "Treponema pallidum (the causative agent of syphilis)",
+        "Mycobacterium tuberculosis",
+        "Streptococcus pneumoniae",
+        "Clostridium tetani"
+      ],
+      correct: 0,
+      explanation: "There is substantial antigenic cross-reactivity between Borrelia burgdorferi and Treponema pallidum; patients with syphilis or other spirochetal infections may produce false-positive Lyme enzyme immunoassays."
+    },
+    {
+      q: "In the CDC two-tiered diagnostic algorithm for Lyme disease, what is the required initial (first-tier) test?",
+      options: [
+        "Skin biopsy dark-field microscopy",
+        "Enzyme Immunoassay (EIA / ELISA) or Indirect Immunofluorescence Assay (IFA)",
+        "Stool culture on MacConkey agar",
+        "Specific IgG Western Blot alone"
+      ],
+      correct: 1,
+      explanation: "The first step in the two-tiered testing protocol is a sensitive screening test: either an Enzyme Immunoassay (EIA) or an Indirect Immunofluorescence Assay (IFA)."
+    },
+    {
+      q: "According to the CDC testing algorithm, what should be done if the first-tier serological test (EIA/IFA) yields an equivocal or positive result in a patient whose symptoms began 2 weeks ago?",
+      options: [
+        "Discard the result and declare the patient uninfected",
+        "Perform both IgM and IgG Western Blot confirmatory testing",
+        "Perform IgG Western Blot only",
+        "Perform immediate lumbar puncture culture on blood agar"
+      ],
+      correct: 1,
+      explanation: "For patients with illness onset within the past 30 days, both IgM and IgG Western Blots must be performed, as IgM antibodies appear earliest in acute infection."
+    },
+    {
+      q: "If a patient with suspected Lyme disease has experienced chronic symptoms for greater than 30 days, why does the CDC recommend performing ONLY the IgG Western Blot during second-tier confirmation?",
+      options: [
+        "IgM antibodies are completely destroyed by human serum after 20 days",
+        "Isolated IgM positivity after 30 days represents a high rate of false-positive background reactivity",
+        "Borrelia deletes its IgM-binding epitopes after 4 weeks",
+        "IgG antibodies are only produced during tick feeding"
+      ],
+      correct: 1,
+      explanation: "Beyond 30 days of disease onset, true positive patients will have class-switched to IgG. Relying on an isolated positive IgM result at this stage carries a very high probability of a false-positive result."
+    },
+    {
+      q: "What is the primary oral drug of choice for treating early localized (Stage I) Lyme disease in non-pregnant adults?",
+      options: [
+        "Doxycycline (a tetracycline)",
+        "Gentamicin (an aminoglycoside)",
+        "Ciprofloxacin (a fluoroquinolone)",
+        "Vancomycin (a glycopeptide)"
+      ],
+      correct: 0,
+      explanation: "Oral Doxycycline (or Amoxicillin) is the primary first-line treatment for early localized and early disseminated Lyme disease without neurological involvement."
+    },
+    {
+      q: "Which parenteral third-generation cephalosporin is preferred for treating severe Stage II/III neuroborreliosis or high-grade atrioventricular heart blocks?",
+      options: [
+        "Ceftriaxone",
+        "Cephalexin",
+        "Cefazolin",
+        "Cefoxitin"
+      ],
+      correct: 0,
+      explanation: "Intravenous Ceftriaxone provides high bactericidal activity and excellent penetration across the blood-brain barrier, making it the drug of choice for severe neurological or cardiac Lyme disease."
+    },
+    {
+      q: "Why is antibiotic treatment initiated in Stage I or early Stage II significantly more successful than treatment delayed until late Stage III?",
+      options: [
+        "Late-stage spirochetes develop intrinsic resistance to all beta-lactams",
+        "Late-stage disease involves chronic autoimmune-mediated tissue injury, fibrosis, and joint damage that may not fully resolve despite microbiological cure",
+        "The bacteria lose all plasmids during Stage III",
+        "Ticks reinfect the patient internally during Stage III"
+      ],
+      correct: 1,
+      explanation: "In late persistent disease (Stage III), post-infectious inflammatory cascades, synoviocyte proliferation, and structural neurological injury persist even after the spirochetes have been eliminated."
+    },
+    {
+      q: "What distinct human clinical infection is caused by Spirillum minus, and in which geographic area is it particularly prevalent?",
+      options: [
+        "Relapsing fever; Northern Europe",
+        "Rat-Bite Fever (known as Sodoku); especially prevalent in Asia (Japan)",
+        "Epidemic typhus; Sub-Saharan Africa",
+        "Cat-scratch disease; South America"
+      ],
+      correct: 1,
+      explanation: "Spirillum minus is the causative agent of a form of rat-bite fever called 'Sodoku', which is particularly recognized and documented in Asian countries, including Japan."
+    },
+    {
+      q: "How is Spirillum minus typically transmitted to human patients?",
+      options: [
+        "Through the bite or scratch of an infected rat or rodent",
+        "Inhalation of aerosolized droppings from pigeons",
+        "Bite of an infected soft tick (Ornithodoros)",
+        "Ingestion of unpasteurized cow's milk"
+      ],
+      correct: 0,
+      explanation: "Spirillum minus is part of the normal oral flora of rodents; transmission occurs directly via the bite or scratch of an infected rat, mouse, or rodent-eating carnivore."
+    },
+    {
+      q: "What notable microbiological challenge is associated with the laboratory diagnosis of Spirillum minus?",
+      options: [
+        "It can only grow on solid agar supplemented with 50% sheep blood",
+        "It is non-culturable on standard artificial laboratory media",
+        "It grows so rapidly that it destroys all culture tubes within 2 hours",
+        "It stains intensely with acid-fast Ziehl-Neelsen stain"
+      ],
+      correct: 1,
+      explanation: "Spirillum minus has never been successfully propagated on artificial synthetic or cell-free laboratory culture media; diagnosis relies on dark-field microscopy of wound exudate/lymph node aspirates or animal inoculation."
+    },
+    {
+      q: "What is the primary antimicrobial drug of choice for the treatment of rat-bite fever caused by Spirillum minus?",
+      options: [
+        "Penicillin",
+        "Metronidazole",
+        "Amphotericin B",
+        "Acyclovir"
+      ],
+      correct: 0,
+      explanation: "Penicillin (e.g., intravenous Penicillin G followed by oral penicillin/ampicillin) remains the undisputed first-line treatment for Spirillum minus infections."
+    },
+    {
+      q: "What role does 2'-deoxycytidine-HCl play in the formulation of specialized BSK liquid growth medium for Borrelia?",
+      options: [
+        "It serves as a toxic selective dye that inhibits Gram-positive cocci",
+        "It provides an essential deoxynucleoside precursor required for bacterial DNA replication",
+        "It acts as an anti-foaming agent during agitation",
+        "It buffers the medium to an extreme acidic pH of 4.0"
+      ],
+      correct: 1,
+      explanation: "Borrelia burgdorferi has limited de novo biosynthetic capabilities; 2'-deoxycytidine-HCl provides a necessary pyrimidine nucleoside building block for bacterial genomic DNA synthesis."
+    },
+    {
+      q: "Why is endotoxin-tested, tissue-culture grade water specifically required for the preparation of BSK-H medium?",
+      options: [
+        "Trace endotoxins stimulate the spirochetes to turn into spore-like forms",
+        "To ensure high biochemical purity and eliminate contaminating lipopolysaccharides and pyrogens that inhibit fastidious borrelial growth",
+        "Because Borrelia uses endotoxins as its primary carbon source",
+        "To prevent water from evaporating at 37°C"
+      ],
+      correct: 1,
+      explanation: "BSK-H utilizes endotoxin-tested water to guarantee strict biochemical purity, preventing trace heavy metal or bacterial endotoxin (LPS) contamination that interferes with the replication of delicate spirochetes."
+    },
+    {
+      q: "To which scientific taxonomic phylum and family does Borrelia burgdorferi belong?",
+      options: [
+        "Phylum Spirochaetes, Family Spirochaetaceae",
+        "Phylum Firmicutes, Family Bacillaceae",
+        "Phylum Actinobacteria, Family Mycobacteriaceae",
+        "Phylum Proteobacteria, Family Enterobacteriaceae"
+      ],
+      correct: 0,
+      explanation: "Borrelia burgdorferi is classified under Domain Bacteria, Phylum Spirochaetes (or Spirochaetota), Order Spirochaetales, and Family Spirochaetaceae."
+    },
+    {
+      q: "How does the scientific taxonomic classification of Spirillum minus differ fundamentally from that of Borrelia burgdorferi?",
+      options: [
+        "Spirillum minus is a fungus, whereas Borrelia is a virus",
+        "Spirillum minus belongs to the Phylum Proteobacteria (Class Betaproteobacteria), whereas Borrelia belongs to Phylum Spirochaetes",
+        "Spirillum minus is an acid-fast Gram-positive bacillus",
+        "Spirillum minus belongs to Family Listeriaceae"
+      ],
+      correct: 1,
+      explanation: "Taxonomically, Borrelia is a spirochete (Phylum Spirochaetes), while Spirillum minus is classified within the Phylum Proteobacteria, Class Betaproteobacteria, Order Nitrosomonadales, and Family Spirillaceae."
+    },
+    {
+      q: "What other clinical condition is caused by different species of the genus Borrelia (e.g., Borrelia recurrentis, Borrelia hermsii) that is transmitted by lice or soft ticks?",
+      options: [
+        "Relapsing fever (characterized by cyclic febrile episodes)",
+        "Granulomatosis infantiseptica",
+        "Malignant pseudomembranous angina",
+        "Infectious mononucleosis"
+      ],
+      correct: 0,
+      explanation: "Other members of the genus Borrelia cause Relapsing Fever (louse-borne or tick-borne), characterized by recurrent cycles of high fever and chills separated by afebrile intervals due to periodic antigenic variation of variable major proteins."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
