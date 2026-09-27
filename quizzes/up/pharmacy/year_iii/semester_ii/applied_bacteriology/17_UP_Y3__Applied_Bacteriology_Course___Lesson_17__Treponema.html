@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 17: Treponema Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 17: Treponema</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What historical term was applied to syphilis in 16th-century Europe to differentiate it from Variola (smallpox)?",
+        options: [
+          "The Black Death",
+          "The Great Pox",
+          "Woolsorter's Disease",
+          "The White Plague"
+        ],
+        correct: 1,
+        explanation: "Syphilis was historically designated 'The Great Pox' in the 16th century to distinguish its extensive ulcerating skin lesions from smallpox ('small pox')."
+      },
+      {
+        q: "Which specific subspecies of Treponema pallidum is the causative agent of classic sexually transmitted venereal syphilis?",
+        options: [
+          "Treponema pallidum subspecies endemicum",
+          "Treponema pallidum subspecies pertenue",
+          "Treponema pallidum subspecies pallidum",
+          "Treponema carateum"
+        ],
+        correct: 2,
+        explanation: "Classic venereal syphilis is caused strictly by Treponema pallidum subspecies pallidum. Subspecies pertenue causes Yaws, endemicum causes Bejel, and Treponema carateum causes Pinta."
+      },
+      {
+        q: "Which non-venereal treponemal disease characterized by depigmented skin lesions (dyschromia) is caused by Treponema carateum?",
+        options: [
+          "Pinta",
+          "Yaws",
+          "Bejel",
+          "Scrofula"
+        ],
+        correct: 0,
+        explanation: "Treponema carateum causes Pinta, an endemic non-venereal treponematosis characterized primarily by hyperpigmented and depigmented skin lesions."
+      },
+      {
+        q: "Why is Treponema pallidum invisible under standard brightfield light microscopy using routine Gram staining?",
+        options: [
+          "It lacks a cell wall and disintegrates upon exposure to crystal violet",
+          "Its diameter is extremely narrow (0.1–0.2 µm), which falls below the resolution limit of standard light microscopy",
+          "It reflects 100% of visible light wavelengths, acting as a mirror",
+          "Gram stain reagents cause instant lysis of spirochetes within milliseconds"
+        ],
+        correct: 1,
+        explanation: "T. pallidum is exceptionally slender, measuring only 0.1 to 0.2 µm in width. Because the resolving limit of a standard light microscope is roughly 0.2 µm, it cannot be visualized without darkfield illumination, silver impregnation, or immunofluorescence."
+      },
+      {
+        q: "How many periplasmic flagella (axial filaments) are inserted at each pole of Treponema pallidum, and where are they located?",
+        options: [
+          "1 flagellum per pole, extending freely into the extracellular space",
+          "3 flagella inserted at each pole (total of 6), located in the periplasmic space between the peptidoglycan and outer sheath",
+          "12 polar flagella forming a peritrichous tuft outside the outer membrane",
+          "No flagella; movement is entirely driven by host cytoplasmic streaming"
+        ],
+        correct: 1,
+        explanation: "T. pallidum possesses 3 periplasmic flagella (endoflagella/axial filaments) anchored at each end (totaling 6) wound around the protoplasmic cylinder within the periplasmic space beneath the outer sheath."
+      },
+      {
+        q: "What characteristic motility pattern is observed when live Treponema pallidum is examined under darkfield microscopy?",
+        options: [
+          "Violent darting 'shooting star' motility across the visual field",
+          "Slow graceful rotation with sudden 90-degree angular flexions resembling a 'gentleman bowing at the waist'",
+          "Gliding motility accompanied by slime trail deposition",
+          "Rapid tumbling alternating with linear swimming"
+        ],
+        correct: 1,
+        explanation: "Live T. pallidum exhibits slow rotation along its longitudinal corkscrew axis, translation, and characteristic sudden 90-degree angular bending or flexion ('gentleman bowing at the waist')."
+      },
+      {
+        q: "Which microscopic visualization technique is considered ideal for detecting live, motile spirochetes directly from active primary chancre exudate?",
+        options: [
+          "Darkfield microscopy",
+          "Brightfield microscopy with simple methylene blue stain",
+          "Phase-contrast microscopy of heat-fixed air-dried smears",
+          "Standard Ziehl-Neelsen acid-fast stain"
+        ],
+        correct: 0,
+        explanation: "Darkfield microscopy uses an opaque stop to block central light, illuminating the slender, reflective corkscrew spirochetes against a pitch-black background, allowing real-time assessment of motility."
+      },
+      {
+        q: "Which histologic staining method deposits metallic particles to render Treponema pallidum visible as black corkscrews in tissue biopsies?",
+        options: [
+          "Grocott's methenamine silver / Warthin-Starry silver impregnation",
+          "Hematoxylin and eosin (H&E) routine staining",
+          "Mucicarmine stain",
+          "Prussian blue stain for iron"
+        ],
+        correct: 0,
+        explanation: "Silver impregnation techniques (such as Warthin-Starry stain) deposit metallic silver over the slender spirochetal surface, thickening and darkening the organisms so they appear black in tissue sections."
+      },
+      {
+        q: "What are the in vitro culture requirements and oxygen sensitivity of Treponema pallidum?",
+        options: [
+          "Grows rapidly on MacConkey agar under aerobic conditions (doubling time 20 min)",
+          "Cannot multiply on artificial cell-free media; microaerophilic/anaerobic and exquisitely sensitive to oxygen toxicity",
+          "Strict aerobe requiring high-salt Lowenstein-Jensen egg medium",
+          "Obligate intracellular bacterium requiring human endothelial cell monolayer co-culture"
+        ],
+        correct: 1,
+        explanation: "T. pallidum cannot be cultivated continuously on artificial cell-free media (agar/broth) and must be propagated in living mammalian tissues (e.g., rabbit testes). It is microaerophilic or anaerobic and easily killed by atmospheric oxygen."
+      },
+      {
+        q: "What is the approximate mean generation time of Treponema pallidum in vivo, illustrating its remarkably slow growth rate?",
+        options: [
+          "20 minutes",
+          "2 hours",
+          "30 hours",
+          "14 days"
+        ],
+        correct: 2,
+        explanation: "T. pallidum divides very slowly, possessing a mean generation time of approximately 30 hours (in sharp contrast to E. coli, which replicates every ~20 minutes)."
+      },
+      {
+        q: "Historically, what physiological vulnerability of Treponema pallidum served as the therapeutic basis for 'fever therapy' (pyrotherapy) before the advent of penicillin?",
+        options: [
+          "Hypersensitivity to modest temperature elevations (killed at 41–42°C)",
+          "Instant death in high humidity",
+          "Requirement for sub-zero freezing temperatures to metabolize glucose",
+          "Total dependence on host shivering to absorb iron"
+        ],
+        correct: 0,
+        explanation: "T. pallidum is thermosensitive and dies at temperatures of 41–42°C (105.8–107.6°F). Before antibiotics, clinicians induced high malarial fevers ('fever therapy' / Wagner-Jauregg therapy) to kill the spirochetes."
+      },
+      {
+        q: "What is the natural reservoir and primary host of Treponema pallidum?",
+        options: [
+          "Domestic cattle and sheep",
+          "Wild rodents and tick vectors",
+          "Exclusively humans, with no known animal reservoir",
+          "Avian waterfowl and pet parrots"
+        ],
+        correct: 2,
+        explanation: "Humans are the only natural host and reservoir for Treponema pallidum; there is no animal or environmental reservoir."
+      },
+      {
+        q: "What is the estimated risk of sexual transmission following contact with an individual presenting with an active primary syphilitic lesion?",
+        options: [
+          "Less than 1%",
+          "Approximately 5%",
+          "Greater than 50%",
+          "Strictly 100% upon all mucosal exposures"
+        ],
+        correct: 2,
+        explanation: "Because primary and secondary syphilitic lesions contain extraordinarily dense populations of viable spirochetes, the sexual transmission rate exceeds 50% during direct contact with an active lesion."
+      },
+      {
+        q: "How does Treponema pallidum effectively evade the host humoral immune response and antibody clearance?",
+        options: [
+          "By forming a thick polysaccharide capsule of sialic acid",
+          "Its outer membrane contains very few exposed transmembrane proteins and surface antigens, with lipoproteins hidden below",
+          "By constantly switching surface flagellin genes every 4 hours",
+          "By injecting lethal proteases into B-lymphocytes via a Type III Secretion System"
+        ],
+        correct: 1,
+        explanation: "Often called a 'stealth pathogen', T. pallidum has an outer membrane containing an unusually low density of surface-exposed proteins. Its immunogenic lipoproteins are anchored to the inner membrane and hidden from host antibodies."
+      },
+      {
+        q: "Which host extracellular matrix component does Treponema pallidum bind to facilitate cellular adherence and tissue invasion?",
+        options: [
+          "Fibronectin",
+          "Keratin sulfate",
+          "Myoglobin",
+          "Albumin"
+        ],
+        correct: 0,
+        explanation: "T. pallidum adheres specifically to host fibronectin, laminin, and extracellular matrix coatings on vascular endothelial surfaces, enabling widespread tissue invasion and perivascular dissemination."
+      },
+      {
+        q: "What is the classic clinical hallmark lesion of Primary Syphilis?",
+        options: [
+          "A painful, foul-smelling purulent abscess that drains spontaneously",
+          "A single, painless, indurated ulcer with a clean base (hard chancre)",
+          "A diffuse, itchy maculopapular rash spreading over the torso",
+          "A group of fluid-filled vesicles that crust into honey-colored scabs"
+        ],
+        correct: 1,
+        explanation: "The primary syphilitic lesion is the hard chancre (Hunterian chancre)—characteristically solitary, indurated (button-like cartiliginous firmness), clean-based, and completely painless."
+      },
+      {
+        q: "What typically occurs to the primary chancre if the patient receives NO antibiotic treatment?",
+        options: [
+          "It ulcerates deeper until it causes permanent bone erosion within 2 weeks",
+          "It heals spontaneously within 4 to 6 weeks, leaving the patient latently infected",
+          "It transforms into a malignant squamous cell carcinoma",
+          "It persists as a painful draining wound for over 25 years"
+        ],
+        correct: 1,
+        explanation: "Even without medical intervention, the primary chancre spontaneously resolves and heals within 4 to 6 weeks. However, the spirochetes have already disseminated systemically, progressing to secondary syphilis."
+      },
+      {
+        q: "Which dermatological distribution of the papulosquamous rash (exanthem) is a classic, high-yield diagnostic indicator of Secondary Syphilis?",
+        options: [
+          "Sparing of the hands and feet entirely, limited to the belt line",
+          "Bilateral involvement of the palms of the hands and soles of the feet",
+          "A unilateral dermatomal distribution following intercostal nerves",
+          "Confluent wheals localized strictly to the sun-exposed face"
+        ],
+        correct: 1,
+        explanation: "Secondary syphilis classically presents with a symmetrical, non-pruritic maculopapular or papulosquamous copper-colored rash that prominently involves the palms of the hands and soles of the feet."
+      },
+      {
+        q: "What are 'Condylomata Lata' in the context of secondary syphilis?",
+        options: [
+          "Small calcified granulomas found on cranial bones",
+          "Broad, flat, highly infectious moist wart-like plaques found in intertriginous skin folds (e.g., groin, perineum)",
+          "Hard painful keratotic nodules on the fingernails",
+          "Malignant melanocytic lesions triggered by spirochetal toxins"
+        ],
+        correct: 1,
+        explanation: "Condylomata lata are broad, moist, painless, flat, wart-like papules developing in warm, macerated areas such as the perineum, perianal region, and inner thighs. They teem with spirochetes and are highly contagious."
+      },
+      {
+        q: "What defines the 'Latent Stage' of syphilis?",
+        options: [
+          "The immediate 24-hour period between sexual contact and bacterial cell entry",
+          "The absence of all clinical signs and symptoms while serological tests remain reactive",
+          "The appearance of destructive gummatous necrosis in internal organs",
+          "The stage where bacteria can be grown on ordinary blood agar"
+        ],
+        correct: 1,
+        explanation: "Latent syphilis is clinically silent—the patient is asymptomatic with normal physical findings, but serological treponemal and non-treponemal tests remain reactive, and transmission via blood or to a fetus can still occur."
+      },
+      {
+        q: "Which anatomical vascular lesion is the hallmark pathological basis of Cardiovascular Syphilis in the tertiary stage?",
+        options: [
+          "Endarteritis obliterans of the vasa vasorum supplying the ascending thoracic aorta",
+          "Atherosclerotic plaque rupture in the left anterior descending coronary artery",
+          "Acute thrombophlebitis of the deep femoral veins",
+          "Granulomatous stenosis of the renal arteries"
+        ],
+        correct: 0,
+        explanation: "Tertiary cardiovascular syphilis causes chronic obliterative endarteritis of the vasa vasorum (the blood vessels supplying the aortic adventitia/media). Destruction of elastic fibers causes aortic aneurysm and aortic insufficiency."
+      },
+      {
+        q: "What antigen is utilized in non-treponemal serological screening assays such as the RPR (Rapid Plasma Reagin) and VDRL tests?",
+        options: [
+          "Purified recombinant T. pallidum endoflagellin",
+          "Cardiolipin (a lipid extract originally derived from beef heart) mixed with lecithin and cholesterol",
+          "Inactivated whole elementary bodies of Chlamydia",
+          "Heat-killed Staphylococcal protein A"
+        ],
+        correct: 1,
+        explanation: "Non-treponemal assays (RPR and VDRL) do not use treponemal proteins; they utilize cardiolipin (diphosphatidylglycerol from beef heart) mixed with lecithin and cholesterol to measure anti-lipoidal 'reagin' antibodies."
+      },
+      {
+        q: "What is the primary clinical advantage of monitoring non-treponemal test titers (e.g., RPR/VDRL) over time?",
+        options: [
+          "Titers permanently fix at 1:128 and never decline, confirming lifetime immunity",
+          "Antibody titers correlate with disease activity and decline (e.g., 4-fold drop) following successful antibiotic treatment, allowing cure monitoring",
+          "They predict the specific genetic resistance profile to penicillins",
+          "They detect whether the patient is co-infected with malaria"
+        ],
+        correct: 1,
+        explanation: "Non-treponemal titers reflect disease activity and fall following adequate therapy (typically a fourfold titer reduction, such as 1:32 down to 1:8). They are thus essential for monitoring response to treatment."
+      },
+      {
+        q: "Why are non-treponemal tests prone to biological false-positive (BFP) results?",
+        options: [
+          "They detect non-specific anti-cardiolipin (reagin) antibodies that can be triggered by autoimmune disorders (SLE), pregnancy, viral infections, or malaria",
+          "The reagent reacts with normal hemoglobin in all human blood samples",
+          "Cardiolipin binds directly to therapeutic vitamins in human serum",
+          "High concentrations of aspirin create non-specific agglutination"
+        ],
+        correct: 0,
+        explanation: "Because non-treponemal tests measure reagin antibodies directed against lipid antigens released by damaged cells, biological false positives occur in systemic lupus erythematosus (SLE), antiphospholipid syndrome, acute viral infections, pregnancy, and malaria."
+      },
+      {
+        q: "What is the major characteristic and limitation of confirmatory treponemal tests (e.g., FTA-ABS, MHA-TP)?",
+        options: [
+          "They are extremely cheap but carry a 90% false-negative rate",
+          "They detect specific anti-treponemal antibodies and usually remain reactive for life, meaning they cannot be used to assess treatment success or reinfection",
+          "They only detect spirochetes if drawn during active high fever",
+          "They cross-react with normal gut Enterobacteriaceae in 50% of the population"
+        ],
+        correct: 1,
+        explanation: "Treponemal tests (FTA-ABS, MHA-TP, TP-PA) are highly specific confirmatory tests that detect antibodies against T. pallidum antigens. However, once positive, they typically remain positive for life ('serological scar') and cannot monitor cure or distinguish new reinfection."
+      },
+      {
+        q: "In the FTA-ABS (Fluorescent Treponemal Antibody Absorption) test, what is the critical purpose of the 'absorption' step?",
+        options: [
+          "To absorb all red blood cells and eliminate hemolysis",
+          "To remove non-specific antibodies directed against commensal non-pathogenic treponemes using non-pathogenic Reiter treponeme sorbent",
+          "To completely destroy host IgM antibodies",
+          "To dissolve the glass microscope slide before UV excitation"
+        ],
+        correct: 1,
+        explanation: "The patient's serum is first mixed with an extract of non-pathogenic Reiter treponemes (the 'sorbent') to absorb cross-reacting antibodies common to saprophytic treponemes, ensuring that only antibodies specific to T. pallidum bind the test slide."
+      },
+      {
+        q: "What is the specific diagnostic role of the VDRL test performed on Cerebrospinal Fluid (CSF)?",
+        options: [
+          "It is the gold standard specific test used to confirm Neurosyphilis",
+          "It is used to screen for latent osteomyelitis in long bones",
+          "It diagnoses acute primary syphilitic chancres on the tongue",
+          "It differentiates Yaws from Bejel"
+        ],
+        correct: 0,
+        explanation: "CSF-VDRL testing is highly specific and is considered the standard diagnostic laboratory marker for confirming symptomatic or asymptomatic neurosyphilis."
+      },
+      {
+        q: "What is the drug of choice for treating all stages of syphilis?",
+        options: [
+          "Ciprofloxacin",
+          "Penicillin G (Benzathine Penicillin G)",
+          "Vancomycin",
+          "Gentamicin"
+        ],
+        correct: 1,
+        explanation: "Parenteral Penicillin G (such as intramuscular long-acting Benzathine Penicillin G for early/latent syphilis or IV aqueous crystalline penicillin G for neurosyphilis) is the unquestioned drug of choice; T. pallidum remains exquisitely sensitive to penicillin."
+      },
+      {
+        q: "At what gestational milestone does transplacental transmission of T. pallidum to the fetus become clinically prominent, underscoring the urgency of early prenatal treatment?",
+        options: [
+          "Only during the final 48 hours of labor",
+          "After the 4th month (16 weeks) of gestation, when the Langerhans cell layer of the placenta atrophies",
+          "Strictly before the 2nd week post-conception",
+          "Syphilis can never cross the human placenta under any circumstances"
+        ],
+        correct: 1,
+        explanation: "Although spirochetes can cross the placenta early, severe fetal pathology and immune-mediated damage manifest prominently after the 4th month (16 weeks) of gestation. Adequate maternal penicillin therapy before the 16th week reliably prevents congenital syphilis."
+      },
+      {
+        q: "Why is there currently NO effective clinical vaccine available against Treponema pallidum?",
+        options: [
+          "The organism mutates its entire genome every 24 hours like Influenza A",
+          "The 'paucity' of surface-exposed outer membrane proteins and inability to cultivate the bacterium in cell-free media severely hinder vaccine development",
+          "Treponema pallidum only produces endotoxins that resist immunization",
+          "Vaccination causes immediate autoimmune diabetes in all animal models"
+        ],
+        correct: 1,
+        explanation: "Vaccine development is thwarted by the organism's outer membrane 'stealth' architecture (very few exposed transmembrane protein targets), fragility, inability to grow on artificial culture media, and the lack of accessible animal models."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
