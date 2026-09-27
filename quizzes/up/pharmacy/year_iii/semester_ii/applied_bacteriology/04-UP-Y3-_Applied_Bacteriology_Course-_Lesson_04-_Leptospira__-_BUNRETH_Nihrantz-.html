@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology: Leptospira - Test Mode</title>
+  <style>
+    /* Global & Typography (Strict Arial) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      line-height: 1.5;
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header & Progress Bar */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #646f90;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: 1px solid #d3d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e6e9f2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #4255ff;
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 10px;
+    }
+
+    /* Modal / Drawer for Question Grid */
+    .overview-modal {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 6px 18px rgba(46, 56, 86, 0.08);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .overview-modal.open {
+      display: block;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .overview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e3856;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-item {
+      aspect-ratio: 1;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e3856;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .grid-item:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-item.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #d3d9ff;
+    }
+
+    .grid-item.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.25);
+    }
+
+    /* Study Card */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-stem {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-tile {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: #2e3856;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      width: 100%;
+    }
+
+    .option-tile:not(:disabled):hover {
+      transform: translateY(-2px);
+      border-color: #4255ff;
+      background: #fafbff;
+    }
+
+    .option-tile:disabled {
+      cursor: default;
+    }
+
+    .badge-letter {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #646f90;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Feedback Styling */
+    .option-tile.correct {
+      background: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+      font-weight: 700;
+    }
+
+    .option-tile.correct .badge-letter {
+      background: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-tile.correct .status-tag {
+      display: inline-block;
+      background: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-tile.incorrect {
+      background: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-tile.incorrect .badge-letter {
+      background: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-tile.incorrect .status-tag {
+      display: inline-block;
+      background: #ff6871;
+      color: #ffffff;
+    }
+
+    /* Rationale Card */
+    .rationale-card {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #f8faff;
+      border-radius: 8px;
+      border-left: 4px solid #4255ff;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .rationale-card.show {
+      display: block;
+    }
+
+    .rationale-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4255ff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .rationale-text {
+      font-size: 14px;
+      color: #2e3856;
+      line-height: 1.55;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #f6f7fb;
+      border-color: #cbd2e0;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    .nav-btn.primary:hover {
+      background: #2e38c9;
+    }
+
+    /* Scorecard / Finish Screen */
+    .scorecard {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .scorecard.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      color: #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid #4255ff;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .breakdown-pill {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breakdown-pill.correct-pill {
+      background: #d7f7eb;
+      color: #0e6948;
+    }
+
+    .breakdown-pill.incorrect-pill {
+      background: #ffdfe0;
+      color: #b31d27;
+    }
+
+    /* Footer & Branding (Strictly Arial) */
+    footer {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .author-credit {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e3856;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2e3856;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .top-meta, footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question-stem {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Navigation & Progress Bar -->
+  <header>
+    <div class="top-meta">
+      <div>
+        <div class="quiz-title">Applied Bacteriology — Lesson 04: Leptospira</div>
+        <div class="subtitle">Interactive Test Mode • 30 Multiple Choice Questions</div>
+      </div>
+      <button class="action-btn" id="toggleGridBtn" onclick="toggleOverview()">
+        <span>📋</span> <span id="toggleGridLabel">View Question List</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="stat-row">
+      <span id="questionCounter">Question 1 of 30</span>
+      <span id="answeredCounter">0 / 30 Answered</span>
+    </div>
+  </header>
+
+  <!-- Question List Modal/Drawer -->
+  <div class="overview-modal" id="overviewDrawer">
+    <div class="overview-header">
+      <div class="overview-title">Question Navigator</div>
+      <button class="action-btn" style="padding: 4px 10px; font-size: 11px;" onclick="toggleOverview()">Close</button>
+    </div>
+    <div class="grid-container" id="gridContainer"></div>
+  </div>
+
+  <!-- Main Question Card -->
+  <main class="quiz-card" id="quizCard">
+    <div class="question-stem" id="questionStem">Loading question...</div>
+
+    <div class="options-group" id="optionsGroup"></div>
+
+    <div class="rationale-card" id="rationaleCard">
+      <div class="rationale-title">Explanation & Rationale</div>
+      <div class="rationale-text" id="rationaleText"></div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <!-- Completion Scorecard -->
+  <section class="scorecard" id="scorecard">
+    <div class="score-circle">
+      <div class="score-num" id="scorePercent">0%</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Assessment Completed!</h2>
+    <p style="color: #646f90; margin-bottom: 24px; font-size: 14px;">Review your answers by clicking through the question list or retake the test.</p>
+    
+    <div class="breakdown-row">
+      <div class="breakdown-pill correct-pill" id="scoreCorrect">Correct: 0</div>
+      <div class="breakdown-pill incorrect-pill" id="scoreIncorrect">Incorrect: 0</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button class="nav-btn" onclick="reviewQuestions()">Review Test</button>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+  </section>
+
+  <!-- Footer & Attribution -->
+  <footer>
+    <div class="author-credit">Prepared by BUNRETH Nihrantz</div>
+    <div class="social-links">
+      <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+      <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+      <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // High-Yield 30 Questions Dataset strictly built from Lesson 04 content
+  const quizData = [
+    {
+      q: "Under electron or dark-field microscopy, what characteristic morphological shape and feature defines the genus Leptospira?",
+      options: [
+        "Pleomorphic club-shaped rod arranged in palisades",
+        "Thin, tightly coiled spiral spirochete with hooked ends resembling a 'question mark'",
+        "Encapsulated Gram-negative diplococcus",
+        "Rigid comma-shaped rod with a single polar flagellum"
+      ],
+      correct: 1,
+      explanation: "Leptospira is an exceptionally thin, tightly coiled spiral bacterium (spirochete) characterized by fine coils and one or both ends bent into distinctive hooks, giving it a question-mark-like appearance."
+    },
+    {
+      q: "What cellular organelle located within the periplasmic space is responsible for the rapid, corkscrew-like motility of Leptospira?",
+      options: [
+        "External peritrichous flagella",
+        "Endoflagella (axial filaments)",
+        "Type IV retractile pili",
+        "Actin comet tails"
+      ],
+      correct: 1,
+      explanation: "Like other spirochetes, Leptospira possesses periplasmic endoflagella (axial filaments) anchored at subterminal poles that rotate inside the outer sheath, propelling the organism with rapid translational and rotational movement."
+    },
+    {
+      q: "What are the atmospheric oxygen requirements for the growth and survival of Leptospira?",
+      options: [
+        "Obligate anaerobe (poisoned by oxygen)",
+        "Obligate aerobe (requires oxygen for metabolism)",
+        "Microaerophilic (requiring 5% CO2 only)",
+        "Aerotolerant anaerobe"
+      ],
+      correct: 1,
+      explanation: "Unlike many other spirochetes, Leptospira species are strict (obligate) aerobes that rely on oxygen to metabolize long-chain fatty acids as their primary carbon and energy source."
+    },
+    {
+      q: "Which specialized liquid culture medium is specifically formulated and universally utilized for the isolation and maintenance of Leptospira?",
+      options: [
+        "Barbour-Stoenner-Kelly (BSK) medium",
+        "EMJH (Ellinghausen-McCullough-Johnson-Harris) medium",
+        "Loeffler coagulated serum slant",
+        "Tinsdale tellurite medium"
+      ],
+      correct: 1,
+      explanation: "EMJH medium is the classical semi-synthetic formulation optimized specifically for the nutritional and buffering requirements of fastidious Leptospira species."
+    },
+    {
+      q: "What essential trace vitamin is an indispensable component of EMJH medium because Leptospira cannot synthesize it de novo?",
+      options: [
+        "Vitamin C (ascorbic acid)",
+        "Thiamine (Vitamin B1)",
+        "Vitamin K1 (phylloquinone)",
+        "Vitamin D3 (cholecalciferol)"
+      ],
+      correct: 1,
+      explanation: "Thiamine (vitamin B1) at trace concentrations (0.5 mg/L) is essential for leptospiral carbohydrate and pyruvate dehydrogenase-linked metabolism, as the organism lacks biosynthetic pathways for this cofactor."
+    },
+    {
+      q: "In the 1-liter chemical formulation of EMJH medium, what is the role of ammonium chloride (NH4Cl)?",
+      options: [
+        "Selective antibiotic agent to suppress Gram-positive cocci",
+        "Primary inorganic nitrogen source for amino acid synthesis",
+        "Osmotic stabilizer replacing sodium chloride",
+        "Antioxidant neutralizing atmospheric peroxides"
+      ],
+      correct: 1,
+      explanation: "NH4Cl (0.25 g/L) provides the primary inorganic nitrogen source utilized by Leptospira for the synthesis of nitrogenous cellular constituents and amino acids."
+    },
+    {
+      q: "What primary chemical component serves as the pH buffering system in EMJH growth medium?",
+      options: [
+        "Calcium carbonate and hydrochloric acid",
+        "Phosphate buffer system (Na2HPO4 and KH2PO4)",
+        "Sodium bicarbonate and citric acid",
+        "Tris-EDTA complex"
+      ],
+      correct: 1,
+      explanation: "Disodium hydrogen phosphate (Na2HPO4, 1 g) and potassium dihydrogen phosphate (KH2PO4, 0.3 g) form a stable phosphate buffer system to maintain neutral pH (~7.2–7.4)."
+    },
+    {
+      q: "Which single bacterial species encompasses virtually all pathogenic serovars of Leptospira responsible for human disease?",
+      options: [
+        "Leptospira biflexa",
+        "Leptospira interrogans",
+        "Leptospira parva",
+        "Leptospira wolbachii"
+      ],
+      correct: 1,
+      explanation: "Leptospira interrogans is the primary pathogenic species in humans and animals, whereas Leptospira biflexa comprises harmless saprophytes found in fresh surface water."
+    },
+    {
+      q: "What macromolecular cell-surface component provides the antigenic basis for classifying Leptospira interrogans into more than 250 distinct serovars?",
+      options: [
+        "Peptidoglycan tetrapeptide crosslinks",
+        "Lipopolysaccharide (LPS) O-antigen structure",
+        "Axial filament flagellin monomers",
+        "Porin outer membrane channel diameter"
+      ],
+      correct: 1,
+      explanation: "Serovars are differentiated based on the structural heterogeneity and carbohydrate epitope composition of the surface lipopolysaccharide (LPS)."
+    },
+    {
+      q: "Which animal reservoir host is classically associated with Leptospira interrogans serovar Icterohaemorrhagiae, the causative agent of severe Weil's disease?",
+      options: [
+        "Domestic cats",
+        "Rats and wild rodents",
+        "Dairy cattle",
+        "Feral swine"
+      ],
+      correct: 1,
+      explanation: "Rats (notably Rattus norvegicus) are the classic maintenance host for serovar Icterohaemorrhagiae, chronically shedding bacteria in urine without displaying clinical illness."
+    },
+    {
+      q: "Which animal species is the primary natural reservoir host for Leptospira interrogans serovar Canicola?",
+      options: [
+        "Horses",
+        "Dogs",
+        "Poultry",
+        "Sheep"
+      ],
+      correct: 1,
+      explanation: "Dogs serve as the primary maintenance host for serovar Canicola, which can be shed in canine urine and transmitted to veterinary personnel or dog owners."
+    },
+    {
+      q: "Serovar Pomona is classically maintained by and shed into the environment by which livestock species?",
+      options: [
+        "Pigs and cattle",
+        "Domestic chickens",
+        "Laboratory rabbits",
+        "Goats exclusively"
+      ],
+      correct: 0,
+      explanation: "Serovar Pomona is commonly associated with swine and cattle, representing an important occupational zoonotic hazard for farmers and slaughterhouse personnel."
+    },
+    {
+      q: "Why are humans classified as 'accidental, dead-end hosts' in the transmission cycle of leptospirosis?",
+      options: [
+        "Humans destroy all leptospires within 2 minutes of cutaneous entry",
+        "Human-to-human transmission is virtually nonexistent, and humans do not sustain the environmental reservoir cycle",
+        "Leptospira cannot replicate inside human parenchymal tissues",
+        "Human urine has an alkaline pH that instantly kills all spirochetes"
+      ],
+      correct: 1,
+      explanation: "Leptospirosis is an environmental zoonosis. Humans acquire infection accidentally through contact with animal urine or contaminated water, but they do not transmit the infection to other humans or maintain the cycle."
+    },
+    {
+      q: "In which anatomical niche of asymptomatic mammalian reservoir hosts (e.g., rats) do pathogenic leptospires persist and multiply chronically?",
+      options: [
+        "Gallbladder epithelium",
+        "Renal proximal convoluted tubules",
+        "Alveolar spaces of the lungs",
+        "Synovial fluid of hind legs"
+      ],
+      correct: 1,
+      explanation: "Pathogenic leptospires colonize the lumen of the proximal renal tubular brush border in carrier animals, shedding continuously into the urine for months, years, or lifetime."
+    },
+    {
+      q: "Which environmental conditions are ESSENTIAL for the prolonged survival of Leptospira outside the mammalian host in nature?",
+      options: [
+        "Dry, arid sand dunes with direct exposure to ultraviolet sunlight",
+        "Freshwater (puddles, rivers), neutral or slightly alkaline moist soil, warm temperatures (~30°C), and shaded areas",
+        "Hyper-saline ocean water with high osmotic pressure",
+        "Freezing sub-zero glacial permafrost"
+      ],
+      correct: 1,
+      explanation: "Leptospires are fragile organisms that are killed by desiccation, pH < 6.5, salinity, and direct sunlight; they thrive in warm, shaded freshwater and neutral moist mud."
+    },
+    {
+      q: "What is the primary mode of entry of Leptospira into the human body?",
+      options: [
+        "Direct inhalation of infectious aerosols into terminal bronchioles",
+        "Transdermal penetration through minor cuts, abrasions, or prolonged water-softened skin, and mucous membranes (e.g., conjunctiva)",
+        "Transmission via the bite of an infected Ixodes tick",
+        "Ingestion of spore-contaminated honey"
+      ],
+      correct: 1,
+      explanation: "Leptospires enter the host by penetrating breached skin, intact water-macerated epidermis, or intact mucosal membranes (conjunctival, oral, or nasopharyngeal mucosa) following contact with contaminated water."
+    },
+    {
+      q: "Why do tropical countries typically experience sharp epidemiological spikes in leptospirosis cases following typhoons and monsoon floods?",
+      options: [
+        "Floodwaters dilute antibiotics in domestic drinking supplies",
+        "Heavy rains and floodwaters wash rodent urine out of soil and sewer systems, causing widespread contamination of standing surface waters where humans wade",
+        "Rats reproduce 100 times faster during heavy rainfall",
+        "Flooding triggers spontaneous mutation of non-pathogenic bacteria into spirochetes"
+      ],
+      correct: 1,
+      explanation: "Heavy monsoon rains and floodwaters flush burrowing rodents and their infectious urine out of drainage systems, exposing populations wading in contaminated street floodwaters to high bacterial inocula."
+    },
+    {
+      q: "What classic clinical triad characterizes 'Weil's disease,' the severe icteric-hemorrhagic manifestation of leptospirosis?",
+      options: [
+        "Hypertension, bradycardia, and irregular respirations",
+        "High fever, intense jaundice (hepatic dysfunction), and acute renal failure with bleeding diathesis",
+        "Pseudomembranous pharyngitis, bull neck, and myocarditis",
+        "Erythema migrans, facial palsy, and large-joint arthritis"
+      ],
+      correct: 1,
+      explanation: "Weil's disease is the severe form of leptospirosis characterized by the triad of high fever, profound jaundice (hepatic necrosis/dysfunction), and acute renal failure (oliguria/anuria) accompanied by hemorrhages."
+    },
+    {
+      q: "Which eye finding is highly characteristic of acute leptospirosis, frequently providing a critical clinical diagnostic clue?",
+      options: [
+        "Purulent exudate gluing eyelids shut upon waking",
+        "Conjunctival hyperemia (suffusion) without purulent discharge",
+        "Bilateral retinal detachment within 24 hours",
+        "Unilateral Kayser-Fleischer corneal rings"
+      ],
+      correct: 1,
+      explanation: "Conjunctival suffusion (marked dilation of conjunctival blood vessels causing bright red sclerae without inflammatory purulent exudate) is a hallmark sign seen early in leptospirosis."
+    },
+    {
+      q: "Severe muscle tenderness (myalgia) in acute leptospirosis characteristically localizes to which anatomical region?",
+      options: [
+        "Small muscles of the hands",
+        "Calf muscles (gastrocnemius) and lower back (paraspinal muscles)",
+        "Deltoid muscles exclusively",
+        "Temporalis and masseter muscles"
+      ],
+      correct: 1,
+      explanation: "Severe, exquisite tenderness elicited upon palpation of the calf muscles (gastrocnemius) and lower lumbar region is a classic hallmark of early systemic leptospirosis."
+    },
+    {
+      q: "Approximately what percentage of clinical leptospirosis cases present as the mild, anicteric (non-jaundice) form?",
+      options: [
+        "Less than 5%",
+        "Approximately 50%",
+        "Approximately 90%",
+        "100% of all cases"
+      ],
+      correct: 2,
+      explanation: "Around 90% of symptomatic patients develop the mild, anicteric form of leptospirosis, presenting as an acute flu-like febrile illness that is frequently misdiagnosed as dengue, malaria, or influenza."
+    },
+    {
+      q: "What is the typical biphasic clinical course observed in patients with anicteric leptospirosis?",
+      options: [
+        "A 20-year latent asymptomatic phase followed by gumma formation",
+        "An initial acute septicemic phase (3–7 days), followed by a brief afebrile interval, and then an immune phase marked by antibodies, meningitis, and urine shedding",
+        "Chronic bloody diarrhea lasting 6 months followed by sudden paralysis",
+        "Spontaneous resolution in 1 hour followed by permanent coma"
+      ],
+      correct: 1,
+      explanation: "Anicteric leptospirosis is classically biphasic: an initial leptospiremic (acute) phase with high fever and chills (days 1–7), followed by an immune phase where circulating antibodies appear, leptospires vanish from blood, and aseptic meningitis/uveitis may develop."
+    },
+    {
+      q: "During which time window from symptom onset is blood the optimal clinical diagnostic specimen for isolating Leptospira or detecting its DNA by PCR?",
+      options: [
+        "Days 1 to 7 (acute septicemic phase)",
+        "Day 14 to day 28 exclusively",
+        "Month 3 to month 6 of convalescence",
+        "Blood is never useful for diagnosing leptospirosis"
+      ],
+      correct: 0,
+      explanation: "Leptospires circulate in the bloodstream during the first 7 days (leptospiremic phase). After day 7, circulating antibodies clear the bacteria from blood, causing blood cultures and blood PCR to become negative."
+    },
+    {
+      q: "From which day following symptom onset does urine become the primary clinical specimen for leptospiral detection?",
+      options: [
+        "Urine is only positive on Day 1",
+        "From day 7 to 10 onward (leptospiruric phase)",
+        "Urine becomes positive only after 1 full year",
+        "Urine is positive only during the incubation period"
+      ],
+      correct: 1,
+      explanation: "Beginning in the second week of illness (days 7–10 onward), leptospires colonize the renal tubules and are shed in the urine (leptospiruric phase), remaining detectable for several weeks."
+    },
+    {
+      q: "When collecting whole blood for direct dark-field microscopic examination of live motile Leptospira, which anticoagulant should be utilized?",
+      options: [
+        "Heparin",
+        "EDTA",
+        "Sodium citrate",
+        "Fluoride oxalate"
+      ],
+      correct: 0,
+      explanation: "Heparinized blood is preferred because EDTA and citrate can impair spirochete viability and alter their motility characteristics under dark-field microscopy."
+    },
+    {
+      q: "Why is bacterial culture considered clinically impractical for urgent medical decision-making in acute leptospirosis?",
+      options: [
+        "Leptospira grows as an explosive gas within 10 minutes",
+        "Leptospira grows very slowly, often requiring several weeks to 2 months of incubation before visible growth is confirmed",
+        "The bacteria require liquid mercury as a growth substrate",
+        "Cultures can only be grown at absolute zero (-273°C)"
+      ],
+      correct: 1,
+      explanation: "Leptospira has a slow doubling time; cultures in EMJH medium routinely take 2 to 6 weeks (and up to 2 months) of incubation before showing growth, making culture useless for acute therapeutic guidance."
+    },
+    {
+      q: "What is the primary diagnostic hazard associated with relying on dark-field microscopy of blood or urine for leptospirosis diagnosis?",
+      options: [
+        "Dark-field light rays denature bacterial DNA instantly",
+        "Artifacts (such as fibrin filaments and extruded erythrocyte membrane protoplasmic strands) mimic spirochete motility, causing frequent false-positive errors",
+        "Leptospires become completely invisible when magnified",
+        "The microscope stage heats the specimen to 100°C"
+      ],
+      correct: 1,
+      explanation: "Direct dark-field microscopy has poor sensitivity (<10%) and notoriously poor specificity; Brownian motion of cell debris, myelin figures, and filamentous fibrin strands ('pseudo-spirochetes') leads to frequent false-positive misdiagnoses."
+    },
+    {
+      q: "What is the undisputed international gold-standard serological reference test for laboratory confirmation of leptospirosis?",
+      options: [
+        "Microscopic Agglutination Test (MAT)",
+        "Widal tube agglutination test",
+        "VDRL flocculation assay",
+        "Paul-Bunnell heterophile antibody test"
+      ],
+      correct: 0,
+      explanation: "The Microscopic Agglutination Test (MAT), which measures patient serum agglutination of live leptospiral serovar panels under dark-field microscopy, is the recognized definitive reference standard."
+    },
+    {
+      q: "What is the antimicrobial drug of choice for the treatment of severe or hospitalized patients with Weil's disease, and when should it ideally be started?",
+      options: [
+        "Intravenous Ceftriaxone monotherapy started on Day 30",
+        "Intravenous Penicillin G, ideally initiated within the first 4 to 5 days of symptom onset",
+        "Oral Vancomycin capsules started after dialysis",
+        "Intravenous Gentamicin monotherapy"
+      ],
+      correct: 1,
+      explanation: "Intravenous Penicillin G is the historical first-line therapy for severe leptospirosis, demonstrating maximal clinical benefit in reducing morbidity and organ failure when started early in the disease course (first 4–5 days)."
+    },
+    {
+      q: "For non-hospitalized patients with early anicteric leptospirosis or patients with a documented penicillin allergy, which oral antibiotic regimen is recommended?",
+      options: [
+        "Oral Doxycycline",
+        "Oral Linezolid",
+        "Oral Metronidazole",
+        "Oral Colistin"
+      ],
+      correct: 0,
+      explanation: "Oral Doxycycline (a tetracycline) is highly active against Leptospira, serves as the drug of choice for outpatients with mild infection, is effective for penicillin-allergic patients, and is used for post-exposure chemoprophylaxis."
+    }
+  ];
+
+  // State Variables
+  let currentIndex = 0;
+  let userAnswers = new Array(quizData.length).fill(null);
+  let isOverviewOpen = false;
+
+  // DOM Elements
+  const questionStem = document.getElementById("questionStem");
+  const optionsGroup = document.getElementById("optionsGroup");
+  const rationaleCard = document.getElementById("rationaleCard");
+  const rationaleText = document.getElementById("rationaleText");
+  const questionCounter = document.getElementById("questionCounter");
+  const answeredCounter = document.getElementById("answeredCounter");
+  const progressBar = document.getElementById("progressBar");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const gridContainer = document.getElementById("gridContainer");
+  const overviewDrawer = document.getElementById("overviewDrawer");
+  const toggleGridLabel = document.getElementById("toggleGridLabel");
+  const quizCard = document.getElementById("quizCard");
+  const navBar = document.getElementById("navBar");
+  const scorecard = document.getElementById("scorecard");
+
+  // Initialize
+  function initQuiz() {
+    buildGrid();
+    renderQuestion(currentIndex);
+    updateProgress();
+  }
+
+  // Build Navigator Grid
+  function buildGrid() {
+    gridContainer.innerHTML = "";
+    quizData.forEach((_, i) => {
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.id = `grid-item-${i}`;
+      item.innerText = i + 1;
+      item.onclick = () => jumpToQuestion(i);
+      gridContainer.appendChild(item);
+    });
+  }
+
+  // Render Current Question
+  function renderQuestion(index) {
+    const data = quizData[index];
+    questionStem.innerText = `${index + 1}. ${data.q}`;
+    optionsGroup.innerHTML = "";
+    rationaleCard.classList.remove("show");
+
+    const letters = ["A", "B", "C", "D"];
+    const hasAnswered = userAnswers[index] !== null;
+
+    data.options.forEach((optText, optIdx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-tile";
+      btn.disabled = hasAnswered;
+
+      const badge = document.createElement("span");
+      badge.className = "badge-letter";
+      badge.innerText = letters[optIdx];
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.innerText = optText;
+
+      const tag = document.createElement("span");
+      tag.className = "status-tag";
+
+      btn.appendChild(badge);
+      btn.appendChild(text);
+      btn.appendChild(tag);
+
+      // Handle answered state styling
+      if (hasAnswered) {
+        if (optIdx === data.correct) {
+          btn.classList.add("correct");
+          tag.innerText = "Correct";
+        } else if (optIdx === userAnswers[index]) {
+          btn.classList.add("incorrect");
+          tag.innerText = "Incorrect";
+        }
+      } else {
+        btn.onclick = () => handleSelectOption(index, optIdx);
+      }
+
+      optionsGroup.appendChild(btn);
+    });
+
+    if (hasAnswered) {
+      rationaleText.innerText = data.explanation;
+      rationaleCard.classList.add("show");
+    }
+
+    // Update Counter & Controls
+    questionCounter.innerText = `Question ${index + 1} of ${quizData.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.innerText = index === quizData.length - 1 ? "Finish Test 🏁" : "Next →";
+
+    updateGridStatus();
+  }
+
+  // Handle Option Click
+  function handleSelectOption(qIndex, selectedOptIndex) {
+    if (userAnswers[qIndex] !== null) return;
+
+    userAnswers[qIndex] = selectedOptIndex;
+    renderQuestion(qIndex);
+    updateProgress();
+    updateGridStatus();
+  }
+
+  // Update Progress Bar & Answered Count
+  function updateProgress() {
+    const answeredTotal = userAnswers.filter(ans => ans !== null).length;
+    const percent = (answeredTotal / quizData.length) * 100;
+    progressBar.style.width = `${percent}%`;
+    answeredCounter.innerText = `${answeredTotal} / ${quizData.length} Answered`;
+  }
+
+  // Update Grid Visuals
+  function updateGridStatus() {
+    quizData.forEach((_, i) => {
+      const gridBox = document.getElementById(`grid-item-${i}`);
+      if (!gridBox) return;
+
+      gridBox.className = "grid-item";
+      if (userAnswers[i] !== null) {
+        gridBox.classList.add("answered");
+      }
+      if (i === currentIndex) {
+        gridBox.classList.add("active");
+      }
+    });
+  }
+
+  // Navigation Handlers
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < quizData.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      finishTest();
+    }
+  }
+
+  function jumpToQuestion(index) {
+    currentIndex = index;
+    if (scorecard.classList.contains("active")) {
+      scorecard.classList.remove("active");
+      quizCard.style.display = "block";
+      navBar.style.display = "flex";
+    }
+    renderQuestion(currentIndex);
+    if (isOverviewOpen) toggleOverview();
+  }
+
+  function toggleOverview() {
+    isOverviewOpen = !isOverviewOpen;
+    if (isOverviewOpen) {
+      overviewDrawer.classList.add("open");
+      toggleGridLabel.innerText = "Hide Question List";
+    } else {
+      overviewDrawer.classList.remove("open");
+      toggleGridLabel.innerText = "View Question List";
+    }
+  }
+
+  // Finish & Scorecard Display
+  function finishTest() {
+    let correctCount = 0;
+    userAnswers.forEach((ans, i) => {
+      if (ans === quizData[i].correct) correctCount++;
+    });
+
+    const percent = Math.round((correctCount / quizData.length) * 100);
+    const incorrectCount = quizData.length - correctCount;
+
+    document.getElementById("scorePercent").innerText = `${percent}%`;
+    document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
+    document.getElementById("scoreIncorrect").innerText = `Incorrect / Skipped: ${incorrectCount}`;
+
+    quizCard.style.display = "none";
+    navBar.style.display = "none";
+    scorecard.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function reviewQuestions() {
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    currentIndex = 0;
+    renderQuestion(currentIndex);
+  }
+
+  function restartQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    currentIndex = 0;
+    scorecard.classList.remove("active");
+    quizCard.style.display = "block";
+    navBar.style.display = "flex";
+    updateProgress();
+    renderQuestion(currentIndex);
+  }
+
+  // Run on start
+  initQuiz();
+</script>
+
+</body>
+</html>
