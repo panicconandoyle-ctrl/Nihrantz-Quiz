@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Bacteriology - Lesson 12: Bacillus anthracis Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .quiz-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 780px;
+      border-radius: 12px;
+      border: 1px solid #e6e9f2;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header & Progress */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #646f90;
+    }
+
+    .list-toggle-btn {
+      background: #eef1ff;
+      color: #4255ff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .list-toggle-btn:hover {
+      background: #e0e5ff;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e6e9f2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #646f90;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Drawer / Grid Navigation */
+    .question-grid-drawer {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+      background: #f6f7fb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e6e9f2;
+    }
+
+    .grid-btn {
+      height: 38px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-btn:hover {
+      border-color: #4255ff;
+    }
+
+    .grid-btn.active {
+      border: 2px solid #4255ff;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-btn.answered {
+      background: #eef1ff;
+      color: #4255ff;
+      border-color: #c9d2ff;
+    }
+
+    /* Question & Card */
+    .question-stem {
+      font-size: 19px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e6e9f2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: #2e3856;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(66, 85, 255, 0.08);
+    }
+
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      color: #646f90;
+      font-weight: bold;
+      font-size: 13px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 10px;
+      display: none;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+    .option-btn.correct .option-badge {
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+    .option-btn.incorrect .option-badge {
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Card */
+    .explanation-card {
+      display: none;
+      background: #f8f9fc;
+      border-left: 4px solid #4255ff;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2e3856;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4255ff;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #f0f2f7;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.primary {
+      background-color: #4255ff;
+      border-color: #4255ff;
+      color: #ffffff;
+    }
+
+    .nav-btn.primary:hover:not(:disabled) {
+      background-color: #2e38c9;
+      border-color: #2e38c9;
+      color: #ffffff;
+    }
+
+    /* Score Card Modal/View */
+    .scorecard-view {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #eef1ff;
+      border: 6px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+    }
+
+    .score-val {
+      font-size: 38px;
+      font-weight: bold;
+      color: #4255ff;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #646f90;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .scorecard-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scorecard-summary {
+      font-size: 16px;
+      color: #646f90;
+      margin-bottom: 28px;
+    }
+
+    /* Branding & Footer */
+    .footer-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e6e9f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .attribution-text {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 13px;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #4255ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <span class="quiz-title">Applied Bacteriology • Lesson 12: Bacillus anthracis</span>
+      <button class="list-toggle-btn" id="toggleGridBtn" onclick="toggleQuestionGrid()">View List</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Dynamic Question Grid -->
+    <div class="question-grid-drawer" id="questionGrid"></div>
+
+    <!-- Question View -->
+    <div id="questionView">
+      <div class="meta-row">
+        <span id="questionCounter">Question 1 of 30</span>
+        <span id="answeredCounter">0 / 30 Answered</span>
+      </div>
+
+      <div class="question-stem" id="questionStem">Loading question...</div>
+
+      <div class="options-group" id="optionsContainer"></div>
+
+      <div class="explanation-card" id="explanationCard">
+        <div class="explanation-title">Microbiological & Clinical Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="controls-row">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View -->
+    <div class="scorecard-view" id="scorecardView">
+      <div class="score-circle">
+        <span class="score-val" id="scorePercent">0%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <h2 class="scorecard-title">Quiz Completed!</h2>
+      <p class="scorecard-summary" id="scoreSummary">You answered 0 out of 30 correctly.</p>
+      <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Footer Attribution & Socials -->
+    <div class="footer-section">
+      <div class="attribution-text">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the etymological origin of the term 'anthrax' in relation to the clinical disease?",
+        options: [
+          "From the Latin word for 'lung infection'",
+          "From the Greek word for 'coal', referring to the characteristic black necrotic skin eschar",
+          "From the French term for 'swollen gland'",
+          "From the Arabic word for 'soil spore'"
+        ],
+        correct: 1,
+        explanation: "The name 'anthrax' comes directly from the Greek word for coal (anthrakis), referring to the pathognomonic black, coal-like necrotic eschar that forms on the skin in cutaneous infections."
+      },
+      {
+        q: "Which French scientists in 1848 demonstrated the experimental transmission of anthrax by injecting infected animal blood into laboratory animals?",
+        options: [
+          "Pasteur and Koch",
+          "Chantemesse and Widal",
+          "Rayer and Davaine",
+          "Kiyoshi Shiga and Bensted"
+        ],
+        correct: 2,
+        explanation: "In 1848, Rayer and Davaine demonstrated that injecting infected blood into healthy lab animals reproduced the disease, providing early crucial evidence for the germ theory."
+      },
+      {
+        q: "Which morphological description correctly classifies Bacillus anthracis under light microscopy?",
+        options: [
+          "Gram-negative motile comma-shaped rods",
+          "Gram-positive, non-motile, large rods (2–5 µm) often arranged in long chains ('bamboo cane')",
+          "Gram-positive cocci in grape-like clusters",
+          "Acid-fast branching filamentous rods"
+        ],
+        correct: 1,
+        explanation: "Bacillus anthracis appears as large Gram-positive bacilli (approx. 2–5 µm long, 1 µm wide) arranged in long chains, resembling segments of bamboo cane. It is strictly non-motile."
+      },
+      {
+        q: "What is the oxygen requirement of Bacillus anthracis, distinguishing it from Clostridium species?",
+        options: [
+          "Obligate aerobe",
+          "Obligate anaerobe",
+          "Microaerophilic (requires 5% CO2 only)",
+          "Aerotolerant fermenter"
+        ],
+        correct: 0,
+        explanation: "Bacillus anthracis is an obligate aerobe (distinguishing it from the strictly anaerobic spore-forming genus Clostridium)."
+      },
+      {
+        q: "What unique chemical polymer constitutes the protective antiphagocytic capsule of Bacillus anthracis?",
+        options: [
+          "Polysaccharide polymer of sialic acid",
+          "Hyaluronic acid matrix",
+          "Polymer of D-glutamic acid",
+          "Peptidoglycan-teichoic acid complex"
+        ],
+        correct: 2,
+        explanation: "Unlike the vast majority of encapsulated bacteria that produce polysaccharide capsules, B. anthracis produces a polypeptide capsule made of poly-D-glutamic acid, which inhibits phagocytosis."
+      },
+      {
+        q: "Where are the genes encoding the tripartite anthrax toxin complex and the capsule located?",
+        options: [
+          "Integrated into the main bacterial chromosome",
+          "On separate virulence plasmids",
+          "Within bacteriophage prophages",
+          "On transposable insertion sequences in ribosomes"
+        ],
+        correct: 1,
+        explanation: "The major virulence factors of B. anthracis are plasmid-encoded (the tripartite toxin complex on plasmid pXO1 and the poly-D-glutamic acid capsule on plasmid pXO2). Strains that lose plasmids become avirulent."
+      },
+      {
+        q: "Which specific protein in the anthrax tripartite toxin complex is responsible for binding host cell surface receptors and facilitating intracellular transport?",
+        options: [
+          "Factor I (Edema Factor)",
+          "Factor II (Protective Antigen)",
+          "Factor III (Lethal Factor)",
+          "Shiga-like toxin A subunit"
+        ],
+        correct: 1,
+        explanation: "Protective Antigen (PA / Factor II) binds host cell surface receptors and forms a pore that translocates Edema Factor (EF) and Lethal Factor (LF) into the host cell cytoplasm. It is also the principal antigen used in anthrax vaccines."
+      },
+      {
+        q: "What is the primary pathogenic action of Edema Factor (EF / Factor I)?",
+        options: [
+          "Direct cleavage of host cell DNA",
+          "Disruption of cell signaling and fluid regulation, leading to massive swelling and edema",
+          "Depolymerization of intracellular actin filaments",
+          "Pore formation in red blood cell membranes causing massive hemolysis"
+        ],
+        correct: 1,
+        explanation: "Edema Factor (EF) is a calmodulin-dependent adenylate cyclase that dramatically elevates intracellular cyclic AMP (cAMP), causing dysregulation of fluid balance and massive tissue edema."
+      },
+      {
+        q: "What is the physiological role of Lethal Factor (LF / Factor III) in anthrax pathogenesis?",
+        options: [
+          "Inducing cell death, capillary thrombosis, tissue necrosis, and systemic circulatory shock",
+          "Synthesizing the poly-D-glutamic acid capsule",
+          "Inactivating gastric acid in the digestive tract",
+          "Promoting flagellar assembly in bloodstream environments"
+        ],
+        correct: 0,
+        explanation: "Lethal Factor (LF) is a zinc metalloprotease that cleaves MAP kinase kinases (MAPKK), triggering macrophage lysis, tissue necrosis, severe hypoxia, nutrient depletion, and fatal shock."
+      },
+      {
+        q: "Which environmental factor serves as the critical trigger for Bacillus anthracis vegetative cells to undergo sporulation?",
+        options: [
+          "Exposure to atmospheric oxygen outside the dying animal host",
+          "The strict absence of oxygen deep inside animal liver tissue",
+          "Incubation at boiling temperatures (100°C)",
+          "High concentrations of lactic acid in living muscle"
+        ],
+        correct: 0,
+        explanation: "Inside the living host body (low oxygen), B. anthracis exists exclusively in its vegetative, encapsulated state. Exposure to atmospheric oxygen when body fluids or carcasses are exposed to air triggers sporulation."
+      },
+      {
+        q: "Which natural hosts are the primary victims and natural reservoirs of anthrax in agricultural settings?",
+        options: [
+          "Canines and felines",
+          "Grazing herbivores (cattle, sheep, goats, horses)",
+          "Rodents and lagomorphs",
+          "Aquatic amphibians"
+        ],
+        correct: 1,
+        explanation: "Herbivores (cattle, sheep, goats, horses, deer) are the primary natural hosts. They ingest spores from contaminated pastures while grazing."
+      },
+      {
+        q: "What role do humans play in the transmission cycle of Bacillus anthracis?",
+        options: [
+          "Primary obligate reservoir transmitting infection via respiratory aerosols to family members",
+          "Accidental dead-end hosts infected through contact with infected animals or contaminated animal products",
+          "Intermediate hosts required for sexual reproduction of the organism",
+          "Chronic asymptomatic carriers shedding organisms for decades in urine"
+        ],
+        correct: 1,
+        explanation: "Humans are accidental, dead-end hosts who acquire infection via occupational exposure to infected animal carcasses, hides, or wool. Person-to-person transmission does not occur."
+      },
+      {
+        q: "Which clinical form of anthrax accounts for more than 95% of naturally occurring human cases worldwide?",
+        options: [
+          "Inhalational anthrax",
+          "Gastrointestinal anthrax",
+          "Cutaneous anthrax",
+          "Injection anthrax"
+        ],
+        correct: 2,
+        explanation: "Cutaneous anthrax represents over 95% of naturally acquired human anthrax cases globally, resulting from spores entering micro-abrasions in the skin."
+      },
+      {
+        q: "What is the typical clinical evolution of a cutaneous anthrax lesion?",
+        options: [
+          "Painful pus-filled carbuncle that turns into an open draining fistula",
+          "Itchy papules/blisters that rupture into a painless ulcer with a coal-black necrotic eschar surrounded by extensive edema",
+          "Spreading rash on the palms and soles followed by desquamation",
+          "A deeply painful hemorrhagic bulla that remains bright red without necrosis"
+        ],
+        correct: 1,
+        explanation: "Cutaneous anthrax starts as small, pruritic bumps or blisters that rupture to form a painless ulcer with a characteristic sunken black necrotic center (eschar) surrounded by gelatinous edema."
+      },
+      {
+        q: "What historical industrial nickname was given to inhalational anthrax due to contaminated raw fibers?",
+        options: [
+          "Tanner's disease",
+          "Woolsorter's disease",
+          "Foundry fever",
+          "Baker's asthma"
+        ],
+        correct: 1,
+        explanation: "Inhalational anthrax was historically known as 'Woolsorter's disease' because textile workers inhaled aerosolized spores when handling contaminated raw sheep wool and animal fleeces."
+      },
+      {
+        q: "What classic radiological hallmark on chest X-ray or CT scan strongly points toward inhalational anthrax?",
+        options: [
+          "Mediastinal widening and pleural effusion caused by hemorrhagic mediastinitis",
+          "Pneumothorax with complete collapse of the left lung",
+          "Bilateral apical cavitary lesions typical of primary TB",
+          "Diffuse 'honeycombing' fibrosis without lymph node enlargement"
+        ],
+        correct: 0,
+        explanation: "Inhaled spores are transported by alveolar macrophages to mediastinal lymph nodes, where germination causes hemorrhagic mediastinitis. This manifests on chest imaging as marked mediastinal widening and pleural effusion."
+      },
+      {
+        q: "How is gastrointestinal anthrax typically acquired in human populations?",
+        options: [
+          "Inhaling spores during field plowing",
+          "Ingesting inadequately cooked meat from infected livestock",
+          "Drinking municipal chlorinated tap water",
+          "Handling clean sheep wool"
+        ],
+        correct: 1,
+        explanation: "Gastrointestinal anthrax is acquired by ingesting undercooked or contaminated meat derived from infected animals, leading to mucosal ulceration, severe abdominal pain, and hematemesis/melena."
+      },
+      {
+        q: "Which symptoms typically characterize gastrointestinal anthrax?",
+        options: [
+          "Persistent dry cough and pleural friction rub",
+          "Fever, severe abdominal pain, bloody vomiting (hematemesis), bloody diarrhea, and ascites/swelling",
+          "Painless urethral discharge and dysuria",
+          "Maculopapular rash on the wrists and ankles"
+        ],
+        correct: 1,
+        explanation: "GI anthrax presents with fever, chills, severe abdominal pain, bloody vomiting, bloody diarrhea, swelling of the abdomen, and sometimes sore throat and painful neck gland swelling."
+      },
+      {
+        q: "What clinical features distinguish injection anthrax (seen in contaminated heroin users) from classic cutaneous anthrax?",
+        options: [
+          "It is completely painless and never involves swelling",
+          "It produces deep subcutaneous/muscular abscesses, spreads much more rapidly, and lacks a prominent superficial black eschar",
+          "It is exclusively transmitted through mosquito bites",
+          "It is completely benign and does not require antibiotic therapy"
+        ],
+        correct: 1,
+        explanation: "Injection anthrax occurs when contaminated heroin is injected deep into subcutaneous tissue or muscle, forming deep abscesses, spreading rapidly, and often lacking the classic superficial black eschar."
+      },
+      {
+        q: "What special physiological growth requirement or nutrient aids the multiplication of B. anthracis inside host tissues?",
+        options: [
+          "Excess extracellular calcium and alkaline pH",
+          "Shikimic acid and active host iron capture mechanisms",
+          "Exogenous vitamin C and cholesterol",
+          "Hyperbaric nitrogen gas"
+        ],
+        correct: 1,
+        explanation: "The lesson notes highlight shikimic acid as a tissue multiplication factor and emphasize the bacterium's specialized iron capture mechanisms essential for rapid in vivo proliferation."
+      },
+      {
+        q: "Why is it an absolute rule that diagnostic clinical specimens must be collected BEFORE starting antimicrobial therapy?",
+        options: [
+          "Antibiotics will alter the Gram stain color from purple to green",
+          "Bacillus anthracis is killed rapidly by antibiotics, rendering cultures negative and impairing laboratory detection",
+          "Administering antibiotics permanently destroys human DNA in the sample",
+          "Antibiotics cause immediate in vitro sporulation within transport containers"
+        ],
+        correct: 1,
+        explanation: "B. anthracis is exquisitely susceptible to first-line antibiotics; a single dose can rapidly clear vegetative organisms from lesions or bloodstream, rendering bacterial cultures falsely negative."
+      },
+      {
+        q: "What colony morphology does Bacillus anthracis typically exhibit when grown on standard nutrient or blood agar?",
+        options: [
+          "Mucoid, lactose-fermenting bright pink colonies",
+          "White or greyish 'Type R' (rough) colonies with a flat, ground-glass appearance and irregular borders",
+          "Green-blue colonies with intense black centers",
+          "Yellow buttery colonies displaying vigorous beta-hemolysis"
+        ],
+        correct: 1,
+        explanation: "On culture plates, B. anthracis produces characteristic 'Type R' (rough) colonies that are white or greyish with a matte, 'ground-glass' texture and tenacious edges ('Medusa-head' appearance)."
+      },
+      {
+        q: "Under microscopic examination, which histological staining pattern is famously described for B. anthracis chains?",
+        options: [
+          "Clusters resembling bunches of grapes",
+          "Long chains resembling segments of 'bamboo cane'",
+          "Chinese-letter angular arrangements",
+          "Safety-pin bipolar staining"
+        ],
+        correct: 1,
+        explanation: "The square-ended vegetative bacilli adhere end-to-end in long chains, creating the classic 'bamboo cane' appearance under the microscope."
+      },
+      {
+        q: "Which biochemical reaction helps distinguish Bacillus anthracis from many other non-pathogenic environmental bacilli?",
+        options: [
+          "Catalase positive and non-motile",
+          "Catalase negative and rapid swarming motility",
+          "Strict anaerobe and oxidase positive",
+          "Indole positive and urease rapid-positive"
+        ],
+        correct: 0,
+        explanation: "B. anthracis is catalase positive and non-motile. Its lack of motility is a crucial lab feature differentiating it from B. cereus and B. thuringiensis (which are motile)."
+      },
+      {
+        q: "What is the traditional drug of choice for treating naturally occurring infections caused by fully susceptible Bacillus anthracis?",
+        options: [
+          "Penicillin G",
+          "Vancomycin",
+          "Amphotericin B",
+          "Metronidazole"
+        ],
+        correct: 0,
+        explanation: "Traditionally, intravenous Penicillin G has been the primary drug of choice for naturally occurring, susceptible Bacillus anthracis infections."
+      },
+      {
+        q: "Which oral antimicrobial agents are standard first-line therapies or post-exposure prophylaxis for anthrax, especially during bioterrorism scenarios or penicillin allergy?",
+        options: [
+          "Gentamicin or Streptomycin",
+          "Ciprofloxacin (fluoroquinolone) or Doxycycline (tetracycline)",
+          "Trimethoprim-sulfamethoxazole or Cephalexin",
+          "Erythromycin or Clotrimazole"
+        ],
+        correct: 1,
+        explanation: "Ciprofloxacin (a fluoroquinolone) and Doxycycline (a tetracycline) are the primary recommended agents for empirical treatment and post-exposure prophylaxis, particularly in biosecurity protocols."
+      },
+      {
+        q: "Why can the incubation period of inhalational anthrax extend up to 60 days (2 months) after exposure?",
+        options: [
+          "Vegetative bacteria replicate only once every three weeks",
+          "Inhaled dormant endospores can remain latent inside alveolar and mediastinal tissues for weeks before germinating",
+          "The capsule completely prevents bacterial growth until high fever occurs",
+          "Spores can only germinate during host rapid eye movement (REM) sleep"
+        ],
+        correct: 1,
+        explanation: "Anthrax endospores are extraordinarily stable and can remain dormant within mediastinal lymph nodes and alveolar spaces for up to 60 days before finally germinating into vegetative cells."
+      },
+      {
+        q: "What soil conditions are known to specifically favor the long-term survival of B. anthracis spores in pastures?",
+        options: [
+          "Extremely acidic soil with high sulfur content",
+          "Soil rich in calcium with a neutral pH (pH 7.0–7.4)",
+          "Completely submerged anaerobic marine sediments",
+          "Dry sandy desert dunes devoid of organic matter"
+        ],
+        correct: 1,
+        explanation: "Spores persist for decades in alkaline or neutral soils (pH 7.0–7.4) that are rich in calcium and organic nitrogen, creating recognized 'anthrax districts' or persistent endemic zones."
+      },
+      {
+        q: "Why is Bacillus anthracis categorized as a top-tier agent of concern for biological warfare and bioterrorism?",
+        options: [
+          "It spreads rapidly from person to person via common coughing in movie theaters",
+          "Its spores are extremely resilient, easily aerosolized, highly lethal upon inhalation, and can be produced in large quantities",
+          "It infects both plant crops and mammals with 100% insect vector dependence",
+          "It has no known antibiotic sensitivity whatsoever"
+        ],
+        correct: 1,
+        explanation: "B. anthracis endospores can be produced in large quantities, stored dry, and aerosolized to cause inhalational anthrax, which has high lethality without prompt treatment. Spores also resist environmental degradation."
+      },
+      {
+        q: "Can cutaneous or inhalational anthrax be directly transmitted person-to-person under normal social or clinical contact?",
+        options: [
+          "Yes, it is highly contagious through respiratory droplet sneezes",
+          "No, anthrax is essentially non-contagious between humans; isolation of contacts is not required",
+          "Yes, it spreads through shared dining utensils",
+          "Yes, it is an airborne virus-like infection with a basic reproduction number (R0) of 15"
+        ],
+        correct: 1,
+        explanation: "Anthrax is not contagious person-to-person. Inhaled spores are taken up into deep mediastinal nodes and are not expelled in respiratory droplets, and cutaneous exudates do not transmit airborne infection."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("questionCounter");
+    const answeredCounterEl = document.getElementById("answeredCounter");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionStemEl = document.getElementById("questionStem");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const explanationCardEl = document.getElementById("explanationCard");
+    const explanationContentEl = document.getElementById("explanationContent");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const questionGridEl = document.getElementById("questionGrid");
+    const toggleGridBtn = document.getElementById("toggleGridBtn");
+    const questionViewEl = document.getElementById("questionView");
+    const scorecardViewEl = document.getElementById("scorecardView");
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-btn";
+        btn.id = `grid-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIdx = idx;
+          renderQuestion();
+        };
+        questionGridEl.appendChild(btn);
+      });
+    }
+
+    function toggleQuestionGrid() {
+      const isVisible = questionGridEl.style.display === "grid";
+      questionGridEl.style.display = isVisible ? "none" : "grid";
+      toggleGridBtn.innerText = isVisible ? "View List" : "Hide List";
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQuestionIdx];
+      const answered = userAnswers[currentQuestionIdx];
+
+      // Update counters & progress
+      questionCounterEl.innerText = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      const totalAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCounterEl.innerText = `${totalAnswered} / ${quizData.length} Answered`;
+      progressBarEl.style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+
+      // Update grid highlights
+      quizData.forEach((_, idx) => {
+        const gridBtn = document.getElementById(`grid-btn-${idx}`);
+        gridBtn.className = "grid-btn";
+        if (userAnswers[idx] !== null) gridBtn.classList.add("answered");
+        if (idx === currentQuestionIdx) gridBtn.classList.add("active");
+      });
+
+      // Question Stem
+      questionStemEl.innerText = `${currentQuestionIdx + 1}. ${qData.q}`;
+
+      // Render Options
+      optionsContainerEl.innerHTML = "";
+      const optionLetters = ["A", "B", "C", "D"];
+
+      qData.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `
+          <span class="option-badge">${optionLetters[optIdx]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="status-tag"></span>
+        `;
+
+        if (answered !== null) {
+          btn.disabled = true;
+          const statusTag = btn.querySelector(".status-tag");
+          if (optIdx === qData.correct) {
+            btn.classList.add("correct");
+            statusTag.innerText = "Correct";
+          } else if (optIdx === answered) {
+            btn.classList.add("incorrect");
+            statusTag.innerText = "Incorrect";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // Explanation Card
+      if (answered !== null) {
+        explanationContentEl.innerText = qData.explanation;
+        explanationCardEl.style.display = "block";
+      } else {
+        explanationCardEl.style.display = "none";
+      }
+
+      // Nav controls
+      prevBtn.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtn.innerText = "Finish Quiz";
+      } else {
+        nextBtn.innerText = "Next";
+      }
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showScorecard();
+      }
+    }
+
+    function showScorecard() {
+      questionViewEl.style.display = "none";
+      questionGridEl.style.display = "none";
+      toggleGridBtn.style.display = "none";
+      scorecardViewEl.style.display = "block";
+
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+      scorePercentEl.innerText = `${percentage}%`;
+      scoreSummaryEl.innerText = `You answered ${correctCount} out of ${quizData.length} questions correctly.`;
+    }
+
+    function restartQuiz() {
+      userAnswers = new Array(quizData.length).fill(null);
+      currentQuestionIdx = 0;
+      scorecardViewEl.style.display = "none";
+      toggleGridBtn.style.display = "inline-block";
+      questionViewEl.style.display = "block";
+      buildGrid();
+      renderQuestion();
+    }
+
+    // Initialize on window load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
