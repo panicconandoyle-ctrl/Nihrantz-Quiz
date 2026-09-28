@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutritional Biochemistry: Vitamins & Micronutrient Metabolism (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Nutritional Biochemistry: Vitamins & Micronutrients</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Which physiological characteristic distinguishes water-soluble vitamins from fat-soluble vitamins, with Vitamin B12 as the major exception?",
+        options: [
+          "Water-soluble vitamins require mixed micelle formation for brush-border absorption.",
+          "Water-soluble vitamins have negligible body storage reserves and excess is filtered renally into urine.",
+          "Water-soluble vitamins are eliminated exclusively through the biliary tree into feces.",
+          "Water-soluble vitamins bioaccumulate in adipose tissue over many years."
+        ],
+        correct: 1,
+        explanation: "Unlike fat-soluble vitamins (A, D, E, K), water-soluble vitamins (B-complex, C) dissolve freely in aqueous chyme, have minimal body storage capacity, and excess amounts undergo glomerular filtration and renal elimination. (Vitamin B12 is the key exception, with several years of hepatic stores)."
+      },
+      {
+        q: "What is the biologically active coenzyme form of Vitamin B1 (Thiamine), synthesized via thiamine kinase?",
+        options: [
+          "Flavin Adenine Dinucleotide (FAD)",
+          "Thiamine Pyrophosphate (TPP)",
+          "Pyridoxal 5'-Phosphate (PLP)",
+          "Tetrahydrofolate (THF)"
+        ],
+        correct: 1,
+        explanation: "Thiamine is phosphorylated by thiamine kinase using ATP to synthesize Thiamine Pyrophosphate (TPP), the active coenzyme required for oxidative decarboxylation and transketolase reactions."
+      },
+      {
+        q: "Which multienzyme complexes strictly require Thiamine Pyrophosphate (TPP) as an essential coenzyme for their catalytic activity?",
+        options: [
+          "Pyruvate Dehydrogenase, α-Ketoglutarate Dehydrogenase, and BCKDH",
+          "HMG-CoA Reductase and Fatty Acid Synthase",
+          "Methionine Synthase and Methylmalonyl-CoA Mutase",
+          "Prolyl Hydroxylase and Lysyl Hydroxylase"
+        ],
+        correct: 0,
+        explanation: "TPP is an obligate cofactor for key oxidative decarboxylation enzymes: Pyruvate Dehydrogenase (PDH), α-Ketoglutarate Dehydrogenase, and Branched-Chain α-Ketoacid Dehydrogenase (BCKDH), as well as cytoplasmic Transketolase in the PPP."
+      },
+      {
+        q: "How does 'Wet Beriberi' classically differ from 'Dry Beriberi' in clinical thiamine (Vitamin B1) deficiency?",
+        options: [
+          "Dry beriberi causes high-output heart failure; wet beriberi causes isolated symmetrical polyneuropathy.",
+          "Wet beriberi presents with high-output cardiac failure, peripheral vasodilation, and generalized edema, whereas dry beriberi is characterized by symmetrical sensorimotor polyneuropathy and muscle wasting.",
+          "Wet beriberi causes severe corneal neovascularization; dry beriberi causes alopecia and dermatitis.",
+          "Dry beriberi causes photosensitive hyperkeratotic neck eruptions; wet beriberi causes splenomegaly."
+        ],
+        correct: 1,
+        explanation: "Wet beriberi features prominent cardiovascular decompensation (high-output congestive heart failure, peripheral vasodilation, tachycardia, and edema). Dry beriberi manifests primarily as symmetrical distal sensorimotor peripheral neuropathy, muscle wasting, and hyporeflexia."
+      },
+      {
+        q: "Which active coenzyme forms are synthesized from Vitamin B2 (Riboflavin) to act as 2e-/2H+ prosthetic redox carriers?",
+        options: [
+          "NAD+ and NADP+",
+          "FMN (Flavin Mononucleotide) and FAD (Flavin Adenine Dinucleotide)",
+          "Coenzyme A and 4'-phosphopantetheine",
+          "Methylcobalamin and Adenosylcobalamin"
+        ],
+        correct: 1,
+        explanation: "Riboflavin (B2) contains an isoalloxazine ring and is converted into the flavocoenzymes FMN and FAD, which participate as two-electron/two-proton redox carriers in mitochondrial electron transport (Complex I & II), fatty acid β-oxidation, and glutathione reduction."
+      },
+      {
+        q: "A patient presents with erythematous fissures at the oral commissures (angular cheilitis), a painful magenta-red tongue (glossitis), and superficial corneal neovascularization. Which micronutrient is deficient?",
+        options: [
+          "Thiamine (Vitamin B1)",
+          "Riboflavin (Vitamin B2)",
+          "Biotin (Vitamin B7)",
+          "Ascorbic acid (Vitamin C)"
+        ],
+        correct: 1,
+        explanation: "Ariboflavinosis (Vitamin B2 deficiency) characteristically presents with angular cheilitis, glossitis (swollen, magenta tongue), seborrheic dermatitis around the nasolabial folds, and corneal neovascularization."
+      },
+      {
+        q: "Which essential amino acid can be endogenously converted into Niacin (Vitamin B3) at an efficiency ratio of approximately 60 mg to 1 mg?",
+        options: [
+          "L-Phenylalanine",
+          "L-Tryptophan",
+          "L-Methionine",
+          "L-Lysine"
+        ],
+        correct: 1,
+        explanation: "Humans can synthesize nicotinic acid endogenously from dietary L-tryptophan. The conversion efficiency is approximately 60 mg of dietary tryptophan to produce 1 mg of niacin, a pathway requiring vitamins B2 and B6 as cofactors."
+      },
+      {
+        q: "What is the primary metabolic role distinction between NAD+/NADH and NADP+/NADPH?",
+        options: [
+          "NAD+ is used primarily for one-carbon transfers; NADPH is used for carboxylation.",
+          "NAD+ acts as an electron acceptor in catabolic oxidations (glycolysis, TCA cycle); NADPH provides reducing equivalents for anabolic biosyntheses and antioxidant defense.",
+          "NADPH carries activated acyl groups; NAD+ repairs erythrocyte cell membranes.",
+          "NAD+ is water-soluble; NADPH is strictly lipid-soluble."
+        ],
+        correct: 1,
+        explanation: "NAD+ serves as a major electron acceptor in catabolic pathways (glycolysis, pyruvate oxidation, TCA cycle, β-oxidation) generating ATP. NADPH acts as a specialized electron donor driving reductive anabolic pathways (fatty acid and cholesterol synthesis) and regenerating reduced glutathione."
+      },
+      {
+        q: "What are the classic '4 Ds' characterizing end-stage clinical Pellagra caused by Niacin (Vitamin B3) deficiency?",
+        options: [
+          "Dyspnea, Dysphagia, Dysarthria, and Death",
+          "Dermatitis, Diarrhea, Dementia, and Death",
+          "Depression, Demyelination, Dystrophy, and Death",
+          "Dehydration, Dyslipidemia, Dacryocystitis, and Death"
+        ],
+        correct: 1,
+        explanation: "Pellagra is the classic clinical disease of severe niacin deficiency, characterized by the four Ds: Dermatitis (photosensitive Casal necklace rash), Diarrhea (villous atrophy), Dementia (neurocognitive decline), and Death if untreated."
+      },
+      {
+        q: "What is the characteristic dermatological distribution of the photosensitive rash in Pellagra known as 'Casal necklace'?",
+        options: [
+          "A unilateral dermatomal eruption across thoracic intercostal nerves",
+          "A symmetrical, hyperpigmented, hyperkeratotic desquamating band around the neck over sun-exposed skin",
+          "Violaceous papules distributed over the extensor metacarpophalangeal joints",
+          "Periorbital edema and lilac discoloration of the upper eyelids"
+        ],
+        correct: 1,
+        explanation: "Casal necklace is a pathognomonic, bilateral, symmetrical, hyperkeratotic, hyperpigmented rash developing on sun-exposed skin around the neck and upper chest in patients with severe niacin deficiency (Pellagra)."
+      },
+      {
+        q: "Vitamin B5 (Pantothenic Acid) serves as the obligate structural precursor for the cellular biosynthesis of which critical metabolic cofactor?",
+        options: [
+          "Thiamine Pyrophosphate (TPP)",
+          "Coenzyme A (CoA-SH) and the acyl-carrier protein (ACP) domain",
+          "Tetrahydrofolate (THF)",
+          "Nicotinamide Adenine Dinucleotide (NAD+)"
+        ],
+        correct: 1,
+        explanation: "Pantothenic acid (B5) is the core structural precursor for the synthesis of Coenzyme A (CoA-SH) and 4'-phosphopantetheine (the ACP domain of fatty acid synthase), which carry activated acyl groups via high-energy thioester bonds."
+      },
+      {
+        q: "Which active coenzyme form of Vitamin B6 (Pyridoxine) is required as a catalytic cofactor for more than 100 enzymatic reactions, including ALT and AST transaminations?",
+        options: [
+          "Pyridoxine Hydrochloride",
+          "Pyridoxal 5'-Phosphate (PLP)",
+          "Pyridoxamine Phosphate",
+          "Biocytin"
+        ],
+        correct: 1,
+        explanation: "Pyridoxal 5'-phosphate (PLP) is the active coenzyme of vitamin B6. It is an obligate cofactor for aminotransferases (ALT, AST), decarboxylases (neurotransmitter synthesis), glycogen phosphorylase, and δ-aminolevulinic acid synthase (heme synthesis)."
+      },
+      {
+        q: "Why can long-term pharmacotherapy with the antitubercular agent Isoniazid precipitate peripheral neuropathy and sideroblastic anemia?",
+        options: [
+          "Isoniazid competitively displaces intrinsic factor from terminal ileal receptors.",
+          "Isoniazid covalently binds pyridoxal to form an inactive hydrazone complex, depleting functional PLP.",
+          "Isoniazid degrades the isoalloxazine ring of riboflavin into toxic aldehydes.",
+          "Isoniazid binds tightly to avidin, inhibiting biotin-dependent carboxylases."
+        ],
+        correct: 1,
+        explanation: "Isoniazid binds directly to pyridoxal and PLP to form an inactive hydrazone complex, increasing renal excretion of B6. Without pyridoxine co-supplementation, this causes PLP depletion, leading to peripheral neuropathy and impaired heme synthesis (sideroblastic anemia)."
+      },
+      {
+        q: "Unlike most other water-soluble vitamins, what irreversible neurotoxicity can develop with chronic mega-dose supplementation of Vitamin B6 (>500 mg/day)?",
+        options: [
+          "Irreversible sensory axonal polyneuropathy and ataxia",
+          "Complete blindness from bilateral optic nerve demyelination",
+          "Sudden sensorineural hearing loss and cerebellar calcification",
+          "Acute hemorrhagic stroke secondary to coagulopathy"
+        ],
+        correct: 0,
+        explanation: "While most water-soluble vitamins are readily cleared renally, chronic mega-dosing of vitamin B6 (>500 mg/day) produces neurotoxicity characterized by sensory axonal neuropathy, loss of deep tendon reflexes, and severe sensory ataxia."
+      },
+      {
+        q: "What fundamental biochemical reaction type is mediated by Biotin (Vitamin B7) in enzymes like Pyruvate Carboxylase and Acetyl-CoA Carboxylase?",
+        options: [
+          "One-carbon methyl unit transfer",
+          "ATP-dependent transfer of activated carbon dioxide (CO2 carboxylation)",
+          "Oxidative decarboxylation of α-ketoacids",
+          "Phosphorolytic cleavage of glycogen polymers"
+        ],
+        correct: 1,
+        explanation: "Biotin functions as a mobile coenzyme carrier of activated CO2 in ATP-dependent carboxylation reactions, such as pyruvate carboxylase (gluconeogenesis), acetyl-CoA carboxylase (fatty acid synthesis), and propionyl-CoA carboxylase."
+      },
+      {
+        q: "How does the excessive chronic consumption of RAW egg whites induce dietary Biotin (Vitamin B7) deficiency?",
+        options: [
+          "Raw egg whites contain high concentrations of avidin, an oviduct glycoprotein that binds biotin with high affinity, preventing its absorption.",
+          "Egg albumen contains heavy metals that competitively inhibit intestinal biotin transporters.",
+          "Lysozyme in raw egg whites enzymatically destroys the biocytin amide bond in the gastric lumen.",
+          "Ovalbumin stimulates massive urinary filtration and excretion of uncomplexed biotin."
+        ],
+        correct: 0,
+        explanation: "Raw egg whites contain avidin, a glycoprotein that binds biotin with extremely high affinity (Kd ~ 10^-15 M), forming an irreversible complex that resists digestion and blocks absorption. Cooking denatures avidin, preventing this deficiency."
+      },
+      {
+        q: "Why is high circulating exogenous Biotin a critical concern in hospital clinical laboratory testing?",
+        options: [
+          "It lyses erythrocytes, preventing hemoglobin measurement.",
+          "It interferes with streptavidin-biotinylated immunoassays, spuriously depressing cardiac troponin and elevating free T4.",
+          "It chemically precipitates standard calibrators during fixed-time kinetic assays.",
+          "It oxidizes glucose oxidase, causing false-positive blood glucose tests."
+        ],
+        correct: 1,
+        explanation: "Many clinical immunoassays use streptavidin-biotin binding to capture diagnostic antibodies. High circulating biotin outcompetes assay reagents, producing falsely low cardiac troponin (masking myocardial infarction) and falsely altered thyroid hormone panels."
+      },
+      {
+        q: "Which specific enzymatic step in de novo pyrimidine synthesis requires N5,N10-methylene-THF as a carbon donor to produce dTMP for DNA replication?",
+        options: [
+          "Dihydrofolate Reductase",
+          "Thymidylate Synthase",
+          "Methionine Synthase",
+          "Methylmalonyl-CoA Mutase"
+        ],
+        correct: 1,
+        explanation: "Thymidylate synthase catalyzes the methylation of dUMP to generate dTMP for DNA synthesis, using N5,N10-methylene-THF as the obligate methyl donor and reducing agent."
+      },
+      {
+        q: "Prophylactic maternal supplementation with 400 µg/day of Folic Acid prior to conception and during early gestation prevents up to 70% of which congenital malformations?",
+        options: [
+          "Cleft lip and palate defects",
+          "Open Neural Tube Defects (e.g., spina bifida and anencephaly)",
+          "Congenital hypertrophic pyloric stenosis",
+          "Tetralogy of Fallot and ventricular septal defects"
+        ],
+        correct: 1,
+        explanation: "Periconceptional folic acid supplementation (400 µg daily) supports the intense DNA synthesis and rapid cell division required for neural plate expansion and embryonic neural tube closure during the first 28 days post-conception, preventing spina bifida and anencephaly."
+      },
+      {
+        q: "What is the critical clinical risk of administering high-dose Folate alone to a patient suffering from uncorrected Vitamin B12 deficiency?",
+        options: [
+          "It triggers severe allergic anaphylaxis and acute renal failure.",
+          "It corrects the megaloblastic anemia while allowing demyelinating neurological damage (subacute combined degeneration) to progress unchecked.",
+          "It rapidly causes acute hypercalcemia and nephrocalcinosis.",
+          "It precipitates severe dry beriberi and lactic acidosis within 24 hours."
+        ],
+        correct: 1,
+        explanation: "Folate bypasses the block in DNA synthesis, resolving the hematologic megaloblastic anemia. However, it cannot correct the defect in methylmalonyl-CoA mutase, allowing spinal cord demyelination (subacute combined degeneration) to progress irreversibly."
+      },
+      {
+        q: "Which gastric glycoprotein, secreted by gastric parietal cells, is essential for the physiological endocytic absorption of Vitamin B12 in the terminal ileum?",
+        options: [
+          "Haptocorrin (R-binder)",
+          "Intrinsic Factor (IF)",
+          "Transketolase",
+          "Pepsinogen I"
+        ],
+        correct: 1,
+        explanation: "Intrinsic Factor (IF) is secreted by gastric parietal cells. In the duodenum, liberated cobalamin binds IF; the intact IF-B12 complex travels to the terminal ileum, where it binds cubam/cubilin receptors for receptor-mediated endocytosis."
+      },
+      {
+        q: "Which two distinct biochemical reactions in human cellular metabolism strictly depend on Vitamin B12 (Cobalamin)?",
+        options: [
+          "Methionine Synthase (cytosol) and Methylmalonyl-CoA Mutase (mitochondria)",
+          "Pyruvate Dehydrogenase and α-Ketoglutarate Dehydrogenase",
+          "Acetyl-CoA Carboxylase and Propionyl-CoA Carboxylase",
+          "Prolyl Hydroxylase and Lysyl Hydroxylase"
+        ],
+        correct: 0,
+        explanation: "Humans utilize cobalamin in two reactions: Methylcobalamin is a cytosolic cofactor for Methionine Synthase (homocysteine remethylation), and 5'-Deoxyadenosylcobalamin is a mitochondrial cofactor for Methylmalonyl-CoA Mutase (converting methylmalonyl-CoA to succinyl-CoA)."
+      },
+      {
+        q: "In differentiating macrocytic anemias, which pattern of diagnostic serum biomarkers definitively confirms Vitamin B12 deficiency over isolated Folate deficiency?",
+        options: [
+          "Elevated Homocysteine with normal Methylmalonic Acid (MMA)",
+          "Elevated Methylmalonic Acid (MMA) AND elevated Homocysteine",
+          "Normal Homocysteine with severely elevated Pyruvate",
+          "Decreased Alkaline Phosphatase with elevated GGT"
+        ],
+        correct: 1,
+        explanation: "In Vitamin B12 deficiency, both methionine synthase and methylmalonyl-CoA mutase are impaired, causing elevations in BOTH homocysteine and methylmalonic acid (MMA). In pure folate deficiency, homocysteine is elevated, but MMA is completely normal."
+      },
+      {
+        q: "According to the 'Methyl Trap' hypothesis, why does Vitamin B12 deficiency induce a functional intracellular folate deficiency?",
+        options: [
+          "Cobalamin deficiency accelerates the enzymatic destruction of dietary folate in the gut lumen.",
+          "Folates become irreversibly trapped as N5-methyl-THF because methionine synthase requires B12 to transfer the methyl group and regenerate free THF.",
+          "Unconjugated methylmalonic acid binds dihydrofolate reductase with nanomolar affinity.",
+          "Lack of B12 prevents intestinal folate polyglutamylation across the brush border."
+        ],
+        correct: 1,
+        explanation: "The conversion of 5,10-methylene-THF to N5-methyl-THF is irreversible. The only exit route is the B12-dependent methionine synthase reaction. Without B12, folate is trapped as N5-methyl-THF, starving cells of the free THF needed for dTMP and purine synthesis."
+      },
+      {
+        q: "What is the biochemical role of Ascorbic Acid (Vitamin C) in stabilizing the collagen triple-helix architecture?",
+        options: [
+          "It maintains iron in the reduced ferrous (Fe2+) state within prolyl and lysyl hydroxylases to permit post-translational hydroxylation.",
+          "It cross-links adjacent dystrophin filaments to the sarcolemma via biocytin linkages.",
+          "It acts as a lipid-soluble chain-breaking antioxidant in the sarcoplasmic reticulum.",
+          "It catalyzes the non-enzymatic cyclization of proline into hydroxyproline."
+        ],
+        correct: 0,
+        explanation: "Ascorbic acid acts as a specific biological reducing agent that maintains the active-site iron in its reduced ferrous (Fe2+) state inside prolyl and lysyl hydroxylases. Hydroxyproline and hydroxylysine are vital for interchain hydrogen bonding that stabilizes the collagen triple helix."
+      },
+      {
+        q: "A patient presents with perifollicular petechiae, swollen bleeding gums, splinter hemorrhages under the nails, hemarthroses, and poor wound healing. What is the diagnosis?",
+        options: [
+          "Pellagra",
+          "Scurvy (Vitamin C deficiency)",
+          "Dry Beriberi",
+          "Ariboflavinosis"
+        ],
+        correct: 1,
+        explanation: "These clinical signs are classic manifestations of Scurvy resulting from vitamin C deficiency. Defective collagen synthesis leads to capillary fragility, microvascular hemorrhages (petechiae, bleeding gums, splinter hemorrhages), hemarthroses, and impaired tissue healing."
+      },
+      {
+        q: "Which fat-soluble vitamin binds nuclear retinoic acid receptors (RAR/RXR) to regulate epithelial cellular differentiation and is also essential for synthesizing rhodopsin for night vision?",
+        options: [
+          "Vitamin A (Retinol)",
+          "Vitamin D (Cholecalciferol)",
+          "Vitamin E (α-Tocopherol)",
+          "Vitamin K (Phylloquinone)"
+        ],
+        correct: 0,
+        explanation: "Vitamin A functions in retinal chromophore synthesis (11-cis-retinal complexes with opsin to form rhodopsin in rods for vision) and acts as an all-trans-retinoic acid ligand for nuclear receptors controlling epithelial differentiation and barrier integrity."
+      },
+      {
+        q: "What is the primary physiological mechanism of Vitamin D (Calcitriol) in maintaining systemic calcium homeostasis?",
+        options: [
+          "Inhibiting the sodium-potassium-2-chloride (NKCC2) cotransporter in the Loop of Henle",
+          "Inducing the expression of enterocyte calcium-binding transport proteins (calbindin) to optimize intestinal mineral absorption",
+          "Blocking osteoclastic bone resorption in response to hypocalcemia",
+          "Stimulating hepatic ribosomal synthesis of prothrombin and factor VII"
+        ],
+        correct: 1,
+        explanation: "Active calcitriol (1,25-(OH)2D3) binds nuclear vitamin D receptors in intestinal enterocytes, upregulating transport proteins such as calbindin, which enhances calcium and phosphate absorption from the gastrointestinal lumen."
+      },
+      {
+        q: "Which fat-soluble vitamin acts as an essential lipid-soluble chain-breaking antioxidant, terminating free radical propagation in polyunsaturated cellular membranes?",
+        options: [
+          "Vitamin A (Retinol)",
+          "Vitamin D3 (Cholecalciferol)",
+          "Vitamin E (α-Tocopherol)",
+          "Vitamin K1 (Phylloquinone)"
+        ],
+        correct: 2,
+        explanation: "Vitamin E (α-tocopherol) intercalates into lipid bilayers where it donates a phenolic hydrogen atom to peroxyl radicals, terminating the chain reaction of lipid peroxidation and safeguarding cellular and erythrocyte membranes."
+      },
+      {
+        q: "What is the obligate enzymatic role of Vitamin K in the hepatic synthesis of functional coagulation factors II, VII, IX, and X?",
+        options: [
+          "It phosphorylates the catalytic serine triad in active thrombin.",
+          "It serves as an essential cofactor for γ-glutamyl carboxylase, converting glutamic acid residues into γ-carboxyglutamate (Gla) domains that bind calcium.",
+          "It cleaves prothrombin into thrombin in the presence of antithrombin III.",
+          "It acts as a mobile single-carbon carrier for hepatic thymidylate synthase."
+        ],
+        correct: 1,
+        explanation: "Vitamin K is the obligate cofactor for γ-glutamyl carboxylase, which post-translationally carboxylates glutamic acid residues on Factors II, VII, IX, X, and proteins C/S into γ-carboxyglutamate (Gla) residues. These Gla domains chelate Ca2+, enabling membrane binding during coagulation."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
