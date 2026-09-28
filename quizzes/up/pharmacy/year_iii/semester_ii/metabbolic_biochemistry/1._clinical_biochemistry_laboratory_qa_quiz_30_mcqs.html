@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical Biochemistry & Laboratory QA Quiz (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header & Progress Bar */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Grid Drawer */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Option Tiles */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Answer States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Clinical Biochemistry & Laboratory QA Test</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Which pair of biochemical markers directly guides dose reductions and dosing interval extensions for renally eliminated medications?",
+        options: [
+          "Alanine Aminotransferase (ALT) and Aspartate Aminotransferase (AST)",
+          "Serum Creatinine and estimated Glomerular Filtration Rate (eGFR)",
+          "Glycosylated Hemoglobin (HbA1c) and Fasting Blood Glucose",
+          "Total Bilirubin and Alkaline Phosphatase (ALP)"
+        ],
+        correct: 1,
+        explanation: "Serum creatinine concentrations and eGFR reflect renal clearance capacity and directly direct dose adjustments and dosing interval extensions for renally cleared drugs (e.g., vancomycin, aminoglycosides, metformin) to prevent drug accumulation and nephrotoxicity."
+      },
+      {
+        q: "A urine protein test reported as 'Protein (2+)' is classified under which analytical methodology?",
+        options: [
+          "Qualitative analysis",
+          "Semi-quantitative analysis",
+          "Quantitative analysis",
+          "Enzymatic rate analysis"
+        ],
+        correct: 1,
+        explanation: "Urine protein (2+) is semi-quantitative because it reports analyte abundance via a graded ordinal category (Trace, 1+, 2+, 3+, 4+) rather than an absolute scalar mass concentration with calibrated units."
+      },
+      {
+        q: "An HIV screening immunoassay result reported as 'Non-reactive' is an example of which type of laboratory analysis?",
+        options: [
+          "Qualitative analysis",
+          "Semi-quantitative analysis",
+          "Quantitative analysis",
+          "Kinetic fixed-time analysis"
+        ],
+        correct: 0,
+        explanation: "Qualitative analysis produces a binary categorical determination indicating the presence or absence of an analyte (e.g., Positive/Negative, Reactive/Non-reactive, Detected/Not detected)."
+      },
+      {
+        q: "Which of the following test results represents a true quantitative laboratory analysis?",
+        options: [
+          "Pathogen PCR: Detected",
+          "Urine pregnancy test: β-hCG Negative",
+          "Serum Sodium: 138 mmol/L",
+          "Urine Ketones: Trace"
+        ],
+        correct: 2,
+        explanation: "Serum sodium (138 mmol/L) is a quantitative analysis because it reports an absolute numerical scalar value with standardized SI metric units (mmol/L)."
+      },
+      {
+        q: "According to laboratory quality assurance data, what percentage of total diagnostic testing errors occur in the pre-analytical phase?",
+        options: [
+          "10% to 20%",
+          "25% to 35%",
+          "40% to 50%",
+          "60% to 70%"
+        ],
+        correct: 3,
+        explanation: "Statistically, 60% to 70% of all laboratory diagnostic errors originate during the pre-analytical phase, primarily due to manual specimen collection, labeling, transport, and phlebotomy variables outside the analyzer."
+      },
+      {
+        q: "What is the critical laboratory rule regarding automated clinical analyzers and compromised specimens?",
+        options: [
+          "Advanced analyzers automatically correct optical absorbance for hemolyzed red cells.",
+          "An automated clinical analyzer cannot correct for a compromised specimen.",
+          "Specimens drawn in the wrong anticoagulant tube are mathematically re-calibrated by IQC software.",
+          "Automated delta checks neutralize specimen integrity errors prior to report release."
+        ],
+        correct: 1,
+        explanation: "An automated clinical analyzer cannot correct for a compromised specimen. A hemolyzed serum sample or blood drawn into an incorrect tube will yield misleading results despite perfect instrument calibration."
+      },
+      {
+        q: "A pharmacist identifies a critical panic laboratory value of severe hyperkalemia. Which urgent intervention should be prepared immediately?",
+        options: [
+          "Recalculate Cockcroft-Gault CrCl and halve the ACE inhibitor dose next morning",
+          "Urgent panic-value notification and preparation of calcium gluconate and insulin-dextrose",
+          "Discontinue nephrotoxic antibiotics and check a 24-hour urine collection",
+          "Withhold all lipid-lowering therapy and draw baseline hepatic transaminases"
+        ],
+        correct: 1,
+        explanation: "Severe hyperkalemia is a life-threatening critical/panic electrolyte emergency requiring urgent clinical notification and immediate cardioprotective stabilization (calcium gluconate) and intracellular potassium shifting (insulin-dextrose)."
+      },
+      {
+        q: "A clinical laboratory reports a positive urine β-hCG test for a female patient receiving lisinopril and atorvastatin. What is the immediate pharmacist action?",
+        options: [
+          "Double the atorvastatin dosage to prevent gestational hyperlipidemia",
+          "Immediately discontinue teratogenic agents (ACE inhibitors, statins)",
+          "Request a repeat urine β-hCG in 4 weeks to verify gestational age",
+          "Withhold insulin and initiate metformin monotherapy"
+        ],
+        correct: 1,
+        explanation: "Positive urine β-hCG indicates early gestation; ACE inhibitors (e.g., lisinopril) and statins are teratogenic and must be discontinued immediately to protect fetal development."
+      },
+      {
+        q: "In the classic dartboard analogy, what does an exceptionally tight grouping of darts located far away from the central bullseye represent?",
+        options: [
+          "High accuracy and high precision",
+          "High accuracy but low precision",
+          "Precise but inaccurate (systematic bias)",
+          "Neither accurate nor precise (random error)"
+        ],
+        correct: 2,
+        explanation: "A tight grouping indicates high repeatability/precision, but its displacement away from the target bullseye demonstrates systematic inaccuracy (analytical bias)."
+      },
+      {
+        q: "Which formula accurately defines analytical percentage bias (Bias%)?",
+        options: [
+          "Bias% = [(Target - Mean) / Mean] × 100",
+          "Bias% = [(Mean - Target) / Target] × 100",
+          "Bias% = [Standard Deviation / Mean] × 100",
+          "Bias% = [(A2 - A1) / Δt] × 100"
+        ],
+        correct: 1,
+        explanation: "Bias% is calculated as [(Mean - Target) / Target] × 100, which quantifies the systematic divergence of the measured analytical mean from the known true target value."
+      },
+      {
+        q: "According to the Beer-Lambert Law (A = ε · c · l), optical absorbance (A) is directly proportional to which two parameters?",
+        options: [
+          "Wavelength of incident light and sample temperature",
+          "Analyte concentration (c) and optical path length (l)",
+          "Incident radiant flux (I0) and cuvette diameter squared",
+          "Transmitted intensity (I) and molar extinction coefficient only"
+        ],
+        correct: 1,
+        explanation: "The Beer-Lambert Law states that absorbance is directly proportional to both the internal optical path length traversed by light (l) and the molar concentration of the absorbing chemical species (c)."
+      },
+      {
+        q: "What is the analytical importance of selecting the absorption maximum (λmax) for photometric assays?",
+        options: [
+          "It eliminates the requirement for standard calibrators",
+          "It maximizes molar absorptivity, analytical sensitivity, and the signal-to-noise ratio",
+          "It shifts broad-band visible light into the infrared region",
+          "It ensures zero optical transmission across all wavelengths"
+        ],
+        correct: 1,
+        explanation: "At λmax, the chromophore exhibits its greatest molar extinction, maximizing analytical sensitivity and signal-to-noise ratio, ensuring optimal photometric measurement."
+      },
+      {
+        q: "Which of the following correctly displays regions of the electromagnetic spectrum arranged in order of INCREASING wavelength (λ) and DECREASING photon energy?",
+        options: [
+          "Radio Waves → Microwaves → Infrared → Visible Light → Ultraviolet → Gamma Rays",
+          "Gamma Rays → X-rays → Ultraviolet → Visible Light → Infrared → Radio Waves",
+          "Visible Light → Ultraviolet → X-rays → Gamma Rays → Infrared → Microwaves",
+          "Infrared → Visible Light → Ultraviolet → X-rays → Microwaves → Radio Waves"
+        ],
+        correct: 1,
+        explanation: "Arranged in order of increasing wavelength (λ) and decreasing photon energy (E = hc/λ): Gamma rays → X-rays → Ultraviolet → Visible Light → Infrared → Microwaves → Radio Waves."
+      },
+      {
+        q: "How does a spectrophotometer differ fundamentally from a simple colorimeter?",
+        options: [
+          "Spectrophotometers use broad-band gelatin filters; colorimeters isolate monochromatic light",
+          "Spectrophotometers isolate narrow spectral bandwidths (1-5 nm) using monochromators across UV, visible, and near-IR regions",
+          "Spectrophotometers are strictly qualitative; colorimeters provide quantitative scalar units",
+          "Colorimeters eliminate all stray light; spectrophotometers are highly vulnerable to interference"
+        ],
+        correct: 1,
+        explanation: "Spectrophotometers utilize prisms or diffraction gratings (monochromators) to isolate narrow spectral bandwidths (1–5 nm) across UV and visible ranges, yielding superior resolution, accuracy, and sensitivity compared to colorimeters with broad filters."
+      },
+      {
+        q: "In spectrophotometric clinical assays, what is the primary role of an analytical 'Blank'?",
+        options: [
+          "To establish multi-point standard calibration curves",
+          "To provide external peer-comparison for ISO certification",
+          "To zero the instrument and eliminate baseline absorbance of reagents and cuvettes",
+          "To verify day-to-day random analytical error within ±2 SD"
+        ],
+        correct: 2,
+        explanation: "A blank consists of the solvent/reagents devoid of analyte; it is used to zero the instrument and cancel out baseline absorbance from reagents and optical interfaces."
+      },
+      {
+        q: "What is the key functional distinction between a Standard (Calibrator) and a Quality Control (Control) material?",
+        options: [
+          "Calibrators are drawn from random patient sera; controls are chemically synthetic solvents",
+          "A Calibrator establishes the quantitative curve/constant; a Control verifies daily method accuracy and precision within ±2 SD",
+          "Calibrators monitor random daily drift; controls establish absolute proportionality constants",
+          "Controls zero the photometer; calibrators evaluate instrument temperature"
+        ],
+        correct: 1,
+        explanation: "A calibrator/standard is a purified material of known concentration used to set the calibration curve; a control is an independent stable matrix with defined confidence limits (±2 SD) used to verify that the assay performs accurately and precisely."
+      },
+      {
+        q: "Which reaction mode allows the reaction to proceed to thermodynamic completion before recording a single absorbance at the plateau?",
+        options: [
+          "Endpoint reaction mode",
+          "Fixed-time reaction mode",
+          "Continuous kinetic rate mode",
+          "Differential turbidimetric mode"
+        ],
+        correct: 0,
+        explanation: "In endpoint reaction modes (e.g., glucose GOD-PAP, total cholesterol, total protein), the reaction proceeds until all analyte is consumed and reaches a plateau; a single final absorbance is recorded."
+      },
+      {
+        q: "Urea (Berthelot method) and Creatinine (Jaffé kinetic method) are classic clinical examples of which biochemical reaction mode?",
+        options: [
+          "Endpoint reaction mode",
+          "Fixed-Time reaction mode",
+          "Continuous enzymatic rate mode",
+          "Binary qualitative mode"
+        ],
+        correct: 1,
+        explanation: "Fixed-time reaction modes record absorbance at two precise time points (T1 and T2) during an ongoing reaction, where analyte concentration is proportional to (A2 - A1)."
+      },
+      {
+        q: "Measurement of catalytic enzyme activities (e.g., ALT, AST, ALP, LDH) requires which analytical mode?",
+        options: [
+          "Endpoint single-plateau photometric capture",
+          "Continuous kinetic / rate monitoring of absorbance change over time (ΔA/min)",
+          "Graded ordinal semi-quantitative scale",
+          "Binary qualitative optical agglutination"
+        ],
+        correct: 1,
+        explanation: "Enzymatic activity is determined by continuous kinetic/rate assays that monitor the rate of substrate consumption or product generation (ΔA/min) over time."
+      },
+      {
+        q: "Which statistical parameter provides a unit-independent index of relative analytical imprecision?",
+        options: [
+          "Arithmetic Mean (x̄)",
+          "Coefficient of Variation (CV%)",
+          "Analytical Bias Percentage (Bias%)",
+          "Absorption Maximum (λmax)"
+        ],
+        correct: 1,
+        explanation: "The Coefficient of Variation (CV% = [SD / x̄] × 100) expresses standard deviation as a percentage of the mean, providing a unitless, normalized index of relative analytical imprecision."
+      },
+      {
+        q: "How many independent analytical runs are typically required to establish baseline historical Mean and SD limits on a Levey-Jennings chart?",
+        options: [
+          "2 to 3 runs",
+          "5 to 10 runs",
+          "20 to 30 runs",
+          "100 to 120 runs"
+        ],
+        correct: 2,
+        explanation: "Establishing reliable baseline quality control limits (Mean, ±1 SD, ±2 SD, ±3 SD) on a Levey-Jennings chart requires collecting historical data across 20 to 30 independent analytical runs."
+      },
+      {
+        q: "Under Westgard multirule evaluation, what does a single QC violation exceeding ±3 SD (1_3s rule) indicate, and what action is required?",
+        options: [
+          "Acceptable random variance; release patient results with a cautionary flag",
+          "Minor calibration drift; re-run the same control tube at the end of the day",
+          "Severe random error or large systemic shift; immediately reject the analytical run and halt reporting",
+          "Emerging systemic bias; report results and recalibrate within 48 hours"
+        ],
+        correct: 2,
+        explanation: "The 1_3s rule is a rejection rule: a single value outside ±3 SD occurs by chance in <0.3% of runs and indicates severe random error or significant systemic shift. The run must be rejected immediately, and no patient results may be released."
+      },
+      {
+        q: "A Levey-Jennings plot reveals two consecutive QC measurements exceeding +2 SD on the same side of the mean. Which Westgard rule is breached, and what is its cause?",
+        options: [
+          "R_4s rule indicating acute random error",
+          "2_2s rule indicating systematic error (e.g., calibration shift or reagent decay)",
+          "1_3s rule indicating severe phlebotomy artifact",
+          "10_x rule indicating acceptable Gaussian distribution"
+        ],
+        correct: 1,
+        explanation: "The 2_2s rule is violated when two consecutive QC points exceed +2 SD (or -2 SD) on the same side of the mean. It signals systematic analytical error such as reagent deterioration or calibration shift."
+      },
+      {
+        q: "Within the same analytical run, Control Level 1 tests at +2.2 SD while Control Level 2 tests at -2.1 SD. Which rule is breached?",
+        options: [
+          "10_x rule",
+          "4_1s rule",
+          "R_4s rule",
+          "1_2s warning rule"
+        ],
+        correct: 2,
+        explanation: "The R_4s rule is violated when the absolute range between two controls in the same run exceeds 4 SD (here, +2.2 - (-2.1) = 4.3 SD). It specifically detects acute random error, requiring run rejection."
+      },
+      {
+        q: "Gross erythrocyte hemolysis causes spurious in vitro elevations of which serum analytes?",
+        options: [
+          "Sodium, glucose, and urea",
+          "Potassium, Aspartate Aminotransferase (AST), and Lactate Dehydrogenase (LDH)",
+          "Albumin, calcium, and total cholesterol",
+          "Total bilirubin, alkaline phosphatase, and uric acid"
+        ],
+        correct: 1,
+        explanation: "Erythrocytes contain high intracellular concentrations of potassium, AST, and LDH. Lysis of red cells releases these contents directly into plasma/serum, creating marked artifactual elevations."
+      },
+      {
+        q: "Leaving a phlebotomy tourniquet applied for longer than 1 minute causes which pre-analytical artifact?",
+        options: [
+          "Spurious dilution of serum total proteins and albumin",
+          "Localized hemoconcentration falsely elevating proteins, enzymes, and total calcium",
+          "Marked false-negative reductions in serum potassium",
+          "Severe chemical degradation of glucose to lactate"
+        ],
+        correct: 1,
+        explanation: "Prolonged venous stasis (>1 minute) forces fluid out of the microvasculature into surrounding tissues, resulting in localized hemoconcentration of non-diffusible large molecules (proteins, enzymes) and protein-bound ions (calcium)."
+      },
+      {
+        q: "A healthy 14-year-old male exhibits an isolated, marked elevation in serum Alkaline Phosphatase (ALP). What is the physiological rationale?",
+        options: [
+          "Accelerated muscle breakdown from physical exercise",
+          "Normal osteoblastic activity associated with physiological adolescent bone growth",
+          "Transient benign intrahepatic cholestasis of adolescence",
+          "Age-dependent reduction in renal glomerular clearance"
+        ],
+        correct: 1,
+        explanation: "Alkaline phosphatase has a bone isoenzyme that is physiologically elevated in children and adolescents due to osteoblastic bone mineralization during active growth spurts."
+      },
+      {
+        q: "High-dose Vitamin C (ascorbic acid) supplementation causes which analytical interference on routine laboratory testing?",
+        options: [
+          "False-positive results on streptavidin immunoassays",
+          "False-negative reactions on oxidation-reduction based glucose, dipstick blood, and bilirubin tests",
+          "Spurious hypercalcemia due to competitive cuvette binding",
+          "Severe light scattering leading to pseudolipemia"
+        ],
+        correct: 1,
+        explanation: "Ascorbic acid is a potent antioxidant that reduces peroxide intermediates, producing false-negative results on hydrogen peroxide-dependent oxidation assays (e.g., glucose oxidase, fecal occult blood, dipstick hemoglobin, bilirubin)."
+      },
+      {
+        q: "Exogenous high-dose Biotin (Vitamin B7) intake produces clinically dangerous assay interference through which mechanism?",
+        options: [
+          "Cross-reacts with streptavidin-biotin capture systems in immunoassays, yielding spurious thyroid and troponin results",
+          "Causes non-specific erythrocyte hemolysis during blood tube centrifugation",
+          "Inhibits monoamine oxidase in automated photometric flow cells",
+          "Precipitates total protein in fixed-time kinetic assays"
+        ],
+        correct: 0,
+        explanation: "Excess circulating free biotin outcompetes biotinylated reagents in streptavidin-biotin based clinical immunoassays, resulting in falsely high or falsely low values for cardiac troponins and thyroid hormones."
+      },
+      {
+        q: "In the 7-step systematic protocol for interpreting biochemical laboratory results, what is Step 7?",
+        options: [
+          "Pre-analytical specimen clarity verification",
+          "Comparison against biological reference intervals",
+          "Confirmation of patient identity, age, and sex",
+          "Identification of Panic / Critical values requiring urgent communication"
+        ],
+        correct: 3,
+        explanation: "Step 7 is the identification of Panic/Critical values (severe electrolyte, glycemic, or hematologic disturbances) that represent imminent physiological danger requiring immediate clinical communication."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav buttons state
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    // Launch quiz on load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
