@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muscle Function, Bioenergetics & Myopathies Quiz (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Box */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Muscle Physiology, Bioenergetics & Myopathies</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Options rendered via JS -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Which morphological feature distinguishes skeletal muscle from cardiac and smooth muscle?",
+        options: [
+          "Short, branched fibers connected by intercalated discs",
+          "Long, cylindrical, unbranched fibers with multiple peripheral nuclei",
+          "Spindle-shaped non-striated cells with a single central nucleus",
+          "Involuntary autonomic innervation controlling tonic peristalsis"
+        ],
+        correct: 1,
+        explanation: "Skeletal muscle consists of long, cylindrical, unbranched fibers with multiple peripheral nuclei under voluntary somatic control. Cardiac muscle has branched cells with intercalated discs, and smooth muscle is spindle-shaped, non-striated, and unbranched."
+      },
+      {
+        q: "In striated muscle histology, which structural zone contains thin actin filaments only and is bisected by the Z disc?",
+        options: [
+          "A band",
+          "I band",
+          "H zone",
+          "M line"
+        ],
+        correct: 1,
+        explanation: "The I band is the light, isotropic band containing only thin actin filaments (bisected by the Z disc). The A band contains the entire length of thick myosin filaments, and the central region lacking actin overlap is the H zone."
+      },
+      {
+        q: "Which sarcomeric zone or band remains constant in width during active muscular contraction?",
+        options: [
+          "I band",
+          "H zone",
+          "Distance between adjacent Z discs",
+          "A band"
+        ],
+        correct: 3,
+        explanation: "According to the sliding filament theory, thin filaments slide centripetally over thick filaments. The I band and H zone shorten or disappear, and Z discs draw closer together, but the A band width remains constant because thick myosin filament length does not change."
+      },
+      {
+        q: "What is the primary mechanical role of titin within the sarcomere architecture?",
+        options: [
+          "Translocating GLUT-4 transporters during muscular contraction",
+          "Anchoring thick myosin filaments to Z discs and providing passive elastic recoil",
+          "Binding calcium ions directly to initiate the cocking stroke",
+          "Forming transverse covalent cross-links between thin actin monomers"
+        ],
+        correct: 1,
+        explanation: "Titin forms elastic filaments that span from the M line to the Z disc, anchoring thick myosin filaments in place and providing passive tension and elastic recoil during muscle stretch and relaxation."
+      },
+      {
+        q: "During the cross-bridge cycle, which event directly triggers the 'power stroke' (the conformational swivel of the myosin lever arm)?",
+        options: [
+          "Hydrolysis of ATP into ADP and Pi by myosin ATPase",
+          "Binding of a new ATP molecule to the nucleotide pocket",
+          "Release of inorganic phosphate (Pi) and ADP from the myosin head",
+          "Active uptake of Ca2+ into the sarcoplasmic reticulum by SERCA"
+        ],
+        correct: 2,
+        explanation: "After energized myosin binds actin, the release of inorganic phosphate (Pi) and ADP initiates the conformational change in the neck/lever arm known as the power stroke, pulling the thin filament toward the center of the sarcomere."
+      },
+      {
+        q: "What molecular event is mandatory to cause allosteric DETACHMENT of the myosin head from the actin filament?",
+        options: [
+          "Phosphorylation of troponin T by creatine kinase",
+          "Binding of a fresh ATP molecule to the myosin nucleotide-binding site",
+          "Release of calcium ions into the sarcoplasm",
+          "Non-enzymatic cyclization of creatine to creatinine"
+        ],
+        correct: 1,
+        explanation: "Detachment of the myosin head from actin strictly requires the binding of a new ATP molecule. In the absence of ATP, detachment cannot occur, leaving cross-bridges locked in place (the biochemical basis of rigor mortis)."
+      },
+      {
+        q: "Why does rigor mortis develop in skeletal muscle following somatic death?",
+        options: [
+          "Excessive accumulation of lactic acid hydrolyzes the dystrophin glycoprotein complex.",
+          "Cessation of metabolic ATP synthesis prevents cross-bridge dissociation, locking actin and myosin together.",
+          "Massive overactivation of SERCA pumps depletes sarcoplasmic calcium reserves.",
+          "Selective proteolytic cleavage of titin filaments causes irreversible fiber stiffening."
+        ],
+        correct: 1,
+        explanation: "Following death, cellular respiration and ATP synthesis cease. Without ATP to bind the myosin head, cross-bridges cannot dissociate, leaving muscle fibers locked in persistent actin-myosin contracture (rigor mortis)."
+      },
+      {
+        q: "Which cellular transporter consumes ATP to pump cytosolic Ca2+ back into the sarcoplasmic reticulum lumen to permit muscular relaxation?",
+        options: [
+          "Na+/K+-ATPase pump",
+          "SERCA pump (Sarco/Endoplasmic Reticulum Ca2+-ATPase)",
+          "Dystrophin-glycoprotein canalicular antiporter",
+          "Organic anion transporting polypeptide (OATP)"
+        ],
+        correct: 1,
+        explanation: "Muscular relaxation is an active ATP-dependent process driven by SERCA pumps, which pump cytosolic calcium back into the sarcoplasmic reticulum lumen against a steep concentration gradient."
+      },
+      {
+        q: "Which energy system provides immediate ATP regeneration for maximal muscular exertion lasting 3 to 10 seconds?",
+        options: [
+          "Mitochondrial beta-oxidation of fatty acids",
+          "ATP-Phosphocreatine (phosphagen) system via Creatine Kinase",
+          "Aerobic glycolysis coupled with Krebs cycle oxidation",
+          "Hepatic gluconeogenesis from lactate"
+        ],
+        correct: 1,
+        explanation: "The phosphagen system (ATP-phosphocreatine) provides instantaneous anaerobic ATP resynthesis via Creatine Kinase during high-intensity, explosive exertion lasting approximately 3 to 10 seconds."
+      },
+      {
+        q: "What is the net ATP yield generated per glucose molecule degraded exclusively via anaerobic glycolysis?",
+        options: [
+          "2 ATP",
+          "4 ATP",
+          "30 to 32 ATP",
+          "36 to 38 ATP"
+        ],
+        correct: 0,
+        explanation: "Anaerobic glycolysis degrades glucose into lactate via cytoplasmic fermentation, yielding a net of 2 ATP per glucose molecule, compared to 30 to 32 ATP generated during complete mitochondrial aerobic oxidation."
+      },
+      {
+        q: "In resting muscle, how is the storage pool of Phosphocreatine regenerated?",
+        options: [
+          "Direct uptake of creatine phosphate from the gastrointestinal lumen",
+          "Mitochondrial ATP donates a high-energy phosphate group to free Creatine via Creatine Kinase",
+          "Non-enzymatic spontaneous transphosphorylation of ADP by glycogen phosphorylase",
+          "Degradation of myoglobin heme rings into phosphagen intermediates"
+        ],
+        correct: 1,
+        explanation: "In resting muscle, when ATP is plentiful from mitochondrial respiration, Creatine Kinase catalyzes the transfer of a high-energy phosphate group from ATP to free Creatine, regenerating Phosphocreatine for future bursts of work."
+      },
+      {
+        q: "Through which mechanism is endogenous Creatinine formed from muscle metabolites?",
+        options: [
+          "Enzymatic oxidation catalyzed by hepatic glucuronosyltransferase",
+          "Slow, spontaneous, non-enzymatic, and irreversible intramolecular cyclization of free Creatine",
+          "Ribosomal deamination of circulating alanine during fasting",
+          "Proteolytic cleavage of myosin light chains by cytosolic calpains"
+        ],
+        correct: 1,
+        explanation: "Creatinine is generated at a steady daily rate (~1-2% of total muscle creatine per day) through slow, spontaneous, non-enzymatic intramolecular cyclization of free creatine, then filtered renally without reabsorption."
+      },
+      {
+        q: "Which Creatine Kinase isoenzyme is the predominant fraction (>95%) expressed in skeletal muscle tissue?",
+        options: [
+          "CK-BB",
+          "CK-MB",
+          "CK-MM",
+          "CK-Mt (Mitochondrial)"
+        ],
+        correct: 2,
+        explanation: "CK-MM is the predominant isoform in skeletal muscle, representing over 95% of total skeletal muscle CK activity. CK-MB is concentrated in myocardium (~20-30%), and CK-BB is found in brain and smooth muscle."
+      },
+      {
+        q: "What is the primary clinical significance of low-molecular-weight Myoglobin (17.8 kDa) in acute muscle damage?",
+        options: [
+          "It rapidly leaks from injured sarcolemma, filters into urine, and can cause pigment nephropathy (AKI).",
+          "It stabilizes the dystrophin-glycoprotein complex against mechanical shearing.",
+          "It serves as a highly specific biomarker for osteoblastic bone remineralization.",
+          "It prevents calcium phosphate precipitation in necrotic myofibrils."
+        ],
+        correct: 0,
+        explanation: "Myoglobin is a small monomeric hemoprotein that rapidly leaks into the circulation following myocyte necrosis, filters freely across glomeruli (causing cola-colored myoglobinuria), and causes tubular obstruction and toxic acute kidney injury."
+      },
+      {
+        q: "Why can acute muscular necrosis lead to a mistaken clinical suspicion of acute hepatocellular liver injury?",
+        options: [
+          "Skeletal muscle necrosis stimulates hepatic phase I cytochrome P450 enzymes.",
+          "Damaged myocytes release large amounts of Aspartate Aminotransferase (AST) into circulation.",
+          "Myoglobin cross-reacts directly with total bilirubin photometric assays.",
+          "Muscle cytolysis inhibits the hepatic urea cycle, causing acute transaminitis."
+        ],
+        correct: 1,
+        explanation: "AST is abundantly concentrated in skeletal muscle myocytes as well as hepatocytes. Acute muscle injury releases AST (and to a lesser degree ALT) into circulation, which can be misdiagnosed as acute liver disease if CK is not checked."
+      },
+      {
+        q: "Which biomarkers are structurally distinct regulatory proteins preferred for diagnosing myocardial infarction because they do NOT elevate in pure skeletal muscle necrosis?",
+        options: [
+          "Total Creatine Kinase (CK) and Aldolase",
+          "Cardiac Troponins (cTnI and cTnT)",
+          "Lactate Dehydrogenase (LDH) and AST",
+          "Serum Myoglobin and CK-MM"
+        ],
+        correct: 1,
+        explanation: "Cardiac troponins (cTnI and cTnT) have unique cardiac amino acid sequences and are the preferred, highly specific biomarkers for myocardial necrosis; they remain unaffected by isolated skeletal muscle damage."
+      },
+      {
+        q: "What is the genetic inheritance pattern and chromosomal localization of the mutated gene in Duchenne Muscular Dystrophy (DMD)?",
+        options: [
+          "Autosomal dominant on chromosome 4q35",
+          "X-linked recessive on chromosome Xp21.2",
+          "Autosomal recessive on chromosome 19q13",
+          "Mitochondrial DNA maternal inheritance"
+        ],
+        correct: 1,
+        explanation: "Duchenne Muscular Dystrophy is an X-linked recessive genetic disorder caused by mutations in the DMD gene located at Xp21.2 on the short arm of the X chromosome."
+      },
+      {
+        q: "What is the primary molecular function of the subsarcolemmal structural protein Dystrophin in healthy skeletal muscle?",
+        options: [
+          "Hydrolyzing ATP to reset the myosin lever arm during contraction",
+          "Anchoring the internal actin cytoskeleton to the extracellular matrix via the dystrophin-glycoprotein complex",
+          "Pumping cytosolic Ca2+ into the terminal cisternae of the sarcoplasmic reticulum",
+          "Facilitating the reversible transphosphorylation of creatine to phosphocreatine"
+        ],
+        correct: 1,
+        explanation: "Dystrophin acts as an essential mechanical shock absorber, anchoring the intracellular filamentous actin cytoskeleton to the extracellular matrix through the dystrophin-glycoprotein complex (DGC) to protect the sarcolemma from contraction-induced stress."
+      },
+      {
+        q: "What classic physical maneuver involves a young boy using his hands to 'climb up' his thighs and shins to rise from a seated position on the floor?",
+        options: [
+          "Trousseau sign",
+          "Gowers sign",
+          "Chvostek sign",
+          "Kernig sign"
+        ],
+        correct: 1,
+        explanation: "Gowers sign is the classic clinical sign of pelvic girdle and proximal lower-extremity muscular weakness (characteristic of DMD), where the patient uses their hands to climb up their own legs to achieve an upright posture."
+      },
+      {
+        q: "In boys with Duchenne Muscular Dystrophy, what causes the characteristic 'pseudohypertrophy' of the calf muscles?",
+        options: [
+          "Excessive myofiber hypertrophy from uninhibited glycogen storage",
+          "Replacement of degenerated, necrotic muscle fibers by fibrofatty connective tissue",
+          "Marked venous engorgement secondary to deep vein thrombosis",
+          "Overactivation of the dystrophin-glycoprotein complex expanding the sarcolemma"
+        ],
+        correct: 1,
+        explanation: "Calf pseudohypertrophy in DMD creates the appearance of muscular enlargement; however, the true contractile myofibers have degenerated and have been progressively replaced by non-contractile adipose and fibrous connective tissue."
+      },
+      {
+        q: "Which laboratory finding is characteristic of young patients presenting with untreated Duchenne Muscular Dystrophy?",
+        options: [
+          "Serum CK levels markedly elevated to 10 to 100 times the upper limit of normal",
+          "Completely normal serum CK with isolated elevated serum alkaline phosphatase",
+          "Severe isolated unconjugated hyperbilirubinemia with normal transaminases",
+          "Marked reduction of serum AST and ALT below detectable analytical thresholds"
+        ],
+        correct: 0,
+        explanation: "Because of continuous, widespread sarcolemmal breakdown and myocyte necrosis, serum Creatine Kinase (CK) is dramatically elevated in DMD, often reaching 10 to 100 times the upper limit of normal."
+      },
+      {
+        q: "Which autoimmune inflammatory myopathy is characterized by cytotoxic CD8+ T-cell infiltration directed specifically against the endomysium of muscle fibers?",
+        options: [
+          "Polymyositis",
+          "Dermatomyositis",
+          "Becker Muscular Dystrophy",
+          "Inclusion-Body Fibromyalgia"
+        ],
+        correct: 0,
+        explanation: "Polymyositis is an autoimmune inflammatory myopathy driven by cytotoxic CD8+ T-cell infiltration targeting muscle fibers in the endomysium. In contrast, dermatomyositis is complement-mediated and affects the perimysium."
+      },
+      {
+        q: "A patient presents with proximal muscle weakness, a violet periorbital heliotrope rash, and erythematous Gottron papules over the knuckles. What is the diagnosis?",
+        options: [
+          "Polymyositis",
+          "Dermatomyositis",
+          "Duchenne Muscular Dystrophy",
+          "Rhabdomyolysis"
+        ],
+        correct: 1,
+        explanation: "Dermatomyositis presents with symmetrical proximal muscle weakness accompanied by hallmark cutaneous signs: a violaceous heliotrope rash around the eyes and erythematous Gottron papules over the metacarpophalangeal/interphalangeal joints."
+      },
+      {
+        q: "What constitutes the classic clinical triad of acute Rhabdomyolysis?",
+        options: [
+          "Fever, jaundice, and right upper quadrant abdominal pain",
+          "Severe muscle pain (myalgia), profound muscle weakness, and dark tea- or cola-colored urine",
+          "Tremor, diaphoresis, and severe neuroglycopenic confusion",
+          "Polyuria, polydipsia, and unexplained catabolic weight loss"
+        ],
+        correct: 1,
+        explanation: "The classic clinical triad of acute rhabdomyolysis is severe muscle pain (myalgia), profound muscle weakness (or flaccid paralysis), and dark tea- or cola-colored urine resulting from massive myoglobinuria."
+      },
+      {
+        q: "In acute rhabdomyolysis, why does the chemical urine dipstick test strongly positive for 'blood' while microscopic sediment analysis shows NO intact red blood cells?",
+        options: [
+          "The dipstick detects the pseudoperoxidase activity of the heme ring present in filtered myoglobin.",
+          "Excessive acetoacetate in the urine cross-reacts with dipstick diazotization reagents.",
+          "High concentrations of creatinine chemically bleach intact erythrocytes during centrifugation.",
+          "Urine glucose competitively binds erythrocyte cell membranes, preventing microscopic visualization."
+        ],
+        correct: 0,
+        explanation: "Reagent strip testing for urinary blood relies on the catalytic pseudoperoxidase activity of the heme group. The dipstick cannot differentiate between erythrocyte hemoglobin and muscle myoglobin heme rings, testing strongly positive for 'blood' even when intact RBCs are absent."
+      },
+      {
+        q: "Which life-threatening electrolyte disturbance occurs rapidly during massive acute rhabdomyolysis due to the release of intracellular contents from lysed myocytes?",
+        options: [
+          "Severe hypokalemia",
+          "Acute hyperkalemia",
+          "Marked hypophosphatemia",
+          "Extreme hypercalcemia"
+        ],
+        correct: 1,
+        explanation: "Skeletal muscle fibers contain high intracellular concentrations of potassium. Massive muscle cytolysis rapidly pours potassium into the extracellular fluid, resulting in life-threatening hyperkalemia that can precipitate fatal cardiac arrhythmias."
+      },
+      {
+        q: "What are the primary pathophysiological mechanisms responsible for pigment-induced Acute Kidney Injury (AKI) during acute rhabdomyolysis?",
+        options: [
+          "Glomerular immune-complex deposition and excessive basement membrane thickening",
+          "Renal vasoconstriction, tubular myoglobin cast obstruction, and ferrihemate-induced proximal tubular cytotoxicity",
+          "Uncontrolled stimulation of SERCA pumps causing acute hydronephrosis",
+          "Direct autoantibody-mediated cytolysis of podocyte foot processes"
+        ],
+        correct: 1,
+        explanation: "Myoglobin-induced AKI occurs via three synergistic mechanisms: intrarenal vasoconstriction (causing medullary ischemia), formation of obstructing intraluminal casts in distal tubules (with Tamm-Horsfall protein), and direct oxidative cytotoxicity of ferrihemate on proximal tubular cells."
+      },
+      {
+        q: "Which major pharmacological class of cardiovascular medications is most frequently implicated in drug-induced skeletal myopathies and rhabdomyolysis?",
+        options: [
+          "Thiazide diuretics",
+          "HMG-CoA reductase inhibitors (Statins)",
+          "Angiotensin Receptor Blockers (ARBs)",
+          "Direct renin inhibitors"
+        ],
+        correct: 1,
+        explanation: "Statins (HMG-CoA reductase inhibitors, such as simvastatin and atorvastatin) are the most common pharmacological cause of drug-induced myopathy, ranging from mild myalgia to necrotizing myopathy and fulminant rhabdomyolysis."
+      },
+      {
+        q: "Why should serum Thyroid-Stimulating Hormone (TSH) be evaluated in a patient presenting with muscle aches and an elevated Creatine Kinase while on statin therapy?",
+        options: [
+          "Hypothyroidism is an independent cause of myopathy and reduces statin clearance, increasing myotoxicity risk.",
+          "Excessive circulating thyroid hormone directly inhibits Creatine Kinase clearance.",
+          "Statins trigger autoimmune destruction of thyroid follicular cells within 48 hours of administration.",
+          "Thyroid hormones are required to synthesize dystrophin in peripheral skeletal muscles."
+        ],
+        correct: 0,
+        explanation: "Hypothyroidism independently causes proximal muscle weakness and elevated CK, and it diminishes hepatic metabolic clearance of statins, markedly increasing systemic drug exposure and precipitating statin myotoxicity. TSH should be checked before permanently discontinuing statins."
+      },
+      {
+        q: "What is the cornerstone immediate clinical management strategy to protect renal function in acute exertional rhabdomyolysis?",
+        options: [
+          "Aggressive intravenous crystalloid volume resuscitation to flush intraluminal casts and maintain renal perfusion",
+          "Immediate administration of high-dose oral statins to stabilize the sarcolemma",
+          "Strict fluid restriction to prevent acute pulmonary edema",
+          "Immediate intramuscular injection of calcium gluconate into the injured muscle"
+        ],
+        correct: 0,
+        explanation: "Aggressive early intravenous hydration with isotonic crystalloids is the critical cornerstone of rhabdomyolysis management: it expands intravascular volume, counteracts renal vasoconstriction, and flushes obstructing myoglobin casts from renal tubules."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
