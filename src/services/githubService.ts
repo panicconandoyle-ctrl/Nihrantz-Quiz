@@ -4,7 +4,7 @@
  * and direct file commits using GitHub Personal Access Tokens (PAT).
  */
 
-import { FolderNode, QuizItem, DeleteItemTarget } from '../types';
+import { FolderNode, QuizItem, DeleteItemTarget, CreatorSupportConfig } from '../types';
 
 export interface GitHubConfig {
   owner: string;
@@ -186,6 +186,130 @@ export async function commitFileToGitHub(
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Network error during GitHub upload';
     return { success: false, error: msg };
+  }
+}
+
+/**
+ * Commit a binary file (such as a QR code image) directly to GitHub repository using REST API PUT.
+ * The raw base64 data (without 'data:image/...;base64,' prefix) is sent as the content.
+ */
+export async function commitBinaryFileToGitHub(
+  folderPath: string,
+  filename: string,
+  base64Data: string,
+  commitMessage: string,
+  config?: GitHubConfig
+): Promise<{ success: boolean; commitUrl?: string; rawUrl?: string; error?: string; sha?: string }> {
+  const cfg = config || getStoredGithubConfig();
+
+  if (!cfg.token) {
+    return { success: false, error: 'GitHub Personal Access Token is required to commit files to GitHub.' };
+  }
+
+  // Clean data url prefix if present
+  const pureBase64 = base64Data.replace(/^data:[^;]+;base64,/, '');
+
+  // Sanitize path
+  const cleanFolder = folderPath.replace(/^\/+|\/+$/g, '');
+  const cleanFilename = filename.replace(/^\/+|\/+$/g, '');
+  const fullPath = cleanFolder ? `${cleanFolder}/${cleanFilename}` : cleanFilename;
+
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${fullPath}`;
+
+  // Check if file already exists to get its SHA (required by GitHub for updates)
+  let existingSha: string | undefined = undefined;
+  try {
+    const checkRes = await fetch(`${url}?ref=${cfg.branch || 'main'}`, {
+      headers: {
+        Authorization: `Bearer ${cfg.token}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+    });
+    if (checkRes.ok) {
+      const existingData = await checkRes.json();
+      existingSha = existingData.sha;
+    }
+  } catch (e) {
+    // File might not exist yet, which is expected for new uploads
+  }
+
+  const payload: Record<string, unknown> = {
+    message: commitMessage || `Update ${cleanFilename} via Nihrantz Quiz Explorer`,
+    content: pureBase64,
+    branch: cfg.branch || 'main',
+  };
+
+  if (existingSha) {
+    payload.sha = existingSha;
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${cfg.token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.message || `GitHub API returned status ${res.status}`,
+      };
+    }
+
+    const rawUrl = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch || 'main'}/${fullPath}`;
+
+    return {
+      success: true,
+      commitUrl: data.commit?.html_url || data.content?.html_url,
+      rawUrl,
+      sha: data.content?.sha,
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Network error during GitHub upload';
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Commit creator support configuration JSON directly to GitHub repository
+ */
+export async function commitSupportConfigToGitHub(
+  configData: CreatorSupportConfig,
+  commitMessage?: string,
+  config?: GitHubConfig
+): Promise<{ success: boolean; commitUrl?: string; error?: string }> {
+  const content = JSON.stringify(configData, null, 2);
+  const res = await commitFileToGitHub(
+    '',
+    'creator_support.json',
+    content,
+    commitMessage || 'Update creator support config via Nihrantz Quiz Explorer',
+    config
+  );
+  return res;
+}
+
+/**
+ * Fetch creator support configuration from GitHub repository if available
+ */
+export async function fetchSupportConfigFromGitHub(config?: GitHubConfig): Promise<CreatorSupportConfig | null> {
+  const cfg = config || getStoredGithubConfig();
+  try {
+    const res = await fetch(
+      `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch || 'main'}/creator_support.json?t=${Date.now()}`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data as CreatorSupportConfig;
+  } catch (e) {
+    return null;
   }
 }
 

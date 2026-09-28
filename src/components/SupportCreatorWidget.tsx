@@ -125,6 +125,13 @@ export const SupportCreatorWidget: React.FC<SupportCreatorWidgetProps> = ({
                   src={supportConfig.customQrImageUrl} 
                   alt="Creator Support QR" 
                   className="w-full h-full object-contain rounded-lg"
+                  loading="eager"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.includes('/assets/creator_qr.jpg')) {
+                      target.src = '/assets/creator_qr.jpg';
+                    }
+                  }}
                 />
               ) : (
                 /* Crisp Vector Mini-QR */

@@ -72,5 +72,6 @@ export interface CreatorSupportConfig {
   currency: string;
   message?: string;
   customQrImageUrl?: string;
-  qrType?: 'khqr' | 'promptpay' | 'universal' | 'custom';
+  githubQrPath?: string;
+  githubCommitUrl?: string;
 }

@@ -32,7 +32,8 @@ import {
   moveQuizOnGitHub,
   moveFolderOnGitHub,
   renameQuizOnGitHub,
-  renameFolderOnGitHub
+  renameFolderOnGitHub,
+  fetchSupportConfigFromGitHub
 } from './services/githubService';
 import { 
   QuizManifest, 
@@ -184,7 +185,37 @@ export default function App() {
       } catch (e) {
         console.warn('GitHub live fetch error:', e);
       }
+
+      // Sync Creator Support configuration & QR code from GitHub repository
+      try {
+        const ghSupport = await fetchSupportConfigFromGitHub(currentCfg);
+        if (ghSupport && (ghSupport.customQrImageUrl || ghSupport.accountNumber)) {
+          setSupportConfig(prev => {
+            const merged = { ...prev, ...ghSupport };
+            try {
+              localStorage.setItem('nihrantz_creator_support_config', JSON.stringify(merged));
+            } catch (_) {}
+            return merged;
+          });
+        }
+      } catch (e) {
+        console.warn('Could not sync creator support config from GitHub:', e);
+      }
     }
+
+    // Fallback: load static creator_support.json if local QR or support details are stored locally
+    try {
+      const localSupportRes = await fetch('/creator_support.json');
+      if (localSupportRes.ok) {
+        const localSupport = await localSupportRes.json();
+        if (localSupport && (localSupport.customQrImageUrl || localSupport.accountNumber)) {
+          setSupportConfig(prev => {
+            const merged = { ...localSupport, ...prev, customQrImageUrl: prev.customQrImageUrl || localSupport.customQrImageUrl };
+            return merged;
+          });
+        }
+      }
+    } catch (_) {}
 
     // 2. Fetch local manifest to discover any local quizzes not yet pushed to GitHub
     let localManifest = defaultManifest;
