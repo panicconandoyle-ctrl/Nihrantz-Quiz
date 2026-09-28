@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renal Function, Electrolyte Homeostasis & Clinical Nephrology Quiz (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Feedback States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Renal Function, Electrolyte Homeostasis & Nephrology</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Which cells in the kidney secrete Renin to enzymatically drive the Renin-Angiotensin-Aldosterone System (RAAS)?",
+        options: [
+          "Podocytes of Bowman's capsule",
+          "Intercalated cells of the collecting duct",
+          "Juxtaglomerular cells",
+          "Mesangial cells of the glomerular tuft"
+        ],
+        correct: 2,
+        explanation: "Juxtaglomerular cells secrete renin in response to decreased renal perfusion pressure, sympathetic stimulation, or reduced sodium delivery, initiating the RAAS pathway to regulate blood pressure and fluid volume."
+      },
+      {
+        q: "Which active hormone governing gastrointestinal calcium absorption is produced in the proximal convoluted tubule via 1α-hydroxylase?",
+        options: [
+          "Calcifediol [25-(OH)D3]",
+          "Calcitriol [1,25-(OH)2D3]",
+          "Erythropoietin (EPO)",
+          "Parathyroid Hormone (PTH)"
+        ],
+        correct: 1,
+        explanation: "Proximal tubular 1α-hydroxylase converts circulating 25-hydroxyvitamin D (calcifediol) into 1,25-dihydroxyvitamin D3 (calcitriol), the biologically active hormone that stimulates intestinal calcium and phosphate absorption."
+      },
+      {
+        q: "What is the correct mathematical relationship describing the physical renal excretion rate of any solute?",
+        options: [
+          "Excretion Rate = (Filtration Rate + Reabsorption Rate) - Secretion Rate",
+          "Excretion Rate = (Filtration Rate - Reabsorption Rate) + Secretion Rate",
+          "Excretion Rate = Filtration Rate × Reabsorption Rate ÷ Secretion Rate",
+          "Excretion Rate = Secretion Rate - (Filtration Rate + Reabsorption Rate)"
+        ],
+        correct: 1,
+        explanation: "Urinary excretion is the net sum of renal handling processes: Excretion = (Filtration Rate - Reabsorption Rate) + Secretion Rate."
+      },
+      {
+        q: "Why is endogenous creatinine considered an ideal clinical surrogate marker for Glomerular Filtration Rate (GFR)?",
+        options: [
+          "It is completely reabsorbed by the proximal tubules and stored in the medulla.",
+          "It is freely filtered at the glomerulus, has negligible tubular reabsorption, and only minor tubular secretion.",
+          "Its plasma concentration is entirely independent of skeletal muscle mass.",
+          "It is synthesized de novo in the renal cortex at a rate directly proportional to renal blood flow."
+        ],
+        correct: 1,
+        explanation: "Creatinine is produced at a steady rate from muscle creatine breakdown, freely filtered across the glomerular barrier, undergoes negligible reabsorption, and experiences minimal tubular secretion (10–15%), making its clearance a practical surrogate for GFR."
+      },
+      {
+        q: "What components form the negative electrostatic charge-selective barrier within the Glomerular Basement Membrane (GBM)?",
+        options: [
+          "Nephrin and podocin slit diaphragms",
+          "Type IV collagen, laminin, and polyanionic heparan sulfate proteoglycans",
+          "Aquaporin-1 and aquaporin-2 water channel complexes",
+          "Tamm-Horsfall mucoproteins and transferrin receptors"
+        ],
+        correct: 1,
+        explanation: "The GBM is an acellular matrix of Type IV collagen and laminin embedded with polyanionic heparan sulfate proteoglycans, which electrostatically repel negatively charged plasma proteins like albumin."
+      },
+      {
+        q: "Which specific proteins form the interdigitating slit diaphragms between podocyte foot processes?",
+        options: [
+          "Dystrophin and titin",
+          "Nephrin and podocin",
+          "Actin and tropomyosin",
+          "Carbonic anhydrase and calbindin"
+        ],
+        correct: 1,
+        explanation: "Podocyte slit diaphragms (4–14 nm pores) are bridged by a specialized molecular zipper composed primarily of nephrin and podocin, which provides the ultimate size-selective filtration barrier."
+      },
+      {
+        q: "What is the normal physiological estimated Glomerular Filtration Rate (eGFR) in a healthy young adult?",
+        options: [
+          "30–50 mL/min/1.73 m²",
+          "60–89 mL/min/1.73 m²",
+          "90–120 mL/min/1.73 m²",
+          "150–200 mL/min/1.73 m²"
+        ],
+        correct: 2,
+        explanation: "A normal physiological eGFR in healthy adults is 90–120 mL/min/1.73 m², which serves as the quantitative reference standard for staging renal function."
+      },
+      {
+        q: "Which nephron segment is the 'high-capacity workhorse' responsible for obligate reabsorption of ~65–70% of filtered Na+, Cl-, and water, and >99% of filtered glucose?",
+        options: [
+          "Distal Convoluted Tubule (DCT)",
+          "Proximal Convoluted Tubule (PCT)",
+          "Thick Ascending Limb of Henle (TAL)",
+          "Medullary Collecting Duct"
+        ],
+        correct: 1,
+        explanation: "The PCT performs the bulk of reabsorptive transport: roughly 65–70% of filtered sodium, chloride, and water, ~85–90% of bicarbonate, and virtually all filtered glucose and amino acids."
+      },
+      {
+        q: "At what arterial plasma glucose concentration is the renal tubular absorptive threshold (SGLT capacity) exceeded, resulting in overt glucosuria?",
+        options: [
+          "~100 mg/dL (~5.6 mmol/L)",
+          "~126 mg/dL (~7.0 mmol/L)",
+          "~180 mg/dL (~10 mmol/L)",
+          "~300 mg/dL (~16.7 mmol/L)"
+        ],
+        correct: 2,
+        explanation: "When systemic plasma glucose surpasses approximately 180 mg/dL (10 mmol/L), the apical SGLT transporters in the PCT become saturated, causing unreabsorbed glucose to spill into the urine and induce osmotic diuresis."
+      },
+      {
+        q: "Which transport protein located in the Thick Ascending Limb (TAL) of Henle is responsible for actively reabsorbing ions without water to charge the medullary gradient?",
+        options: [
+          "Na+/H+ Exchanger 3 (NHE3)",
+          "Na+-K+-2Cl- Cotransporter 2 (NKCC2)",
+          "Epithelial Sodium Channel (ENaC)",
+          "Sodium-Glucose Cotransporter 2 (SGLT2)"
+        ],
+        correct: 1,
+        explanation: "The water-impermeable TAL actively pumps ions into the medullary interstitium via apical NKCC2 cotransporters, generating the hypertonic corticomedullary gradient essential for urine concentration."
+      },
+      {
+        q: "How does Aldosterone enhance sodium retention and maintain blood pressure in the distal nephron?",
+        options: [
+          "Inhibiting apical Aquaporin-2 exocytosis",
+          "Upregulating basolateral Na+/K+-ATPase and apical ENaC channels in principal cells, exchanging Na+ for K+ and H+",
+          "Directly dilating the afferent arteriole to lower intraglomerular pressure",
+          "Blocking brush-border carbonic anhydrase in proximal convoluted tubules"
+        ],
+        correct: 1,
+        explanation: "Aldosterone stimulates nuclear mineralocorticoid receptors in principal cells, increasing the synthesis and membrane insertion of apical ENaC channels and basolateral Na+/K+-ATPases, promoting sodium reabsorption in exchange for potassium and proton excretion."
+      },
+      {
+        q: "Through which cellular mechanism does Antidiuretic Hormone (ADH / Vasopressin) promote renal free water reabsorption?",
+        options: [
+          "Binding V1 receptors to cause renal vasoconstriction",
+          "Binding basolateral V2 receptors to trigger cAMP-mediated insertion of Aquaporin-2 (AQP2) channels into the apical membrane",
+          "Activating apical NKCC2 cotransporters in the collecting duct",
+          "Phosphorylating nephrin to expand podocyte slit diaphragms"
+        ],
+        correct: 1,
+        explanation: "ADH binds basolateral V2 G-protein coupled receptors in collecting duct principal cells, stimulating adenylate cyclase to raise cAMP, which drives exocytic insertion of Aquaporin-2 (AQP2) water channels into the apical membrane."
+      },
+      {
+        q: "Which intrarenal hemodynamic action of Angiotensin II helps preserve intraglomerular filtration pressure during states of systemic hypoperfusion?",
+        options: [
+          "Selective constriction of the efferent arteriole",
+          "Preferential dilation of the efferent arteriole",
+          "Selective constriction of the afferent arteriole",
+          "Complete closure of the peritubular capillaries"
+        ],
+        correct: 0,
+        explanation: "Angiotensin II preferentially constricts the efferent arteriole, increasing resistance to outflow from the glomerular tuft and maintaining intraglomerular hydrostatic pressure and GFR despite lower systemic perfusion."
+      },
+      {
+        q: "Why do patients with progressive Chronic Kidney Disease (CKD) develop a normocytic, normochromic anemia?",
+        options: [
+          "Excessive urinary loss of transferrin in distal collecting ducts",
+          "Destruction of renal cortical peritubular fibroblasts leading to deficient Erythropoietin (EPO) synthesis",
+          "Direct inhibition of bone marrow stem cells by elevated creatinine",
+          "Inability of renal tubular 1α-hydroxylase to synthesize ferritin"
+        ],
+        correct: 1,
+        explanation: "As progressive fibrosis replaces functional renal cortical parenchyma, peritubular interstitial fibroblasts are lost, causing a deficiency in erythropoietin (EPO) and subsequent failure of erythroid progenitor stimulation in the bone marrow."
+      },
+      {
+        q: "In CKD-Mineral and Bone Disorder (CKD-MBD), what primary biochemical event directly initiates the cascade leading to secondary hyperparathyroidism?",
+        options: [
+          "Hypercalcemia resulting from excess vitamin D intake",
+          "Phosphate retention (hyperphosphatemia) and calcitriol deficiency due to reduced GFR and loss of 1α-hydroxylase",
+          "Excessive urinary excretion of parathyroid hormone",
+          "Direct autoantibody stimulation of parathyroid calcium-sensing receptors"
+        ],
+        correct: 1,
+        explanation: "Declining GFR causes phosphate retention (hyperphosphatemia) and loss of proximal tubular 1α-hydroxylase (calcitriol deficiency). The resulting hypocalcemia and high phosphate stimulate parathyroid hyperplasia and PTH secretion (secondary hyperparathyroidism)."
+      },
+      {
+        q: "Why is Blood Urea Nitrogen (BUN) considered an INFERIOR marker of GFR compared to serum creatinine?",
+        options: [
+          "Urea is not filtered across the glomerular filtration barrier.",
+          "BUN levels are heavily influenced by protein intake, GI bleeding, and variable, flow-dependent tubular reabsorption.",
+          "Urea is destroyed in the bloodstream by erythrocyte enzymes.",
+          "BUN only rises when GFR is above 120 mL/min/1.73 m²."
+        ],
+        correct: 1,
+        explanation: "BUN is an inconsistent filtration marker because urea production fluctuates with dietary protein, catabolism, and upper GI hemorrhage, and filtered urea undergoes significant, flow-dependent tubular reabsorption that increases during volume depletion."
+      },
+      {
+        q: "A urine albumin-to-creatinine ratio (UACR) of 150 mg/g falls into which clinical KDIGO albuminuria category?",
+        options: [
+          "A1 Category (Normal to Mildly Increased)",
+          "A2 Category (Moderately Increased / Microalbuminuria)",
+          "A3 Category (Severely Increased / Macroalbuminuria)",
+          "Nephrotic-range proteinuria"
+        ],
+        correct: 1,
+        explanation: "KDIGO categorizes UACR as: A1 (< 30 mg/g; normal to mildly increased), A2 (30–300 mg/g; moderately increased/microalbuminuria), and A3 (> 300 mg/g; severely increased/macroalbuminuria)."
+      },
+      {
+        q: "The presence of Red Blood Cell (RBC) Casts in urinary sediment microscopy is pathognomonic for which condition?",
+        options: [
+          "Acute Tubular Necrosis (ATN)",
+          "Active Glomerulonephritis / Acute Nephritic Syndrome",
+          "Lower urinary tract cystitis",
+          "Nephrolithiasis with ureteral mucosal abrasion"
+        ],
+        correct: 1,
+        explanation: "RBC casts form when erythrocytes originating from inflamed, damaged glomerular capillaries become trapped within cylindrical Tamm-Horsfall mucoprotein matrices in the distal nephron, which is pathognomonic for active glomerulonephritis."
+      },
+      {
+        q: "Which microscopic urinary cast is considered the diagnostic hallmark of Acute Tubular Necrosis (ATN)?",
+        options: [
+          "Hyaline casts",
+          "Muddy brown granular casts",
+          "White blood cell casts",
+          "Fatty casts with oval fat bodies"
+        ],
+        correct: 1,
+        explanation: "Muddy brown granular casts represent degenerated cylindrical aggregates of sloughed necrotic tubular epithelial cells and Tamm-Horsfall protein, the classic microscopic hallmark of ATN."
+      },
+      {
+        q: "According to KDIGO criteria, which of the following confirms a diagnosis of Acute Kidney Injury (AKI)?",
+        options: [
+          "Serum creatinine increase ≥ 0.3 mg/dL (≥ 26.5 µmol/L) within 48 hours",
+          "Serum creatinine increase of 10% above baseline over 3 months",
+          "Urine output < 1.0 mL/kg/h for 2 consecutive hours",
+          "Presence of trace glucosuria on a random dipstick"
+        ],
+        correct: 0,
+        explanation: "KDIGO defines AKI by a serum creatinine rise ≥ 0.3 mg/dL within 48 hours, a rise ≥ 1.5 times baseline within 7 days, or urine volume < 0.5 mL/kg/h for 6 or more consecutive hours."
+      },
+      {
+        q: "Which form of Acute Kidney Injury is caused by renal hypoperfusion (e.g., dehydration, hemorrhage, heart failure) while the renal parenchyma remains structurally intact and readily reversible upon fluid restoration?",
+        options: [
+          "Intrinsic AKI",
+          "Prerenal AKI",
+          "Postrenal AKI",
+          "Allergic Interstitial Nephritis"
+        ],
+        correct: 1,
+        explanation: "Prerenal AKI arises from decreased effective arterial blood volume and renal hypoperfusion without structural damage to nephron parenchyma; prompt hemodynamic restoration typically normalizes GFR rapidly."
+      },
+      {
+        q: "A patient with long-standing diabetic nephropathy has an eGFR of 22 mL/min/1.73 m² persisting for over 6 months. Which KDIGO CKD stage does this represent?",
+        options: [
+          "Stage G2",
+          "Stage G3a",
+          "Stage G3b",
+          "Stage G4"
+        ],
+        correct: 3,
+        explanation: "KDIGO GFR categories: G1 (≥ 90), G2 (60–89), G3a (45–59), G3b (30–44), G4 (15–29; severely decreased), and G5 (< 15; kidney failure)."
+      },
+      {
+        q: "Which clinical and laboratory feature is characteristic of Nephrotic Syndrome rather than Nephritic Syndrome?",
+        options: [
+          "Heavy proteinuria (> 3.5 g/day) with severe hypoalbuminemia (< 3.0 g/dL) and generalized edema",
+          "Prominent dysmorphic hematuria with red blood cell casts",
+          "Severe oliguria with rapid crescent formation on renal biopsy",
+          "Acute hypertension with periorbital edema and mild non-nephrotic proteinuria"
+        ],
+        correct: 0,
+        explanation: "Nephrotic syndrome is characterized by heavy proteinuria (> 3.5 g/24h), profound hypoalbuminemia (< 3.0 g/dL), generalized edema (anasarca), and hyperlipidemia, resulting from severe podocyte injury and barrier breakdown."
+      },
+      {
+        q: "Why do patients with severe Nephrotic Syndrome develop pronounced hyperlipidemia (hypercholesterolemia)?",
+        options: [
+          "Excessive renal tubular synthesis and secretion of LDL into the renal vein",
+          "Non-specific compensatory acceleration of hepatic protein and lipoprotein synthesis triggered by low oncotic pressure",
+          "Direct dietary cholesterol retention caused by defective biliary filtration",
+          "Impaired conversion of cholesterol to bile acids in the spleen"
+        ],
+        correct: 1,
+        explanation: "Massive urinary albumin loss causes profound hypoalbuminemia and decreased capillary oncotic pressure, prompting the liver to ramp up protein and lipoprotein (apoB) synthesis, leading to marked secondary hyperlipidemia."
+      },
+      {
+        q: "Why must Metformin be discontinued or avoided when a patient's eGFR drops below 30 mL/min/1.73 m²?",
+        options: [
+          "Metformin accumulation significantly elevates the risk of potentially fatal lactic acidosis.",
+          "Metformin directly crystallizes within the loop of Henle, causing obstruction.",
+          "Metformin competitively inhibits renal tubular erythropoietin secretion.",
+          "Metformin causes severe proximal tubular lysosomal phospholipidosis."
+        ],
+        correct: 0,
+        explanation: "Metformin is cleared primarily unchanged by renal excretion. In severe renal impairment (eGFR < 30 mL/min/1.73 m²), drug accumulation can trigger life-threatening biguanide-associated lactic acidosis."
+      },
+      {
+        q: "How does the concurrent administration of an NSAID and an ACE inhibitor precipitate an abrupt drop in intraglomerular hydrostatic pressure and acute decline in GFR?",
+        options: [
+          "NSAIDs constrict the efferent arteriole, while ACE inhibitors dilate the afferent arteriole.",
+          "NSAIDs block prostaglandin-mediated afferent arteriole vasodilation, while ACE inhibitors block angiotensin II-mediated efferent arteriole vasoconstriction.",
+          "Both agents combine to precipitate obstructive crystal casts within collecting ducts.",
+          "NSAIDs and ACE inhibitors directly lyse podocyte slit diaphragms."
+        ],
+        correct: 1,
+        explanation: "Prostaglandins dilate the afferent arteriole (blocked by NSAIDs, causing afferent constriction), while Angiotensin II constricts the efferent arteriole (blocked by ACE inhibitors, causing efferent dilation). Combining them collapses the transcapillary hydrostatic pressure gradient required for filtration."
+      },
+      {
+        q: "Which antimicrobial drug class accumulates inside proximal tubular lysosomes to cause direct nephrotoxicity, mandating close therapeutic drug monitoring?",
+        options: [
+          "Aminoglycosides (e.g., Gentamicin, Amikacin)",
+          "Macrolides (e.g., Azithromycin)",
+          "Penicillins (e.g., Amoxicillin)",
+          "Fluoroquinolones (e.g., Ciprofloxacin)"
+        ],
+        correct: 0,
+        explanation: "Aminoglycosides are freely filtered and undergo pinocytosis into proximal tubular epithelial cells, accumulating within lysosomes and causing oxidative stress, mitochondrial injury, and acute tubular necrosis."
+      },
+      {
+        q: "A patient develops acute interstitial nephritis (AIN) with fever, rash, and white blood cell casts in urine after starting a medication. What is the underlying pathology?",
+        options: [
+          "Mechanical occlusion of distal tubules by drug micro-crystals",
+          "Drug-induced hypersensitivity reaction causing allergic interstitial inflammation and edema",
+          "Non-enzymatic glycation of the glomerular basement membrane",
+          "Direct lysis of collecting duct intercalated cells"
+        ],
+        correct: 1,
+        explanation: "Acute Interstitial Nephritis (AIN) is an immune-mediated hypersensitivity reaction to drugs (e.g., penicillins, cephalosporins, PPIs, NSAIDs) characterized by interstitial inflammatory cell infiltrates, edema, and characteristic WBC casts."
+      },
+      {
+        q: "Which medication can precipitate acute obstructive renal failure via intratubular crystal deposition when administered rapidly intravenously without adequate hydration?",
+        options: [
+          "High-dose Acyclovir",
+          "Insulin regular",
+          "Enalaprilat",
+          "Heparin"
+        ],
+        correct: 0,
+        explanation: "Acyclovir has poor solubility in tubular fluid at physiological urine pH. When administered at high intravenous doses without sufficient hydration, it rapidly crystallizes in collecting tubules, causing acute obstructive nephropathy."
+      },
+      {
+        q: "A 12-year-old male presents with periorbital edema, hypertension, cola-colored urine, and red blood cell casts two weeks after a pharyngeal infection. What is the diagnosis?",
+        options: [
+          "Idiopathic Minimal Change Nephrotic Syndrome",
+          "Acute Post-Streptococcal Glomerulonephritis (Nephritic Syndrome)",
+          "Prerenal Azotemia secondary to dehydration",
+          "Acute Pyelonephritis"
+        ],
+        correct: 1,
+        explanation: "Post-streptococcal glomerulonephritis is an immune-complex mediated nephritic syndrome presenting with gross hematuria (cola-colored urine with dysmorphic RBCs and RBC casts), hypertension, and periorbital edema after a latent streptococcal infection."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
