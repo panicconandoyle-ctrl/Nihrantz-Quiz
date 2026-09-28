@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mineral Biochemistry: Calcium Homeostasis & Clinical Disorders (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Feedback States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Mineral Biochemistry: Calcium Homeostasis Test</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the primary quantitative physiological threshold that classifies a mineral as a Major Element (Macromineral) rather than a Trace Element?",
+        options: [
+          "Daily physiological requirement > 10 mg/day",
+          "Daily physiological requirement > 50 mg/day",
+          "Daily physiological requirement > 100 mg/day",
+          "Daily physiological requirement > 1,000 mg/day"
+        ],
+        correct: 2,
+        explanation: "Macrominerals (such as Ca, P, Mg, Na, K, Cl, S, F) are defined by a daily physiological intake requirement exceeding 100 mg/day, whereas microminerals (trace elements) require less than 100 mg/day."
+      },
+      {
+        q: "Which of the following chemical elements is classified as a toxic heavy metal contaminant rather than an essential physiological mineral?",
+        options: [
+          "Molybdenum (Mo)",
+          "Selenium (Se)",
+          "Cadmium (Cd)",
+          "Manganese (Mn)"
+        ],
+        correct: 2,
+        explanation: "Cadmium (Cd), along with lead (Pb), mercury (Hg), and aluminium (Al), is categorized as a toxic heavy metal with no physiological nutritional benefit, while Mo, Se, and Mn are essential microminerals."
+      },
+      {
+        q: "Approximately what percentage of total adult body calcium (1.0–1.5 kg) is sequestered within the mineralized skeletal and dental reservoir?",
+        options: [
+          "50%",
+          "75%",
+          "90%",
+          "99%"
+        ],
+        correct: 3,
+        explanation: "Approximately 99% of total body calcium is localized in the skeleton and teeth as crystalline hydroxyapatite [Ca10(PO4)6(OH)2], while the remaining dynamically regulated 1% constitutes the exchangeable pool in ECF and soft tissues."
+      },
+      {
+        q: "What is the chemical formula of the crystalline inorganic matrix of bones and teeth in which skeletal calcium is stored?",
+        options: [
+          "CaCO3",
+          "Ca10(PO4)6(OH)2",
+          "Ca3(PO4)2",
+          "CaC2O4"
+        ],
+        correct: 1,
+        explanation: "Skeletal calcium is stored as hydroxyapatite crystals, chemically formulated as Ca10(PO4)6(OH)2, providing structural scaffolding and compressive strength."
+      },
+      {
+        q: "What is the Recommended Dietary Allowance (RDA) of calcium for a healthy adult under baseline maintenance conditions?",
+        options: [
+          "100 mg/day",
+          "500 mg/day",
+          "1,200 mg/day",
+          "1,500 mg/day"
+        ],
+        correct: 1,
+        explanation: "According to standard clinical reference guidelines, the baseline adult maintenance RDA for calcium is 500 mg/day, increasing during pediatric growth (1,200 mg/day), pregnancy/lactation (1,500 mg/day), and postmenopausal/geriatric states (1,500 mg/day)."
+      },
+      {
+        q: "Why do cereal grains like unfortified wheat and rice serve as poor bioavailable dietary sources of calcium?",
+        options: [
+          "They contain high concentrations of phytates that chelate calcium into insoluble precipitates.",
+          "They degrade basolateral ATPases in duodenal enterocytes.",
+          "They directly suppress parathyroid hormone release from chief cells.",
+          "They contain excessive vitamin D that accelerates urinary calcium excretion."
+        ],
+        correct: 0,
+        explanation: "Cereal grains contain high concentrations of phytic acid (phytates), which possess electronegative phosphate groups that chelate divalent calcium ions into insoluble, non-absorbable calcium phytate complexes."
+      },
+      {
+        q: "Where is dietary calcium predominantly absorbed along the gastrointestinal tract?",
+        options: [
+          "Gastric antrum",
+          "Proximal duodenum",
+          "Terminal ileum",
+          "Ascending colon"
+        ],
+        correct: 1,
+        explanation: "Dietary calcium is predominantly absorbed across the proximal duodenum via active transcellular transport mediated by carrier proteins against a steep concentration gradient."
+      },
+      {
+        q: "Which intracellular transport protein is directly induced by Calcitriol [1,25-(OH)2D3] to ferry calcium across enterocytes?",
+        options: [
+          "Calmodulin",
+          "Calbindin",
+          "C-reactive protein",
+          "Ferritin"
+        ],
+        correct: 1,
+        explanation: "Active calcitriol binds to the enterocyte nuclear Vitamin D Receptor (VDR), upregulating the transcription and synthesis of Calbindin, which shuttles absorbed calcium across the cytoplasm to basolateral ATPases."
+      },
+      {
+        q: "How does gastric acidity (low luminal pH) promote the intestinal absorption of dietary calcium?",
+        options: [
+          "It stimulates parafollicular C cells to secrete calcitonin.",
+          "It maintains dietary calcium in its soluble ionized (Ca2+) state.",
+          "It cleaves calbindin into active monomers in the duodenal brush border.",
+          "It saponifies unabsorbed free fatty acids into absorbable micelles."
+        ],
+        correct: 1,
+        explanation: "An acidic gastric environment (low pH) is crucial for dissolving calcium salts and maintaining calcium in a soluble, free ionized (Ca2+) form suitable for mucosal absorption."
+      },
+      {
+        q: "How does fat malabsorption (steatorrhea) inhibit intestinal calcium bioavailability?",
+        options: [
+          "Excessive micelle formation directly destroys enterocyte microvilli.",
+          "Unabsorbed free fatty acids saponify with ionized calcium, forming insoluble 'calcium soaps' excreted in stool.",
+          "Unabsorbed lipids competitively bind to basolateral Na+/Ca2+ exchangers.",
+          "Fat accumulation in the duodenal lumen permanently inactivates 1α-hydroxylase."
+        ],
+        correct: 1,
+        explanation: "In fat malabsorption, unabsorbed luminal free fatty acids bind divalent calcium ions through saponification, forming insoluble, non-absorbable 'calcium soaps' that are lost in the feces."
+      },
+      {
+        q: "During skeletal muscle excitation-contraction coupling, what specific regulatory protein does cytosolic Ca2+ bind to in order to expose actin binding sites?",
+        options: [
+          "Tropomyosin",
+          "Troponin C",
+          "Myosin light-chain kinase",
+          "Calsequestrin"
+        ],
+        correct: 1,
+        explanation: "Depolarization causes sarcoplasmic Ca2+ release into the cytosol, where it binds directly to Troponin C. This induces a conformational shift in tropomyosin, exposing active binding sites on actin for myosin cross-bridge attachment."
+      },
+      {
+        q: "What is the obligate role of extracellular calcium influx at presynaptic axon terminals during synaptic neurotransmission?",
+        options: [
+          "Hyperpolarizing the presynaptic axonal lemma to end the action potential",
+          "Triggering SNARE-mediated vesicular exocytosis of neurotransmitters into the synaptic cleft",
+          "Directly hydrolyzing acetylcholine inside clear vesicles",
+          "Blocking voltage-gated sodium channels along the axon hillock"
+        ],
+        correct: 1,
+        explanation: "When an action potential arrives at an axon terminal, voltage-gated calcium channels open. The rapid influx of Ca2+ engages SNARE proteins to trigger vesicle fusion with the presynaptic membrane, releasing neurotransmitters into the synaptic cleft."
+      },
+      {
+        q: "In the blood coagulation cascade, calcium is traditionally designated as which clotting factor?",
+        options: [
+          "Factor I",
+          "Factor II",
+          "Factor IV",
+          "Factor XII"
+        ],
+        correct: 2,
+        explanation: "Calcium is designated as Factor IV in the classic coagulation cascade nomenclature, serving as an obligate cofactor for assembly of clotting factor complexes."
+      },
+      {
+        q: "How does calcium facilitate the assembly of the prothrombinase complex on activated platelet surfaces?",
+        options: [
+          "By cleaving fibrinogen into soluble fibrinopeptides",
+          "By forming coordination bridges between γ-carboxyglutamate (Gla) residues on clotting factors and anionic membrane phospholipids",
+          "By activating tissue factor pathway inhibitor (TFPI)",
+          "By covalently cross-linking D-dimer domain monomers"
+        ],
+        correct: 1,
+        explanation: "Ionized calcium forms divalent coordinate bridges between negatively charged γ-carboxyglutamate (Gla) residues on Vitamin K-dependent factors (such as Prothrombin) and anionic phospholipids on activated platelet membranes."
+      },
+      {
+        q: "Which 17 kDa regulatory protein contains four 'EF-hand' motifs and undergoes conformational activation upon binding free cytosolic Ca2+ to modulate cellular kinases?",
+        options: [
+          "Calbindin",
+          "Calmodulin",
+          "Calcitonin",
+          "Corticotropin"
+        ],
+        correct: 1,
+        explanation: "Calmodulin is a ubiquitous 17 kDa intracellular calcium sensor containing four EF-hand structural motifs. Binding Ca2+ activates calmodulin, which then binds and modulates target protein kinases, phosphatases, and cyclases."
+      },
+      {
+        q: "What is the normal total plasma calcium reference concentration range in a healthy adult?",
+        options: [
+          "4.5–6.0 mg/dL (1.1–1.5 mmol/L)",
+          "9.0–11.0 mg/dL (2.2–2.7 mmol/L)",
+          "13.5–16.0 mg/dL (3.4–4.0 mmol/L)",
+          "18.0–22.0 mg/dL (4.5–5.5 mmol/L)"
+        ],
+        correct: 1,
+        explanation: "Total plasma calcium is tightly maintained between 9.0 and 11.0 mg/dL (2.2–2.7 mmol/L) under physiological homeostatic control."
+      },
+      {
+        q: "Which plasma calcium subfraction represents the SOLE biologically active pool that governs neuromuscular excitability, endocrine secretion, and cardiac rhythm?",
+        options: [
+          "Albumin-bound calcium",
+          "Citrate-complexed calcium",
+          "Ionized (free) calcium (Ca2+)",
+          "Phosphate-complexed calcium"
+        ],
+        correct: 2,
+        explanation: "Ionized (free) calcium (45–55% of total, ~5.0 mg/dL) is the only biologically active fraction. Protein-bound and complexed forms are metabolically inactive transport and buffering reservoirs."
+      },
+      {
+        q: "Why is protein-bound plasma calcium (~40–45% of total pool) NOT ultrafiltrable at the renal glomerulus?",
+        options: [
+          "It is rapidly degraded by brush-border peptidases.",
+          "It is complexed to large, negatively charged serum macromolecules (predominantly albumin) that cannot traverse the filtration barrier.",
+          "It carries a positive charge that repels podocyte slit diaphragms.",
+          "It is completely sequestered inside circulating erythrocytes."
+        ],
+        correct: 1,
+        explanation: "Protein-bound calcium is attached to high-molecular-weight plasma proteins, predominantly albumin (~66 kDa), which are barred from crossing the charge- and size-selective glomerular filtration barrier."
+      },
+      {
+        q: "Which endocrine gland and cell type synthesize and secrete Parathyroid Hormone (PTH) in response to a drop in ionized plasma calcium?",
+        options: [
+          "Thyroid gland follicular cells",
+          "Thyroid gland parafollicular C cells",
+          "Parathyroid gland chief cells",
+          "Adrenal cortex chromaffin cells"
+        ],
+        correct: 2,
+        explanation: "Chief cells within the parathyroid glands express calcium-sensing receptors that detect decreases in ionized plasma Ca2+, rapidly releasing pre-formed Parathyroid Hormone (PTH)."
+      },
+      {
+        q: "What is the direct renal tubular action of Parathyroid Hormone (PTH) on calcium and phosphate handling?",
+        options: [
+          "Promotes excretion of both calcium and phosphate",
+          "Maximizes distal tubular calcium reabsorption while inhibiting proximal tubular phosphate reabsorption (phosphate dumping)",
+          "Inhibits distal tubular calcium reabsorption while stimulating proximal phosphate retention",
+          "Blocks 1α-hydroxylase enzyme activity in the proximal convoluted tubule"
+        ],
+        correct: 1,
+        explanation: "PTH acts on the renal tubules to maximize calcium reabsorption in the distal convoluted tubule while suppressing phosphate reabsorption in the proximal tubule ('phosphate dumping'), preventing calcium phosphate precipitation."
+      },
+      {
+        q: "Which hormone is synthesized by thyroid parafollicular C cells in response to hypercalcemia to lower circulating blood calcium?",
+        options: [
+          "Calcitriol",
+          "Calcitonin",
+          "Parathyroid Hormone (PTH)",
+          "Thyroxine (T4)"
+        ],
+        correct: 1,
+        explanation: "Calcitonin is released by thyroid parafollicular C cells when plasma ionized calcium rises. It lowers serum calcium by inhibiting osteoclastic bone resorption and promoting renal calcium excretion."
+      },
+      {
+        q: "Which bone cells are characterized as specialized multinucleated macrophages that secrete hydrochloric acid and proteases to resorb bone matrix and elevate serum calcium?",
+        options: [
+          "Osteoblasts",
+          "Osteocytes",
+          "Osteoclasts",
+          "Chondrocytes"
+        ],
+        correct: 2,
+        explanation: "Osteoclasts are multinucleated bone-resorbing macrophages stimulated by PTH that secrete HCl and lysosomal enzymes to dissolve hydroxyapatite and organic osteoid, releasing calcium and phosphate into blood."
+      },
+      {
+        q: "What is the classic electrocardiographic (ECG) hallmark of severe hypercalcemia (> 11.0 mg/dL)?",
+        options: [
+          "Prolonged QT interval",
+          "Shortened QT interval",
+          "Prominent U waves following T waves",
+          "Wide QRS complex with peaked T waves"
+        ],
+        correct: 1,
+        explanation: "Hypercalcemia accelerates cardiac ventricular repolarization, causing a characteristic shortening of the ST segment and QT interval on ECG. (Conversely, hypocalcemia prolongs the QT interval)."
+      },
+      {
+        q: "In Multiple Myeloma, what specific mechanism drives aggressive focal bone destruction and severe hypercalcemia?",
+        options: [
+          "Malignant plasma cells secrete osteoclast-activating factors (OAF), inciting aggressive osteolytic bone resorption.",
+          "Malignant B cells directly produce large amounts of active calcitonin.",
+          "Myeloma paraproteins permanently bind and block renal calcium excretion.",
+          "Renal tubular light-chain casts synthesize parathyroid hormone-related peptide."
+        ],
+        correct: 0,
+        explanation: "In multiple myeloma, clonal plasma cells in bone marrow produce osteoclast-activating cytokines (such as RANKL, IL-1, TNF), stimulating uncontrolled osteoclastic bone resorption, osteolytic 'punched-out' lesions, and severe hypercalcemia."
+      },
+      {
+        q: "What acute pathophysiological mechanism explains why hypocalcemia (< 8.5 mg/dL) produces peripheral neuromuscular irritability and tetany?",
+        options: [
+          "Low extracellular Ca2+ reduces the threshold for opening voltage-gated sodium channels, causing spontaneous axonal depolarization.",
+          "Low calcium directly inhibits acetylcholinesterase at neuromuscular junctions.",
+          "Hypocalcemia blocks glycine and GABA release from spinal Renshaw interneurons.",
+          "Low calcium causes immediate structural denaturation of the actin filament."
+        ],
+        correct: 0,
+        explanation: "Extracellular calcium ions normally screen surface negative charges on voltage-gated sodium channels. Depletion of extracellular Ca2+ lowers the threshold potential toward resting potential, causing spontaneous depolarization and repetitive axonal firing."
+      },
+      {
+        q: "Which clinical physical examination maneuver involves inflating a blood pressure cuff above systolic pressure for 3 minutes to provoke carpal spasm?",
+        options: [
+          "Chvostek's sign",
+          "Trousseau's sign",
+          "Gowers sign",
+          "Kernig's sign"
+        ],
+        correct: 1,
+        explanation: "Trousseau's sign is provoked by inflating a sphygmomanometer cuff above systolic pressure for 3 minutes. Resulting local ischemia amplifies underlying hypocalcemic neuromuscular irritability, inducing painful carpopedal spasm ('obstetrician's hand')."
+      },
+      {
+        q: "Tapping the facial nerve immediately anterior to the external auditory meatus elicits an involuntary ipsilateral facial muscle twitch. What is this sign named?",
+        options: [
+          "Trousseau's sign",
+          "Chvostek's sign",
+          "Babinski's sign",
+          "Battle's sign"
+        ],
+        correct: 1,
+        explanation: "Chvostek's sign is elicited by tapping over the trunk of the facial nerve (cranial nerve VII) anterior to the ear. An ipsilateral twitch of facial and perioral muscles indicates hypocalcemic neuromuscular excitability."
+      },
+      {
+        q: "What is the most immediate life-threatening complication of severe acute hypocalcemia requiring emergency airway vigilance?",
+        options: [
+          "Acute nephrocalcinosis",
+          "Laryngospasm causing acute stridor and mechanical asphyxiation",
+          "Profound high-output cardiomyopathy with anasarca",
+          "Generalized osteitis fibrosa cystica"
+        ],
+        correct: 1,
+        explanation: "Severe acute hypocalcemia can induce violent tetanic contraction of laryngeal vocal cord musculature (laryngospasm), presenting with stridor and precipitating sudden fatal airway obstruction if not treated immediately with IV calcium gluconate."
+      },
+      {
+        q: "How does the underlying molecular mechanism of infectious Tetanus (Clostridium tetani) differ from metabolic Tetany?",
+        options: [
+          "Infectious tetanus is caused by hypercalcemia; metabolic tetany is caused by hyperkalemia.",
+          "Tetanospasmin neurotoxin irreversibly blocks presynaptic exocytosis of inhibitory neurotransmitters (GABA and Glycine) in the spinal cord, whereas metabolic tetany is caused by depletion of ionized Ca2+.",
+          "Infectious tetanus stimulates enterocyte calbindin synthesis; metabolic tetany damages podocytes.",
+          "Infectious tetanus is driven by excessive parathyroid hormone secretion."
+        ],
+        correct: 1,
+        explanation: "Metabolic tetany results from low ionized calcium increasing neuronal membrane sodium permeability. Infectious tetanus results from tetanospasmin cleaving synaptobrevin, which prevents release of inhibitory neurotransmitters (GABA and glycine) from spinal Renshaw interneurons, causing uninhibited motor firing."
+      },
+      {
+        q: "What is the immediate intravenous pharmacotherapeutic intervention mandated to manage severe acute hypocalcemic tetany or post-surgical laryngospasm?",
+        options: [
+          "Intravenous Tetanus Immune Globulin (TIG)",
+          "Intravenous Calcium Gluconate",
+          "Intravenous Calcitonin infusion",
+          "High-dose intravenous Furosemide with sodium chloride"
+        ],
+        correct: 1,
+        explanation: "Acute symptomatic hypocalcemia and emergent tetany/laryngospasm require immediate slow intravenous administration of Calcium Gluconate (typically 10% solution) to rapidly restore circulating ionized calcium and stabilize excitable membranes."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
