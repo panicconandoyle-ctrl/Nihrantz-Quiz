@@ -188,57 +188,206 @@ export const UploadQuizModal: React.FC<UploadQuizModalProps> = ({
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Physics & Quantum Fundamentals</title>
   <style>
-    body { font-family: sans-serif; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 16px; }
-    .card { background: #1e293b; border-radius: 12px; padding: 24px; max-width: 520px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    h2 { margin-top: 0; font-size: 20px; margin-bottom: 16px; }
-    .btn { display: block; width: 100%; text-align: left; background: #334155; color: white; border: 1px solid #475569; padding: 12px; margin: 8px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; }
-    .btn:hover { background: #2563eb; }
-    .btn.correct { background: #059669; border-color: #34d399; }
-    .btn.incorrect { background: #dc2626; border-color: #f87171; }
-    .feedback { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 13px; display: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; max-width: 580px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .mode-group { display: inline-flex; background: rgba(255,255,255,0.06); padding: 2px; border-radius: 6px; }
+    .mode-btn { background: transparent; border: none; color: #94a3b8; padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; }
+    .mode-btn.active { background: #3b82f6; color: white; }
+    .timer-pill { font-family: monospace; font-size: 12px; font-weight: bold; background: rgba(59,130,246,0.15); border: 1px solid #3b82f6; color: #60a5fa; padding: 3px 8px; border-radius: 6px; display: none; }
+    .drawer-btn { background: rgba(255,255,255,0.08); border: 1px solid #475569; color: #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    .drawer { display: none; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 14px; }
+    .drawer.open { display: block; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px; margin-top: 6px; }
+    .grid-box { height: 32px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1px solid #334155; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; position: relative; }
+    .grid-box.active { border-color: #3b82f6; color: #60a5fa; }
+    .grid-box.answered { background: rgba(59,130,246,0.2); border-color: #3b82f6; }
+    .grid-box.flagged::after { content: '🚩'; position: absolute; top: -4px; right: -2px; font-size: 8px; }
+    .q-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .flag-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .flag-btn.flagged { background: #f59e0b; color: #0f172a; font-weight: bold; }
+    h2 { font-size: 18px; margin-bottom: 16px; line-height: 1.4; color: #fff; }
+    .btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: #334155; color: white; border: 1px solid #475569; padding: 12px; margin: 8px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; }
+    .btn:hover:not(:disabled) { background: #475569; }
+    .btn.exam-selected { background: rgba(59,130,246,0.25) !important; border-color: #3b82f6 !important; }
+    .btn.correct { background: #059669 !important; border-color: #34d399 !important; }
+    .btn.incorrect { background: #dc2626 !important; border-color: #f87171 !important; }
+    .feedback { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 13px; display: none; background: rgba(59,130,246,0.1); border-left: 3px solid #3b82f6; color: #93c5fd; }
+    .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    .act-btn { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+    .act-btn:hover { background: #2563eb; }
+    .submit-exam-btn { background: #10b981; }
+    .submit-exam-btn:hover { background: #059669; }
+    .scorecard { display: none; text-align: center; padding: 10px 0; }
+    .score-circle { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 16px; }
+    .drill-btn { background: #f59e0b; color: #0f172a; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 12px; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div style="font-size: 11px; text-transform: uppercase; color: #60a5fa; font-weight: bold; margin-bottom: 8px;">Physics Quiz</div>
-    <h2>1. What is the speed of light in vacuum?</h2>
-    <button class="btn" onclick="check(true, this, 'Correct! Approx 299,792 km/s (~300,000 km/s).')">A) ~300,000 km/s</button>
-    <button class="btn" onclick="check(false, this, 'Incorrect. Light travels at nearly 300,000 km/s in vacuum.')">B) ~150,000 km/s</button>
-    <button class="btn" onclick="check(false, this, 'Incorrect. 1,000,000 km/s exceeds the cosmic speed limit.')">C) ~1,000,000 km/s</button>
-    <div id="fb" class="feedback"></div>
+    <div id="quiz-view">
+      <div class="header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; text-transform: uppercase; color: #60a5fa; font-weight: bold;">Physics</span>
+          <div class="mode-group">
+            <button id="mode-p" class="mode-btn active" onclick="setMode('practice')">Practice</button>
+            <button id="mode-e" class="mode-btn" onclick="setMode('exam')">Exam</button>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="timer-pill" id="timer-pill">⏱️ 04:00</span>
+          <button class="drawer-btn" onclick="toggleDrawer()">List</button>
+        </div>
+      </div>
+      <div class="drawer" id="drawer">
+        <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Question Navigator: (🚩 = Flagged)</div>
+        <div class="grid" id="grid"></div>
+      </div>
+      <div class="q-row">
+        <span style="font-size: 12px; color: #94a3b8;" id="q-num">Question 1</span>
+        <button class="flag-btn" id="flag-btn" onclick="toggleFlag()">🏳️ Flag</button>
+      </div>
+      <h2 id="q-title">Question Stem</h2>
+      <div id="opts"></div>
+      <div id="fb" class="feedback"></div>
+      <div class="nav">
+        <span id="score-text" style="font-size: 12px; color: #94a3b8;">Score: 0</span>
+        <div style="display: flex; gap: 8px;">
+          <button id="submit-exam-btn" class="act-btn submit-exam-btn" style="display: none;" onclick="submitExam()">Submit Exam</button>
+          <button id="next-btn" class="act-btn" onclick="nextQuestion()">Next →</button>
+        </div>
+      </div>
+    </div>
+    <div id="result-view" class="scorecard">
+      <div class="score-circle" id="final-pct">0%</div>
+      <h3 style="margin-bottom: 6px;">Quiz Completed</h3>
+      <p id="final-stats" style="font-size: 13px; color: #94a3b8;"></p>
+      <button id="drill-btn" class="drill-btn" onclick="startTargetedDrill()">🎯 Review Missed &amp; Flagged Questions Only</button>
+      <button class="act-btn" style="width: 100%; margin-top: 8px;" onclick="restart()">🔄 Retake Full Quiz</button>
+    </div>
   </div>
   <script>
-    let audioCtx = null;
-    function playTone(correct) {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = correct ? 'triangle' : 'sine';
-        osc.frequency.setValueAtTime(correct ? 880 : 260, now);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-        osc.start(now); osc.stop(now + 0.2);
-      } catch(e) {}
+    const questions = [
+      { q: "What is the speed of light in a vacuum?", opts: ["~300,000 km/s", "~150,000 km/s", "~1,000,000 km/s"], ans: 0, exp: "Light travels at 299,792 km/s in vacuum." },
+      { q: "What subatomic particle carries a negative electric charge?", opts: ["Proton", "Neutron", "Electron"], ans: 2, exp: "Electrons carry a negative fundamental charge of -1e." },
+      { q: "Which law states that for every action, there is an equal and opposite reaction?", opts: ["Newton's 1st Law", "Newton's 2nd Law", "Newton's 3rd Law"], ans: 2, exp: "Newton's Third Law governs interaction forces between two bodies." }
+    ];
+    let mode = 'practice', active = [...questions], answers = new Array(active.length).fill(null), idx = 0, flags = new Set(), timer = null, remaining = active.length * 60;
+    function init() { renderGrid(); renderQ(); }
+    function setMode(m) {
+      mode = m;
+      document.getElementById('mode-p').className = m === 'practice' ? 'mode-btn active' : 'mode-btn';
+      document.getElementById('mode-e').className = m === 'exam' ? 'mode-btn active' : 'mode-btn';
+      document.getElementById('timer-pill').style.display = m === 'exam' ? 'inline-block' : 'none';
+      document.getElementById('submit-exam-btn').style.display = m === 'exam' ? 'inline-block' : 'none';
+      if (m === 'exam') startTimer(); else if (timer) clearInterval(timer);
+      renderQ();
     }
-    function check(correct, btn, msg) {
-      document.querySelectorAll('.btn').forEach(b => b.disabled = true);
-      btn.className += correct ? ' correct' : ' incorrect';
-      playTone(correct);
+    function startTimer() {
+      if (timer) clearInterval(timer);
+      remaining = active.length * 60;
+      updateTimer();
+      timer = setInterval(() => { remaining--; updateTimer(); if (remaining <= 0) { clearInterval(timer); submitExam(); } }, 1000);
+    }
+    function updateTimer() {
+      const m = Math.floor(remaining / 60), s = remaining % 60;
+      document.getElementById('timer-pill').textContent = \`⏱️ \${String(m).padStart(2,'0')}:\${String(s).padStart(2,'0')}\`;
+    }
+    function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+    function renderGrid() {
+      const g = document.getElementById('grid'); g.innerHTML = '';
+      active.forEach((q, i) => {
+        const b = document.createElement('div'); b.className = 'grid-box';
+        if (i === idx) b.classList.add('active');
+        if (answers[i] !== null) b.classList.add('answered');
+        if (flags.has(q.q)) b.classList.add('flagged');
+        b.textContent = i + 1;
+        b.onclick = () => { idx = i; renderQ(); };
+        g.appendChild(b);
+      });
+    }
+    function toggleFlag() {
+      const q = active[idx].q;
+      if (flags.has(q)) flags.delete(q); else flags.add(q);
+      renderQ();
+    }
+    function renderQ() {
+      renderGrid();
+      const q = active[idx];
+      document.getElementById('q-num').textContent = \`Question \${idx + 1} of \${active.length}\`;
+      document.getElementById('flag-btn').className = flags.has(q.q) ? 'flag-btn flagged' : 'flag-btn';
+      document.getElementById('flag-btn').textContent = flags.has(q.q) ? '🚩 Flagged' : '🏳️ Flag';
+      document.getElementById('q-title').textContent = q.q;
+      const opts = document.getElementById('opts'); opts.innerHTML = '';
       const fb = document.getElementById('fb');
-      fb.style.display = 'block';
-      fb.style.background = correct ? 'rgba(5, 150, 105, 0.2)' : 'rgba(220, 38, 38, 0.2)';
-      fb.textContent = msg;
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: 'quiz-answer', isCorrect: correct }, '*');
-        window.parent.postMessage({ type: 'quiz-completed', score: correct ? 1 : 0, total: 1, percentage: correct ? 100 : 0 }, '*');
+      const answered = answers[idx] !== null;
+      if (mode === 'practice' && answered) {
+        fb.style.display = 'block'; fb.textContent = \`Explanation: \${q.exp}\`;
+      } else {
+        fb.style.display = 'none';
+      }
+      q.opts.forEach((o, i) => {
+        const b = document.createElement('button'); b.className = 'btn';
+        b.textContent = \`\${String.fromCharCode(65 + i)}) \${o}\`;
+        if (mode === 'practice') {
+          b.disabled = answered;
+          if (answered) {
+            if (i === q.ans) b.classList.add('correct');
+            else if (i === answers[idx]) b.classList.add('incorrect');
+          }
+        } else {
+          if (answers[idx] === i) b.classList.add('exam-selected');
+        }
+        b.onclick = () => {
+          answers[idx] = i;
+          if (mode === 'practice' && window.parent) window.parent.postMessage({ type: 'quiz-answer', isCorrect: i === q.ans }, '*');
+          renderQ();
+        };
+        opts.appendChild(b);
+      });
+    }
+    function nextQuestion() {
+      if (idx < active.length - 1) { idx++; renderQ(); }
+      else if (mode === 'exam') submitExam(); else showResults();
+    }
+    function submitExam() {
+      const unanswered = answers.filter(a => a === null).length;
+      if (unanswered > 0 && !confirm(\`You have \${unanswered} unanswered question(s). Submit exam now?\`)) return;
+      showResults();
+    }
+    function showResults() {
+      if (timer) clearInterval(timer);
+      document.getElementById('quiz-view').style.display = 'none';
+      document.getElementById('result-view').style.display = 'block';
+      let correct = 0; answers.forEach((a, i) => { if (a === active[i].ans) correct++; });
+      const pct = Math.round((correct / active.length) * 100);
+      document.getElementById('final-pct').textContent = \`\${pct}%\`;
+      document.getElementById('final-stats').textContent = \`Correct: \${correct} / \${active.length} · Flagged: \${flags.size}\`;
+      const missedOrFlagged = active.filter((q, i) => answers[i] !== q.ans || flags.has(q.q)).length;
+      document.getElementById('drill-btn').disabled = missedOrFlagged === 0;
+      if (window.parent) {
+        window.parent.postMessage({ type: 'quiz-completed', score: correct, total: active.length, percentage: pct, mode }, '*');
       }
     }
+    function startTargetedDrill() {
+      active = active.filter((q, i) => answers[i] !== q.ans || flags.has(q.q));
+      answers = new Array(active.length).fill(null);
+      idx = 0; mode = 'practice';
+      document.getElementById('result-view').style.display = 'none';
+      document.getElementById('quiz-view').style.display = 'block';
+      init();
+    }
+    function restart() {
+      active = [...questions]; answers = new Array(active.length).fill(null);
+      idx = 0; document.getElementById('result-view').style.display = 'none';
+      document.getElementById('quiz-view').style.display = 'block';
+      init();
+    }
+    init();
   </script>
 </body>
 </html>`;

@@ -32,7 +32,7 @@ import { fetchQuizRawHtml, getStoredGithubConfig } from '../services/githubServi
 interface QuizPlayerModalProps {
   quiz: QuizItem | null;
   onClose: () => void;
-  onRecordScore: (quizId: string, score: number, total: number, percentage: number) => void;
+  onRecordScore: (quizId: string, score: number, total: number, percentage: number, mode?: 'practice' | 'exam', timeSpentSeconds?: number) => void;
   onSyncQuizToGitHub?: (quiz: QuizItem) => void;
 }
 
@@ -195,10 +195,10 @@ export const QuizPlayerModal: React.FC<QuizPlayerModalProps> = ({
       } else if (e.data.type === 'quiz-click') {
         playOptionClickSound();
       } else if (e.data.type === 'quiz-completed') {
-        const { score, total, percentage } = e.data;
+        const { score, total, percentage, mode, timeSpentSeconds } = e.data;
         setLatestScore({ score, total, percentage });
         if (quiz) {
-          onRecordScore(quiz.id, score, total, percentage);
+          onRecordScore(quiz.id, score, total, percentage, mode, timeSpentSeconds);
           playVictoryFanfare();
         }
       }

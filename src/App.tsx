@@ -20,6 +20,11 @@ import { AdminConfigModal } from './components/AdminConfigModal';
 import { DeleteConfirmModal, DeleteItemTarget } from './components/DeleteConfirmModal';
 import { MoveItemModal, MoveTarget } from './components/MoveItemModal';
 import { RenameItemModal, RenameTarget } from './components/RenameItemModal';
+import { PreviewPane } from './components/PreviewPane';
+import { 
+  useExplorerKeyboardShortcuts, 
+  SelectedExplorerItem 
+} from './hooks/useExplorerKeyboardShortcuts';
 import { 
   GitHubConfig, 
   getStoredGithubConfig, 
@@ -42,7 +47,8 @@ import {
   ViewMode, 
   SortField, 
   SortDirection,
-  CreatorSupportConfig
+  CreatorSupportConfig,
+  QuizScoreRecord
 } from './types';
 import { 
   defaultManifest, 
@@ -54,6 +60,7 @@ import {
   isSoundEnabled, 
   setSoundEnabled, 
   playNavSound,
+  playOpenSound,
   playSuccessChime,
   playDropSound
 } from './utils/audio';
@@ -81,7 +88,7 @@ export default function App() {
   const [isDark, setIsDark] = useState<boolean>(false);
   const [isSound, setIsSound] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, { score: number; total: number; percentage: number }>>({});
+  const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, QuizScoreRecord>>({});
 
   // Owner Authentication (Role-Based Access)
   const [isOwnerLoggedIn, setIsOwnerLoggedIn] = useState<boolean>(() => {
@@ -141,10 +148,31 @@ export default function App() {
   const [deleteTargets, setDeleteTargets] = useState<DeleteItemTarget[]>([]);
   const [selectedDeleteTargets, setSelectedDeleteTargets] = useState<Map<string, DeleteItemTarget>>(new Map());
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<SelectedExplorerItem | null>(null);
 
   // Renaming Management
   const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
+
+  // Preview Pane Toggle (Windows 11 Explorer Preview Pane)
+  const [showPreviewPane, setShowPreviewPane] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('winquiz_preview_pane');
+      return stored !== 'false';
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const handleTogglePreviewPane = useCallback(() => {
+    setShowPreviewPane(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('winquiz_preview_pane', String(next));
+      } catch (e) {}
+      return next;
+    });
+  }, []);
 
   // Dynamic GitHub Sync State
   const [isDynamicMode, setIsDynamicMode] = useState<boolean>(true);
@@ -502,8 +530,17 @@ export default function App() {
 
   // Navigate to path
   const handleNavigatePath = useCallback((newPath: string) => {
-    const cleanPath = newPath.replace(/^\/+|\/+$/g, '');
-    if (cleanPath === currentPath) return;
+    let cleanPath = newPath.replace(/^\/+|\/+$/g, '');
+    const matched = findFolderByPath(rootFolder, cleanPath);
+    if (matched) {
+      cleanPath = matched.path;
+    }
+    if (cleanPath === currentPath) {
+      setSearchQuery('');
+      setSelectedDeleteTargets(new Map());
+      setSelectedItem(null);
+      return;
+    }
 
     setCurrentPath(cleanPath);
     const updatedHistory = navHistory.slice(0, historyIndex + 1);
@@ -512,7 +549,8 @@ export default function App() {
     setHistoryIndex(updatedHistory.length - 1);
     setSearchQuery('');
     setSelectedDeleteTargets(new Map());
-  }, [currentPath, navHistory, historyIndex]);
+    setSelectedItem(null);
+  }, [currentPath, navHistory, historyIndex, rootFolder]);
 
   // History Back
   const handleGoBack = () => {
@@ -559,18 +597,58 @@ export default function App() {
   };
 
   // Record quiz completion score
-  const handleRecordScore = (quizId: string, score: number, total: number, percentage: number) => {
+  const handleRecordScore = useCallback((
+    quizId: string, 
+    score: number, 
+    total: number, 
+    percentage: number,
+    mode?: 'practice' | 'exam',
+    timeSpentSeconds?: number
+  ) => {
     setCompletedQuizzes(prev => {
       const updated = {
         ...prev,
-        [quizId]: { score, total, percentage }
+        [quizId]: { 
+          quizId,
+          score, 
+          total, 
+          percentage,
+          timestamp: Date.now(),
+          mode: mode || prev[quizId]?.mode || 'practice',
+          timeSpentSeconds: timeSpentSeconds !== undefined ? timeSpentSeconds : prev[quizId]?.timeSpentSeconds
+        }
       };
       try {
         localStorage.setItem('winquiz_scores', JSON.stringify(updated));
       } catch (e) {}
       return updated;
     });
-  };
+  }, []);
+
+  // Listen for postMessage telemetry from the sandboxed iframe to keep scores, progress, and completion states synchronized in localStorage
+  useEffect(() => {
+    const handleGlobalTelemetry = (e: MessageEvent) => {
+      if (!e.data || typeof e.data !== 'object') return;
+      if (e.data.type === 'quiz-completed') {
+        const { quizId, quiz: quizPath, score, total, percentage, mode, timeSpentSeconds } = e.data;
+        let resolvedId = quizId;
+        if (!resolvedId && activeQuiz) {
+          resolvedId = activeQuiz.id;
+        }
+        if (!resolvedId && quizPath) {
+          const all = getAllQuizzes(rootFolder);
+          const found = all.find(q => q.filename === quizPath || q.path.endsWith(quizPath));
+          if (found) resolvedId = found.id;
+        }
+        if (resolvedId && typeof score === 'number' && typeof total === 'number') {
+          const pct = percentage ?? Math.round((score / total) * 100);
+          handleRecordScore(resolvedId, score, total, pct, mode, timeSpentSeconds);
+        }
+      }
+    };
+    window.addEventListener('message', handleGlobalTelemetry);
+    return () => window.removeEventListener('message', handleGlobalTelemetry);
+  }, [activeQuiz, rootFolder, handleRecordScore]);
 
   // Handle Sort Change
   const handleSortChange = (field: SortField) => {
@@ -764,6 +842,7 @@ export default function App() {
 
     // Clear selection after deletion
     setSelectedDeleteTargets(new Map());
+    setSelectedItem(null);
 
     // If currentPath is deleted folder or inside it, navigate up
     const deletedFolders = targets.filter(t => t.type === 'folder');
@@ -930,6 +1009,93 @@ export default function App() {
     return all.filter(q => completedQuizzes[q.id]);
   }, [rootFolder, completedQuizzes]);
 
+  // List of all visible items in the current explorer folder/search view
+  const allVisibleItems = useMemo<SelectedExplorerItem[]>(() => {
+    const list: SelectedExplorerItem[] = [];
+    subfoldersToDisplay.forEach((f) => {
+      list.push({ type: 'folder', id: f.id, path: f.path, name: f.name, folder: f });
+    });
+    quizzesToDisplay.forEach((q) => {
+      list.push({ type: 'quiz', id: q.id, path: q.path, name: q.title, quiz: q });
+    });
+    return list;
+  }, [subfoldersToDisplay, quizzesToDisplay]);
+
+  // Master switch to prevent explorer shortcuts from firing while dialogs/players are active
+  const isAnyModalOpen = Boolean(
+    activeQuiz ||
+    showDonation ||
+    showAdminModal ||
+    showUploadModal ||
+    showNewFolderModal ||
+    showMoveModal ||
+    showRenameModal ||
+    isDeleteModalOpen ||
+    showOwnerLoginModal ||
+    showGuide ||
+    showGitHubSync
+  );
+
+  // Hook to handle Windows Explorer keyboard shortcuts: Delete, Rename (F2), Open (Enter)
+  useExplorerKeyboardShortcuts({
+    selectedItem,
+    selectedTargets: selectedDeleteTargets,
+    isEnabled: !isAnyModalOpen,
+    onOpenItem: (item) => {
+      if (item.type === 'folder') {
+        playNavSound();
+        handleNavigatePath(item.folder.path);
+      } else if (item.type === 'quiz') {
+        playOpenSound();
+        setActiveQuiz(item.quiz);
+      }
+    },
+    onRenameItem: (item) => {
+      if (item.type === 'folder') {
+        handleRequestRenameItem({ type: 'folder', folder: item.folder });
+      } else if (item.type === 'quiz') {
+        handleRequestRenameItem({ type: 'quiz', quiz: item.quiz });
+      }
+    },
+    onDeleteItem: (item) => {
+      if (item.type === 'folder') {
+        handleRequestDeleteFolder(item.folder);
+      } else if (item.type === 'quiz') {
+        handleRequestDeleteQuiz(item.quiz);
+      }
+    },
+    onDeleteMultiple: () => {
+      handleRequestDeleteSelected();
+    },
+    onSelectNext: () => {
+      if (allVisibleItems.length === 0) return;
+      if (!selectedItem) {
+        setSelectedItem(allVisibleItems[0]);
+        return;
+      }
+      const idx = allVisibleItems.findIndex(i => i.path === selectedItem.path);
+      if (idx >= 0 && idx < allVisibleItems.length - 1) {
+        setSelectedItem(allVisibleItems[idx + 1]);
+      }
+    },
+    onSelectPrevious: () => {
+      if (allVisibleItems.length === 0) return;
+      if (!selectedItem) {
+        setSelectedItem(allVisibleItems[0]);
+        return;
+      }
+      const idx = allVisibleItems.findIndex(i => i.path === selectedItem.path);
+      if (idx > 0) {
+        setSelectedItem(allVisibleItems[idx - 1]);
+      }
+    },
+    onClearSelection: () => {
+      setSelectedItem(null);
+      setSelectedDeleteTargets(new Map());
+    },
+    onTogglePreviewPane: handleTogglePreviewPane,
+  });
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans">
       {/* Toast Notification */}
@@ -972,6 +1138,7 @@ export default function App() {
         lastSyncTime={lastSyncTime}
         pendingSyncCount={pendingSyncQuizzes.length}
         onTriggerSync={handleTriggerSync}
+        onNavigatePath={handleNavigatePath}
       />
 
       {/* 2. Ribbon & Command / Breadcrumb Bar with GitHub Sync tools */}
@@ -1006,9 +1173,11 @@ export default function App() {
         selectedCount={selectedDeleteTargets.size}
         onDeleteSelected={handleRequestDeleteSelected}
         onOpenMultiDelete={handleOpenMultiDelete}
+        showPreviewPane={showPreviewPane}
+        onTogglePreviewPane={handleTogglePreviewPane}
       />
 
-      {/* 3. Main Workspace: Sidebar + Explorer Content */}
+      {/* 3. Main Workspace: Sidebar + Explorer Content + Windows 11 Preview Pane */}
       <div className="flex-1 flex min-h-0 relative">
         <Sidebar
           rootFolder={rootFolder}
@@ -1049,6 +1218,23 @@ export default function App() {
           onSelectAllTargets={handleSelectAllTargets}
           onClearSelection={handleClearSelection}
           onRequestDeleteSelected={handleRequestDeleteSelected}
+          selectedItem={selectedItem}
+          onSelectItem={setSelectedItem}
+        />
+
+        {/* Windows 11 Style Toggleable Preview Pane (Alt + P) */}
+        <PreviewPane
+          isOpen={showPreviewPane}
+          onClose={() => handleTogglePreviewPane()}
+          selectedItem={selectedItem}
+          onOpenQuiz={(quiz) => setActiveQuiz(quiz)}
+          onNavigatePath={handleNavigatePath}
+          completedQuizzes={completedQuizzes}
+          ghConfig={ghConfig}
+          canManageItems={isOwnerLoggedIn || isAdminActive}
+          onRequestRenameItem={handleRequestRenameItem}
+          onRequestDeleteQuiz={handleRequestDeleteQuiz}
+          onRequestDeleteFolder={handleRequestDeleteFolder}
         />
       </div>
 

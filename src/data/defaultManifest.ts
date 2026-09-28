@@ -179,7 +179,7 @@ export function getAllQuizzes(root: FolderNode): QuizItem[] {
 export function findFolderByPath(root: FolderNode, targetPath: string): FolderNode | null {
   const cleanTarget = targetPath.replace(/^\/+|\/+$/g, '');
   const cleanRoot = root.path.replace(/^\/+|\/+$/g, '');
-  if (cleanTarget === cleanRoot) return root;
+  if (cleanTarget === cleanRoot || cleanTarget.toLowerCase() === cleanRoot.toLowerCase()) return root;
 
   if (root.folders) {
     for (const sub of root.folders) {

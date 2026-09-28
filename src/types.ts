@@ -51,6 +51,8 @@ export interface QuizScoreRecord {
   total: number;
   percentage: number;
   timestamp: number;
+  mode?: 'practice' | 'exam';
+  timeSpentSeconds?: number;
 }
 
 export interface DeleteItemTarget {

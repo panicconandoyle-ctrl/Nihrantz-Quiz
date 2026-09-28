@@ -42,6 +42,17 @@ interface TitleBarProps {
   lastSyncTime?: string;
   pendingSyncCount?: number;
   onTriggerSync?: () => void;
+  onNavigatePath?: (path: string) => void;
+}
+
+export function formatTitleSegment(segment: string): string {
+  if (!segment) return '';
+  if (segment.toLowerCase() === 'quizzes') return 'Quizzes';
+  if (segment.toLowerCase() === 'up') return 'UP';
+  return segment
+    .split('_')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -64,17 +75,43 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   lastSyncTime,
   pendingSyncCount = 0,
   onTriggerSync,
+  onNavigatePath,
 }) => {
-  const currentFolderName = currentPath.split('/').filter(Boolean).pop() || 'quizzes';
+  const pathSegments = currentPath.split('/').filter(Boolean);
+  const displaySegments = pathSegments.length > 0 ? pathSegments : ['quizzes'];
   const repoUrl = `https://github.com/${ghConfig.owner}/${ghConfig.repo}`;
 
   return (
     <header className="h-10 bg-[#f3f3f3] dark:bg-[#202020] border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-3 select-none text-xs text-neutral-600 dark:text-neutral-300 shrink-0">
-      {/* Left: Window Tab / Brand + GitHub Synchronized Status Badge */}
+      {/* Left: Window Tab with Clickable Breadcrumb Path + GitHub Synchronized Status Badge */}
       <div className="flex items-center gap-2 overflow-hidden">
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-[#2b2b2b] rounded-t-md border-t border-x border-neutral-200 dark:border-neutral-700 font-medium text-neutral-800 dark:text-neutral-100 shadow-xs max-w-[180px] truncate">
-          <Folder className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
-          <span className="truncate">{currentFolderName}</span>
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-[#2b2b2b] rounded-t-md border-t border-x border-neutral-200 dark:border-neutral-700 font-medium text-neutral-800 dark:text-neutral-100 shadow-xs max-w-[280px] sm:max-w-[420px] overflow-x-auto no-scrollbar">
+          <Folder className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0 mr-0.5" />
+          {displaySegments.map((segment, idx) => {
+            const subPath = displaySegments.slice(0, idx + 1).join('/');
+            const isLast = idx === displaySegments.length - 1;
+            const displayName = formatTitleSegment(segment);
+            return (
+              <React.Fragment key={subPath}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playNavSound();
+                    onNavigatePath?.(subPath);
+                  }}
+                  className={`px-1 py-0.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer truncate max-w-[120px] text-xs ${
+                    isLast 
+                      ? 'font-bold text-neutral-900 dark:text-neutral-100' 
+                      : 'text-neutral-500 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline'
+                  }`}
+                  title={`Click to navigate directly to ${displayName} (${subPath})`}
+                >
+                  {displayName}
+                </button>
+                {!isLast && <span className="text-neutral-300 dark:text-neutral-600 text-[10px] select-none">/</span>}
+              </React.Fragment>
+            );
+          })}
         </div>
         <span className="text-neutral-400 dark:text-neutral-500 hidden sm:inline">Nihrantz Quiz Explorer</span>
 

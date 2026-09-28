@@ -21,9 +21,10 @@ import {
   Square,
   Edit3
 } from 'lucide-react';
-import { FolderNode, QuizItem, ViewMode, DeleteItemTarget } from '../types';
+import { FolderNode, QuizItem, ViewMode, DeleteItemTarget, QuizScoreRecord } from '../types';
 import { countFolderQuizzes } from '../data/defaultManifest';
 import { playOpenSound, playNavSound, playDragSound, playDropSound } from '../utils/audio';
+import { SelectedExplorerItem } from '../hooks/useExplorerKeyboardShortcuts';
 
 interface ExplorerContentProps {
   currentFolder: FolderNode;
@@ -35,7 +36,7 @@ interface ExplorerContentProps {
   onOpenQuiz: (quiz: QuizItem) => void;
   favorites: string[];
   onToggleFavorite: (quizId: string) => void;
-  completedQuizzes: Record<string, { score: number; total: number; percentage: number }>;
+  completedQuizzes: Record<string, QuizScoreRecord>;
   canManageItems: boolean;
   onRequestDeleteQuiz: (quiz: QuizItem) => void;
   onRequestDeleteFolder: (folder: FolderNode) => void;
@@ -50,6 +51,8 @@ interface ExplorerContentProps {
   onSelectAllTargets?: (targets: DeleteItemTarget[]) => void;
   onClearSelection?: () => void;
   onRequestDeleteSelected?: () => void;
+  selectedItem?: SelectedExplorerItem | null;
+  onSelectItem?: (item: SelectedExplorerItem | null) => void;
 }
 
 export const ExplorerContent: React.FC<ExplorerContentProps> = ({
@@ -77,6 +80,8 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
   onSelectAllTargets,
   onClearSelection,
   onRequestDeleteSelected,
+  selectedItem = null,
+  onSelectItem,
 }) => {
   const totalItems = subfoldersToDisplay.length + quizzesToDisplay.length;
 
@@ -251,7 +256,15 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
       )}
 
       {/* Scrollable Viewport */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div 
+        className="flex-1 overflow-y-auto p-4"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onSelectItem?.(null);
+            onClearSelection?.();
+          }
+        }}
+      >
         {totalItems === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center p-6 text-neutral-400">
             <FolderOpen className="w-12 h-12 stroke-1 mb-3 text-neutral-300 dark:text-neutral-600" />
@@ -279,7 +292,8 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                     const count = countFolderQuizzes(folder);
                     const isHovered = hoveredFolderPath === folder.path;
                     const isDragging = draggingItemId === folder.path;
-                    const isFolderSelected = selectedTargets ? selectedTargets.has(folder.path) : false;
+                    const isMultiSelectedFolder = selectedTargets ? selectedTargets.has(folder.path) : false;
+                    const isFolderSelected = selectedItem?.path === folder.path || isMultiSelectedFolder;
 
                     return (
                       <div
@@ -291,19 +305,36 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                         onDragLeave={(e) => handleFolderDragLeave(e, folder.path)}
                         onDrop={(e) => handleFolderDrop(e, folder.path)}
                         onClick={() => {
+                          if (selectedItem?.path === folder.path) {
+                            playNavSound();
+                            onNavigatePath(folder.path);
+                          } else {
+                            playNavSound();
+                            onSelectItem?.({
+                              type: 'folder',
+                              id: folder.id,
+                              name: folder.name,
+                              path: folder.path,
+                              folder,
+                            });
+                          }
+                        }}
+                        onDoubleClick={() => {
                           playNavSound();
                           onNavigatePath(folder.path);
                         }}
                         className={`group relative flex flex-col items-center p-3 rounded-xl border cursor-pointer transition-all text-center ${
                           isDragging
                             ? 'opacity-40 border-dashed border-blue-400'
-                            : isFolderSelected
+                            : isMultiSelectedFolder
                             ? 'border-2 border-rose-500 bg-rose-50/70 dark:bg-rose-950/40 shadow-xs'
+                            : isFolderSelected
+                            ? 'border-2 border-blue-500 bg-blue-50/80 dark:bg-blue-950/40 shadow-xs ring-2 ring-blue-500/20'
                             : isHovered
                             ? 'border-2 border-blue-500 bg-blue-100/70 dark:bg-blue-900/50 scale-105 shadow-md'
                             : 'border-transparent hover:border-neutral-200 dark:hover:border-neutral-700/60 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
                         }`}
-                        title={`Folder: ${folder.name} (Drag to move, or drop items here)`}
+                        title={`Folder: ${folder.name} (Click to select, double-click or Enter to open)`}
                       >
                         {/* Checkbox for Multi-Select */}
                         {canManageItems && (
@@ -418,7 +449,8 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                     const record = completedQuizzes[quiz.id];
                     const isPendingSync = quiz.syncStatus === 'pending_sync';
                     const isDragging = draggingItemId === quiz.id;
-                    const isQuizSelected = selectedTargets ? selectedTargets.has(quiz.path) : false;
+                    const isMultiSelectedQuiz = selectedTargets ? selectedTargets.has(quiz.path) : false;
+                    const isQuizSelected = selectedItem?.path === quiz.path || isMultiSelectedQuiz;
 
                     return (
                       <div
@@ -427,19 +459,36 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                         onDragStart={(e) => handleDragStartQuiz(e, quiz)}
                         onDragEnd={handleDragEnd}
                         onClick={() => {
+                          if (selectedItem?.path === quiz.path) {
+                            playOpenSound();
+                            onOpenQuiz(quiz);
+                          } else {
+                            playNavSound();
+                            onSelectItem?.({
+                              type: 'quiz',
+                              id: quiz.id,
+                              name: quiz.title,
+                              path: quiz.path,
+                              quiz,
+                            });
+                          }
+                        }}
+                        onDoubleClick={() => {
                           playOpenSound();
                           onOpenQuiz(quiz);
                         }}
                         className={`group relative flex flex-col justify-between p-4 rounded-xl border bg-white dark:bg-[#202020] hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${
                           isDragging
                             ? 'opacity-40 border-dashed border-blue-400'
-                            : isQuizSelected
+                            : isMultiSelectedQuiz
                             ? 'border-2 border-rose-500 bg-rose-50/30 dark:bg-rose-950/30 shadow-xs'
+                            : isQuizSelected
+                            ? 'border-2 border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 shadow-xs ring-2 ring-blue-500/20'
                             : isPendingSync
                             ? 'border-amber-300 dark:border-amber-700/70 hover:border-amber-400'
                             : 'border-neutral-200/80 dark:border-neutral-800/80 hover:border-blue-400/80 dark:hover:border-blue-500/80'
                         }`}
-                        title="Drag to move this quiz into any folder"
+                        title="Click to select, double-click or Enter to play, drag to move"
                       >
                         <div>
                           {/* Header: Icon + Category + Sync Status Badge + Favorite */}
@@ -695,7 +744,8 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                 {subfoldersToDisplay.map((folder) => {
                   const count = countFolderQuizzes(folder);
                   const isHovered = hoveredFolderPath === folder.path;
-                  const isFolderSelected = selectedTargets ? selectedTargets.has(folder.path) : false;
+                  const isMultiSelectedFolder = selectedTargets ? selectedTargets.has(folder.path) : false;
+                  const isFolderSelected = selectedItem?.path === folder.path || isMultiSelectedFolder;
 
                   return (
                     <tr
@@ -707,12 +757,29 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                       onDragLeave={(e) => handleFolderDragLeave(e, folder.path)}
                       onDrop={(e) => handleFolderDrop(e, folder.path)}
                       onClick={() => {
+                        if (selectedItem?.path === folder.path) {
+                          playNavSound();
+                          onNavigatePath(folder.path);
+                        } else {
+                          playNavSound();
+                          onSelectItem?.({
+                            type: 'folder',
+                            id: folder.id,
+                            name: folder.name,
+                            path: folder.path,
+                            folder,
+                          });
+                        }
+                      }}
+                      onDoubleClick={() => {
                         playNavSound();
                         onNavigatePath(folder.path);
                       }}
                       className={`cursor-pointer transition-colors group ${
-                        isFolderSelected
+                        isMultiSelectedFolder
                           ? 'bg-rose-50/70 dark:bg-rose-950/40 font-semibold'
+                          : isFolderSelected
+                          ? 'bg-blue-50/90 dark:bg-blue-950/50 text-blue-900 dark:text-blue-100 font-semibold shadow-2xs'
                           : isHovered 
                           ? 'bg-blue-100 dark:bg-blue-900/60 font-bold' 
                           : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
@@ -803,7 +870,8 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                 {quizzesToDisplay.map((quiz) => {
                   const isFav = favorites.includes(quiz.id);
                   const isPendingSync = quiz.syncStatus === 'pending_sync';
-                  const isQuizSelected = selectedTargets ? selectedTargets.has(quiz.path) : false;
+                  const isMultiSelectedQuiz = selectedTargets ? selectedTargets.has(quiz.path) : false;
+                  const isQuizSelected = selectedItem?.path === quiz.path || isMultiSelectedQuiz;
 
                   return (
                     <tr
@@ -812,12 +880,29 @@ export const ExplorerContent: React.FC<ExplorerContentProps> = ({
                       onDragStart={(e) => handleDragStartQuiz(e, quiz)}
                       onDragEnd={handleDragEnd}
                       onClick={() => {
+                        if (selectedItem?.path === quiz.path) {
+                          playOpenSound();
+                          onOpenQuiz(quiz);
+                        } else {
+                          playNavSound();
+                          onSelectItem?.({
+                            type: 'quiz',
+                            id: quiz.id,
+                            name: quiz.title,
+                            path: quiz.path,
+                            quiz,
+                          });
+                        }
+                      }}
+                      onDoubleClick={() => {
                         playOpenSound();
                         onOpenQuiz(quiz);
                       }}
                       className={`cursor-pointer transition-colors group ${
-                        isQuizSelected 
+                        isMultiSelectedQuiz 
                           ? 'bg-rose-50/60 dark:bg-rose-950/30 font-semibold' 
+                          : isQuizSelected
+                          ? 'bg-blue-50/90 dark:bg-blue-950/50 text-blue-900 dark:text-blue-100 font-semibold shadow-2xs'
                           : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
                       }`}
                     >

@@ -44,7 +44,7 @@
       align-items: center;
       margin-bottom: 14px;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
     .quiz-title {
@@ -59,11 +59,76 @@
       margin-top: 2px;
     }
 
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Mode Switcher Segmented Control */
+    .mode-toggle-group {
+      display: inline-flex;
+      align-items: center;
+      background: #eef1ff;
+      border: 1px solid #d5dcff;
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .mode-toggle-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #646f90;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .mode-toggle-btn.active {
+      background: #ffffff;
+      color: #4255ff;
+      box-shadow: 0 2px 5px rgba(66, 85, 255, 0.15);
+    }
+
+    /* Exam Countdown Timer Pill */
+    .exam-timer {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4255ff;
+      background: #eef1ff;
+      border: 1px solid #d5dcff;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    .exam-timer.urgent {
+      color: #dc2626;
+      background: #fee2e2;
+      border-color: #fca5a5;
+      animation: pulseAlert 1s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
     .list-toggle-btn {
-      background-color: #eef1ff;
+      background-color: #f6f7fb;
       color: #4255ff;
       border: 1px solid #d5dcff;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
@@ -97,6 +162,36 @@
       font-size: 13px;
       font-weight: 600;
       color: #646f90;
+      align-items: center;
+    }
+
+    /* Targeted Drill Alert Banner */
+    .drill-banner {
+      display: none;
+      background: #fff8e6;
+      border: 1px solid #fed7aa;
+      color: #b45309;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drill-banner.open {
+      display: flex;
+    }
+
+    .drill-exit-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     /* Modal / Drawer for Question Grid */
@@ -114,10 +209,33 @@
     }
 
     .grid-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 14px;
       font-weight: 700;
       color: #2e3856;
       margin-bottom: 12px;
+    }
+
+    .grid-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: #646f90;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
     }
 
     .question-grid {
@@ -139,6 +257,7 @@
       font-weight: 700;
       color: #2e3856;
       transition: all 0.15s ease;
+      position: relative;
     }
 
     .grid-item:hover {
@@ -158,6 +277,16 @@
       color: #4255ff;
     }
 
+    /* Distinct Amber Badge on Flagged Grid Items */
+    .grid-item.flagged::after {
+      content: '🚩';
+      position: absolute;
+      top: -5px;
+      right: -4px;
+      font-size: 10px;
+      line-height: 1;
+    }
+
     /* Question Study Card */
     .card {
       background: #ffffff;
@@ -167,7 +296,13 @@
       box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
+    }
+
+    .q-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .q-number-tag {
@@ -175,6 +310,35 @@
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: #646f90;
+      font-weight: 700;
+    }
+
+    /* Flag / Bookmark Button */
+    .flag-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      color: #646f90;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .flag-btn:hover {
+      background: #fff8e6;
+      border-color: #f59e0b;
+      color: #b45309;
+    }
+
+    .flag-btn.flagged {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #b45309;
       font-weight: 700;
     }
 
@@ -241,7 +405,7 @@
       text-transform: uppercase;
     }
 
-    /* Option States */
+    /* Option States - Practice Mode */
     .option-btn.correct {
       background-color: #d7f7eb !important;
       border-color: #18ae79 !important;
@@ -276,6 +440,21 @@
       display: inline-block;
       background-color: #ff6871;
       color: #ffffff;
+    }
+
+    /* Option States - Exam Mode: Quiet selection without answers revealed */
+    .option-btn.exam-selected {
+      background-color: #eef1ff !important;
+      border-color: #4255ff !important;
+      color: #4255ff !important;
+      font-weight: 600;
+      box-shadow: 0 0 0 1px #4255ff;
+    }
+
+    .option-btn.exam-selected .badge {
+      background-color: #4255ff;
+      color: #ffffff;
+      border-color: #4255ff;
     }
 
     .option-btn:disabled {
@@ -313,6 +492,7 @@
       display: flex;
       justify-content: space-between;
       gap: 12px;
+      align-items: center;
     }
 
     .nav-btn {
@@ -341,18 +521,91 @@
       background-color: #4255ff;
       color: #ffffff;
       border: 1px solid #4255ff;
-      margin-left: auto;
     }
 
     .nav-btn.primary:hover:not(:disabled) {
       background-color: #2e38c9;
     }
 
-    /* Scorecard */
+    .nav-btn.submit-exam-btn {
+      background-color: #10b981;
+      color: #ffffff;
+      border-color: #10b981;
+    }
+
+    .nav-btn.submit-exam-btn:hover:not(:disabled) {
+      background-color: #059669;
+    }
+
+    /* Submit Confirmation Dialog Modal */
+    .dialog-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .dialog-overlay.open {
+      display: flex;
+    }
+
+    .dialog-box {
+      background: #ffffff;
+      border-radius: 14px;
+      max-width: 480px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e6e9f2;
+      text-align: left;
+    }
+
+    .dialog-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e3856;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dialog-body {
+      font-size: 14px;
+      color: #646f90;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .dialog-warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 12px;
+      color: #92400e;
+      font-size: 13px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Rich Final Scorecard */
     .scorecard {
       display: none;
       background: #ffffff;
-      padding: 40px 24px;
+      padding: 32px 24px;
       border-radius: 12px;
       border: 1px solid #e6e9f2;
       box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
@@ -375,6 +628,24 @@
       margin: 10px auto;
     }
 
+    .score-circle.pass {
+      background: #ecfdf5;
+      border-color: #10b981;
+    }
+
+    .score-circle.pass .score-percent {
+      color: #059669;
+    }
+
+    .score-circle.fail {
+      background: #fff1f2;
+      border-color: #f43f5e;
+    }
+
+    .score-circle.fail .score-percent {
+      color: #e11d48;
+    }
+
     .score-percent {
       font-size: 32px;
       font-weight: 800;
@@ -388,15 +659,70 @@
       font-weight: 700;
     }
 
-    .score-breakdown {
-      display: flex;
-      gap: 24px;
-      font-size: 15px;
-      font-weight: 700;
+    .scorecard-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 6px;
     }
 
-    .stat-correct { color: #18ae79; }
-    .stat-incorrect { color: #ff6871; }
+    .metric-card {
+      background: #f6f7fb;
+      border: 1px solid #e6e9f2;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #2e3856;
+    }
+
+    .metric-title {
+      font-size: 11px;
+      color: #646f90;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .scorecard-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 440px;
+      margin-top: 10px;
+    }
+
+    .btn-review-missed {
+      background-color: #f59e0b;
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-review-missed:hover:not(:disabled) {
+      background-color: #d97706;
+    }
+
+    .btn-review-missed:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     /* Footer & Branding */
     .footer {
@@ -450,15 +776,51 @@
 <body>
 
 <div class="app-container">
-  <!-- Top Header Card -->
+  <!-- Top Header Card with Dual Mode Toggle & Timer -->
   <div class="header-card">
     <div class="title-row">
       <div>
         <div class="quiz-title">Immunology: CH5 T Cell-Mediated Immunity</div>
         <div class="quiz-subtitle">Comprehensive 30 High-Yield MCQ Practice Examination</div>
       </div>
-      <button class="list-toggle-btn" id="listToggleBtn" onclick="toggleGrid()">View List</button>
+      <div class="header-controls">
+        <!-- Dual Mode Toggle Switch -->
+        <div class="mode-toggle-group" role="tablist" aria-label="Quiz Mode Selection">
+          <button 
+            id="practiceModeBtn" 
+            class="mode-toggle-btn active" 
+            onclick="switchQuizMode('practice')" 
+            title="Instant feedback & explanations on selection"
+          >
+            🎓 Practice / Tutor
+          </button>
+          <button 
+            id="examModeBtn" 
+            class="mode-toggle-btn" 
+            onclick="switchQuizMode('exam')" 
+            title="Simulated test environment with countdown timer and quiet answers"
+          >
+            ⏱️ Exam Mode
+          </button>
+        </div>
+
+        <!-- Persistent Exam Countdown Timer -->
+        <div class="exam-timer" id="examTimerPill" aria-live="polite">
+          <span>⏳</span>
+          <span id="examTimerDisplay">30:00</span>
+        </div>
+
+        <!-- View List Drawer Toggle Button -->
+        <button class="list-toggle-btn" id="listToggleBtn" onclick="toggleGrid()">View List</button>
+      </div>
     </div>
+
+    <!-- Targeted Drill Alert Banner -->
+    <div class="drill-banner" id="drillBanner">
+      <span id="drillBannerText">🎯 Focused Drill: Reviewing Missed &amp; Flagged Questions</span>
+      <button class="drill-exit-btn" onclick="exitTargetedDrill()">Exit Drill &amp; Return to Full Test</button>
+    </div>
+
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progressBar"></div>
     </div>
@@ -468,41 +830,128 @@
     </div>
   </div>
 
-  <!-- Question Grid Drawer -->
+  <!-- Question Grid Drawer (with Flag Badges) -->
   <div class="grid-modal" id="gridModal">
-    <div class="grid-modal-header">Jump directly to question:</div>
+    <div class="grid-modal-header">
+      <span>Jump directly to question:</span>
+      <div class="grid-legend">
+        <span class="legend-item"><span class="legend-dot" style="background: #4255ff;"></span> Current</span>
+        <span class="legend-item"><span class="legend-dot" style="background: #d5dcff;"></span> Answered</span>
+        <span class="legend-item">🚩 Flagged</span>
+      </div>
+    </div>
     <div class="question-grid" id="questionGrid"></div>
   </div>
 
-  <!-- Main Question Card -->
+  <!-- Main Question Card (with Flag / Bookmark button) -->
   <div class="card" id="questionCard">
-    <div class="q-number-tag" id="qNumberTag">Question 1</div>
+    <div class="q-card-header">
+      <div class="q-number-tag" id="qNumberTag">Question 1</div>
+      <!-- Flag / Bookmark Button -->
+      <button 
+        id="flagBtn" 
+        class="flag-btn" 
+        onclick="toggleCurrentQuestionFlag()" 
+        title="Bookmark this question for targeted review"
+      >
+        <span id="flagIcon">🏳️</span>
+        <span id="flagText">Flag for Review</span>
+      </button>
+    </div>
+
     <div class="q-text" id="qText">Loading question stem...</div>
     <div class="options-list" id="optionsList"></div>
     <div class="rationale-box" id="rationaleBox">
-      <div class="rationale-title">Explanation & Rationales</div>
+      <div class="rationale-title">Explanation &amp; Rationales</div>
       <div class="rationale-content" id="rationaleContent"></div>
     </div>
   </div>
 
   <!-- Scorecard Result Container -->
   <div class="scorecard" id="scoreCard">
-    <h2 style="font-size: 22px; font-weight: 800;">Quiz Completed!</h2>
-    <div class="score-circle">
+    <h2 style="font-size: 22px; font-weight: 800;" id="scorecardHeading">Assessment Completed!</h2>
+    <div class="score-circle" id="scoreCircle">
       <div class="score-percent" id="scorePercent">0%</div>
       <div class="score-label">Score</div>
     </div>
-    <div class="score-breakdown">
-      <span class="stat-correct" id="scoreCorrect">Correct: 0</span>
-      <span class="stat-incorrect" id="scoreIncorrect">Incorrect: 0</span>
+
+    <div class="scorecard-metrics">
+      <div class="metric-card">
+        <div class="metric-value" style="color: #10b981;" id="scoreCorrect">0</div>
+        <div class="metric-title">Correct</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" style="color: #ef4444;" id="scoreIncorrect">0</div>
+        <div class="metric-title">Incorrect</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" style="color: #646f90;" id="scoreUnanswered">0</div>
+        <div class="metric-title">Unanswered</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" style="color: #f59e0b;" id="scoreFlagged">0</div>
+        <div class="metric-title">Flagged</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="scoreTimeTaken">00:00</div>
+        <div class="metric-title">Total Time</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="scoreAvgTime">0s</div>
+        <div class="metric-title">Avg / Question</div>
+      </div>
     </div>
-    <button class="nav-btn primary" onclick="restartQuiz()">Take Test Again</button>
+
+    <div class="scorecard-actions">
+      <!-- Targeted Drill: Review Missed & Flagged Only -->
+      <button 
+        class="btn-review-missed" 
+        id="btnReviewMissed" 
+        onclick="startTargetedDrill()"
+      >
+        <span>🎯 Review Missed &amp; Flagged Questions Only</span>
+      </button>
+
+      <button class="nav-btn primary" onclick="restartQuiz()">
+        🔄 Retake Full Test
+      </button>
+
+      <button class="nav-btn" onclick="reviewAllAnswers()">
+        📖 Review All Answers &amp; Rationales
+      </button>
+    </div>
   </div>
 
   <!-- Navigation Buttons -->
   <div class="nav-bar" id="navBar">
     <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
-    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+    <div style="display: flex; gap: 8px;">
+      <button class="nav-btn submit-exam-btn" id="submitExamBtn" style="display: none;" onclick="promptSubmitExam()">
+        Submit Exam
+      </button>
+      <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+
+  <!-- Submit Exam Confirmation Modal Dialog -->
+  <div class="dialog-overlay" id="submitDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog-box">
+      <div class="dialog-title" id="dialogTitle">
+        <span>📝</span>
+        <span>Submit Exam Confirmation</span>
+      </div>
+      <div class="dialog-body" id="dialogBody">
+        Are you ready to submit your exam and view your final performance scorecard?
+      </div>
+      <div class="dialog-warning" id="dialogUnansweredWarning" style="display: none;">
+        <span>⚠️</span>
+        <span id="dialogWarningText">You have unanswered questions remaining.</span>
+      </div>
+      <div class="dialog-actions" style="margin-top: 18px;">
+        <button class="nav-btn" onclick="closeSubmitDialog()">Review Questions</button>
+        <button class="nav-btn primary" onclick="confirmSubmitExam()">Confirm &amp; Submit</button>
+      </div>
+    </div>
   </div>
 
   <!-- Footer Branding -->
@@ -851,18 +1300,166 @@ const quizData = [
 ];
 
 let currentIdx = 0;
-let userAnswers = new Array(quizData.length).fill(null);
+let currentMode = 'practice'; // 'practice' | 'exam'
+let isDrillMode = false;
+let activeQuestions = [...quizData];
+let userAnswers = new Array(activeQuestions.length).fill(null);
+let flaggedQuestions = new Set();
+let isReviewingAll = false;
+
+// Telemetry & Timing
+let examTimeRemaining = activeQuestions.length * 60; // 60 seconds per question pool
+let examTimerInterval = null;
+let totalTimeElapsed = 0;
+let timerTickInterval = null;
+let questionStartTimestamp = Date.now();
+let questionTimeSpent = new Array(activeQuestions.length).fill(0);
 
 function initQuiz() {
   renderGrid();
   renderQuestion();
   updateProgress();
+  startGlobalTimer();
 }
 
+function startGlobalTimer() {
+  if (timerTickInterval) clearInterval(timerTickInterval);
+  timerTickInterval = setInterval(() => {
+    totalTimeElapsed++;
+    if (questionTimeSpent[currentIdx] !== undefined) {
+      questionTimeSpent[currentIdx]++;
+    }
+  }, 1000);
+}
+
+// Mode Switching: Practice vs Exam
+function switchQuizMode(mode) {
+  if (currentMode === mode) return;
+  currentMode = mode;
+
+  const practiceBtn = document.getElementById("practiceModeBtn");
+  const examBtn = document.getElementById("examModeBtn");
+  const timerPill = document.getElementById("examTimerPill");
+  const submitExamBtn = document.getElementById("submitExamBtn");
+
+  if (mode === 'exam') {
+    practiceBtn.classList.remove("active");
+    examBtn.classList.add("active");
+    timerPill.style.display = "inline-flex";
+    if (submitExamBtn) submitExamBtn.style.display = "inline-block";
+    startExamTimer();
+  } else {
+    examBtn.classList.remove("active");
+    practiceBtn.classList.add("active");
+    timerPill.style.display = "none";
+    if (submitExamBtn) submitExamBtn.style.display = "none";
+    stopExamTimer();
+  }
+
+  // Notify parent window of mode change
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'quiz-mode-change', mode }, '*');
+    }
+  } catch (e) {}
+
+  renderQuestion();
+  updateGridStyles();
+}
+
+function startExamTimer() {
+  stopExamTimer();
+  examTimeRemaining = activeQuestions.length * 60; // Default 60s per question pool
+  updateTimerDisplay();
+
+  examTimerInterval = setInterval(() => {
+    examTimeRemaining--;
+    updateTimerDisplay();
+
+    if (examTimeRemaining <= 0) {
+      stopExamTimer();
+      alert("⏱️ Time is up! Your exam will now be submitted automatically.");
+      submitQuiz(true);
+    }
+  }, 1000);
+}
+
+function stopExamTimer() {
+  if (examTimerInterval) {
+    clearInterval(examTimerInterval);
+    examTimerInterval = null;
+  }
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(examTimeRemaining / 60);
+  const secs = examTimeRemaining % 60;
+  const timerDisplay = document.getElementById("examTimerDisplay");
+  const timerPill = document.getElementById("examTimerPill");
+
+  if (timerDisplay) {
+    timerDisplay.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  if (timerPill) {
+    if (examTimeRemaining <= 60) {
+      timerPill.classList.add("urgent");
+    } else {
+      timerPill.classList.remove("urgent");
+    }
+  }
+}
+
+// Flag / Bookmark Feature
+function toggleCurrentQuestionFlag() {
+  const originalQ = activeQuestions[currentIdx];
+  const qIdentifier = originalQ.q;
+
+  if (flaggedQuestions.has(qIdentifier)) {
+    flaggedQuestions.delete(qIdentifier);
+  } else {
+    flaggedQuestions.add(qIdentifier);
+  }
+
+  updateFlagButtonState();
+  updateGridStyles();
+
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ 
+        type: 'quiz-flag', 
+        questionIndex: currentIdx, 
+        isFlagged: flaggedQuestions.has(qIdentifier) 
+      }, '*');
+    }
+  } catch (e) {}
+}
+
+function updateFlagButtonState() {
+  const originalQ = activeQuestions[currentIdx];
+  const isFlagged = flaggedQuestions.has(originalQ.q);
+  const flagBtn = document.getElementById("flagBtn");
+  const flagIcon = document.getElementById("flagIcon");
+  const flagText = document.getElementById("flagText");
+
+  if (isFlagged) {
+    flagBtn.classList.add("flagged");
+    flagIcon.innerText = "🚩";
+    flagText.innerText = "Flagged";
+    flagBtn.title = "Question is bookmarked for review. Click to unflag.";
+  } else {
+    flagBtn.classList.remove("flagged");
+    flagIcon.innerText = "🏳️";
+    flagText.innerText = "Flag for Review";
+    flagBtn.title = "Bookmark this question for targeted review";
+  }
+}
+
+// Grid Drawer
 function renderGrid() {
   const grid = document.getElementById("questionGrid");
   grid.innerHTML = "";
-  quizData.forEach((_, idx) => {
+  activeQuestions.forEach((_, idx) => {
     const item = document.createElement("div");
     item.className = "grid-item";
     item.id = `grid-item-${idx}`;
@@ -870,6 +1467,7 @@ function renderGrid() {
     item.onclick = () => jumpToQuestion(idx);
     grid.appendChild(item);
   });
+  updateGridStyles();
 }
 
 function toggleGrid() {
@@ -890,10 +1488,16 @@ function jumpToQuestion(idx) {
 }
 
 function renderQuestion() {
-  const q = quizData[currentIdx];
-  document.getElementById("qNumberTag").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+  const q = activeQuestions[currentIdx];
+  const qIdentifier = q.q;
+
+  document.getElementById("qNumberTag").innerText = isDrillMode 
+    ? `Drill Question ${currentIdx + 1} of ${activeQuestions.length}`
+    : `Question ${currentIdx + 1} of ${activeQuestions.length}`;
   document.getElementById("qText").innerText = q.q;
-  document.getElementById("questionCounter").innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+  document.getElementById("questionCounter").innerText = `Question ${currentIdx + 1} of ${activeQuestions.length}`;
+
+  updateFlagButtonState();
 
   const optionsList = document.getElementById("optionsList");
   optionsList.innerHTML = "";
@@ -901,12 +1505,11 @@ function renderQuestion() {
   const rationaleContent = document.getElementById("rationaleContent");
 
   const letters = ["A", "B", "C", "D"];
-  const answered = userAnswers[currentIdx] !== null;
+  const isAnswered = userAnswers[currentIdx] !== null;
 
   q.options.forEach((optText, optIdx) => {
     const btn = document.createElement("button");
     btn.className = "option-btn";
-    btn.disabled = answered;
 
     const badge = document.createElement("div");
     badge.className = "badge";
@@ -923,33 +1526,46 @@ function renderQuestion() {
     btn.appendChild(textSpan);
     btn.appendChild(feedbackPill);
 
-    if (answered) {
-      if (optIdx === q.correct) {
-        btn.classList.add("correct");
-        feedbackPill.innerText = "Correct";
-      } else if (optIdx === userAnswers[currentIdx]) {
-        btn.classList.add("incorrect");
-        feedbackPill.innerText = "Incorrect";
+    if (currentMode === 'practice' || isReviewingAll) {
+      // PRACTICE / TUTOR MODE: Instant visual validation and locked once answered
+      btn.disabled = isAnswered && !isReviewingAll;
+      if (isAnswered) {
+        if (optIdx === q.correct) {
+          btn.classList.add("correct");
+          feedbackPill.innerText = "Correct";
+        } else if (optIdx === userAnswers[currentIdx]) {
+          btn.classList.add("incorrect");
+          feedbackPill.innerText = "Incorrect";
+        }
       }
     } else {
+      // EXAM MODE: Quiet selection, no instant feedback, answer can be modified
+      btn.disabled = false;
+      if (userAnswers[currentIdx] === optIdx) {
+        btn.classList.add("exam-selected");
+      }
+    }
+
+    if (!isReviewingAll) {
       btn.onclick = () => handleSelectOption(optIdx);
     }
 
     optionsList.appendChild(btn);
   });
 
-  if (answered) {
+  // Reveal rationale in Practice Mode or Post-Exam Review
+  if ((currentMode === 'practice' && isAnswered) || isReviewingAll) {
     rationaleBox.style.display = "block";
     rationaleContent.innerText = q.explanation;
   } else {
     rationaleBox.style.display = "none";
   }
 
-  // Update navigation controls
+  // Navigation controls
   document.getElementById("prevBtn").disabled = currentIdx === 0;
   const nextBtn = document.getElementById("nextBtn");
-  if (currentIdx === quizData.length - 1) {
-    nextBtn.innerText = "Submit Test";
+  if (currentIdx === activeQuestions.length - 1) {
+    nextBtn.innerText = currentMode === 'exam' ? "Review & Submit" : "Complete Quiz";
   } else {
     nextBtn.innerText = "Next";
   }
@@ -958,9 +1574,37 @@ function renderQuestion() {
 }
 
 function handleSelectOption(optIdx) {
-  userAnswers[currentIdx] = optIdx;
-  renderQuestion();
-  updateProgress();
+  const q = activeQuestions[currentIdx];
+  const isCorrect = (optIdx === q.correct);
+
+  if (currentMode === 'practice') {
+    if (userAnswers[currentIdx] !== null) return; // Prevent changing in practice mode
+    userAnswers[currentIdx] = optIdx;
+    renderQuestion();
+    updateProgress();
+
+    // Sound and answer telemetry
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ 
+          type: 'quiz-answer', 
+          isCorrect, 
+          questionIndex: currentIdx 
+        }, '*');
+      }
+    } catch(e) {}
+  } else {
+    // Exam mode: quietly store or toggle selection
+    userAnswers[currentIdx] = optIdx;
+    renderQuestion();
+    updateProgress();
+
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'quiz-click' }, '*');
+      }
+    } catch(e) {}
+  }
 }
 
 function prevQuestion() {
@@ -971,23 +1615,27 @@ function prevQuestion() {
 }
 
 function nextQuestion() {
-  if (currentIdx < quizData.length - 1) {
+  if (currentIdx < activeQuestions.length - 1) {
     currentIdx++;
     renderQuestion();
   } else {
-    submitQuiz();
+    if (currentMode === 'exam') {
+      promptSubmitExam();
+    } else {
+      submitQuiz();
+    }
   }
 }
 
 function updateProgress() {
   const answeredCount = userAnswers.filter(a => a !== null).length;
-  const pct = (answeredCount / quizData.length) * 100;
+  const pct = (answeredCount / activeQuestions.length) * 100;
   document.getElementById("progressBar").style.width = `${pct}%`;
-  document.getElementById("answeredCounter").innerText = `${answeredCount} / ${quizData.length} Answered`;
+  document.getElementById("answeredCounter").innerText = `${answeredCount} / ${activeQuestions.length} Answered`;
 }
 
 function updateGridStyles() {
-  quizData.forEach((_, idx) => {
+  activeQuestions.forEach((q, idx) => {
     const el = document.getElementById(`grid-item-${idx}`);
     if (!el) return;
     el.className = "grid-item";
@@ -997,34 +1645,222 @@ function updateGridStyles() {
     if (userAnswers[idx] !== null) {
       el.classList.add("answered");
     }
+    if (flaggedQuestions.has(q.q)) {
+      el.classList.add("flagged");
+    }
   });
 }
 
-function submitQuiz() {
+// Submit Exam Dialog Prompt
+function promptSubmitExam() {
+  const unansweredCount = userAnswers.filter(a => a === null).length;
+  const warningEl = document.getElementById("dialogUnansweredWarning");
+  const warningText = document.getElementById("dialogWarningText");
+  const bodyEl = document.getElementById("dialogBody");
+
+  if (unansweredCount > 0) {
+    warningEl.style.display = "flex";
+    warningText.innerText = `You have ${unansweredCount} unanswered question(s) remaining.`;
+    bodyEl.innerText = `Are you sure you want to finish and submit your exam now? Unanswered questions will be scored as incorrect.`;
+  } else {
+    warningEl.style.display = "none";
+    bodyEl.innerText = `All ${activeQuestions.length} questions have been answered. Would you like to confirm final submission and generate your scorecard?`;
+  }
+
+  document.getElementById("submitDialog").classList.add("open");
+}
+
+function closeSubmitDialog() {
+  document.getElementById("submitDialog").classList.remove("open");
+}
+
+function confirmSubmitExam() {
+  closeSubmitDialog();
+  submitQuiz();
+}
+
+function submitQuiz(isAuto = false) {
+  stopExamTimer();
+
   document.getElementById("questionCard").style.display = "none";
   document.getElementById("navBar").style.display = "none";
   document.getElementById("gridModal").classList.remove("open");
   document.getElementById("listToggleBtn").style.display = "none";
+  document.getElementById("drillBanner").classList.remove("open");
 
   let correctCount = 0;
+  let incorrectCount = 0;
+  let unansweredCount = 0;
+
   userAnswers.forEach((ans, idx) => {
-    if (ans === quizData[idx].correct) correctCount++;
+    if (ans === null) {
+      unansweredCount++;
+    } else if (ans === activeQuestions[idx].correct) {
+      correctCount++;
+    } else {
+      incorrectCount++;
+    }
   });
 
-  const percent = Math.round((correctCount / quizData.length) * 100);
-  document.getElementById("scorePercent").innerText = `${percent}%`;
-  document.getElementById("scoreCorrect").innerText = `Correct: ${correctCount}`;
-  document.getElementById("scoreIncorrect").innerText = `Incorrect: ${quizData.length - correctCount}`;
+  const total = activeQuestions.length;
+  const percentage = Math.round((correctCount / total) * 100);
+
+  // Update Scorecard Elements
+  const scorePercentEl = document.getElementById("scorePercent");
+  scorePercentEl.innerText = `${percentage}%`;
+
+  const scoreCircle = document.getElementById("scoreCircle");
+  scoreCircle.className = "score-circle";
+  if (percentage >= 75) scoreCircle.classList.add("pass");
+  else if (percentage < 60) scoreCircle.classList.add("fail");
+
+  document.getElementById("scoreCorrect").innerText = String(correctCount);
+  document.getElementById("scoreIncorrect").innerText = String(incorrectCount);
+  document.getElementById("scoreUnanswered").innerText = String(unansweredCount);
+
+  // Count flagged in this set
+  let flaggedCount = 0;
+  activeQuestions.forEach(q => {
+    if (flaggedQuestions.has(q.q)) flaggedCount++;
+  });
+  document.getElementById("scoreFlagged").innerText = String(flaggedCount);
+
+  // Timing
+  const totalMins = Math.floor(totalTimeElapsed / 60);
+  const totalSecs = totalTimeElapsed % 60;
+  document.getElementById("scoreTimeTaken").innerText = `${String(totalMins).padStart(2, '0')}:${String(totalSecs).padStart(2, '0')}`;
+  const avgSec = total > 0 ? Math.round(totalTimeElapsed / total) : 0;
+  document.getElementById("scoreAvgTime").innerText = `${avgSec}s`;
+
+  // Targeted Review button logic: Count missed OR flagged
+  const missedOrFlaggedCount = activeQuestions.filter((q, idx) => {
+    const isMissed = userAnswers[idx] !== q.correct;
+    const isFlagged = flaggedQuestions.has(q.q);
+    return isMissed || isFlagged;
+  }).length;
+
+  const btnReview = document.getElementById("btnReviewMissed");
+  if (missedOrFlaggedCount > 0) {
+    btnReview.disabled = false;
+    btnReview.innerHTML = `<span>🎯 Review Missed &amp; Flagged Questions Only (${missedOrFlaggedCount} items)</span>`;
+  } else {
+    btnReview.disabled = true;
+    btnReview.innerHTML = `<span>🎉 100% Mastery - No Missed or Flagged Questions</span>`;
+  }
+
+  const heading = document.getElementById("scorecardHeading");
+  if (isDrillMode) {
+    heading.innerText = `Targeted Drill Completed!`;
+  } else if (currentMode === 'exam') {
+    heading.innerText = percentage >= 80 ? "Board Exam Passed with Distinction!" : "Exam Completed";
+  } else {
+    heading.innerText = "Practice Session Completed!";
+  }
+
   document.getElementById("scoreCard").style.display = "flex";
+
+  // Telemetry to Parent Window (and localStorage sync)
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'quiz-completed',
+        quiz: 'immunology_ch5_t_cell_mediated_immunity_quiz.html',
+        quizId: 'immunology-ch5-t-cell',
+        score: correctCount,
+        total,
+        percentage,
+        mode: currentMode,
+        timeSpentSeconds: totalTimeElapsed,
+        flaggedCount,
+        unansweredCount
+      }, '*');
+    }
+  } catch(e) {}
+}
+
+// Targeted Drill System: "Review Missed & Flagged Questions Only"
+function startTargetedDrill() {
+  const missedOrFlagged = activeQuestions.filter((q, idx) => {
+    const isMissed = userAnswers[idx] !== q.correct;
+    const isFlagged = flaggedQuestions.has(q.q);
+    return isMissed || isFlagged;
+  });
+
+  if (missedOrFlagged.length === 0) return;
+
+  isDrillMode = true;
+  activeQuestions = missedOrFlagged;
+  userAnswers = new Array(activeQuestions.length).fill(null);
+  currentIdx = 0;
+  isReviewingAll = false;
+
+  // In drill session, practice mode is active for immediate learning
+  currentMode = 'practice';
+  document.getElementById("practiceModeBtn").classList.add("active");
+  document.getElementById("examModeBtn").classList.remove("active");
+  document.getElementById("examTimerPill").style.display = "none";
+  if (document.getElementById("submitExamBtn")) {
+    document.getElementById("submitExamBtn").style.display = "none";
+  }
+
+  // Show drill banner
+  const drillBanner = document.getElementById("drillBanner");
+  const drillText = document.getElementById("drillBannerText");
+  drillText.innerText = `🎯 Targeted Drill: Reviewing ${activeQuestions.length} Missed & Flagged Questions`;
+  drillBanner.classList.add("open");
+
+  // Restore UI
+  document.getElementById("scoreCard").style.display = "none";
+  document.getElementById("questionCard").style.display = "flex";
+  document.getElementById("navBar").style.display = "flex";
+  document.getElementById("listToggleBtn").style.display = "inline-block";
+
+  renderGrid();
+  renderQuestion();
+  updateProgress();
+}
+
+function exitTargetedDrill() {
+  isDrillMode = false;
+  activeQuestions = [...quizData];
+  userAnswers = new Array(activeQuestions.length).fill(null);
+  currentIdx = 0;
+  isReviewingAll = false;
+  document.getElementById("drillBanner").classList.remove("open");
+
+  renderGrid();
+  renderQuestion();
+  updateProgress();
+}
+
+function reviewAllAnswers() {
+  isReviewingAll = true;
+  document.getElementById("scoreCard").style.display = "none";
+  document.getElementById("questionCard").style.display = "flex";
+  document.getElementById("navBar").style.display = "flex";
+  document.getElementById("listToggleBtn").style.display = "inline-block";
+  currentIdx = 0;
+  renderQuestion();
 }
 
 function restartQuiz() {
-  userAnswers = new Array(quizData.length).fill(null);
+  isDrillMode = false;
+  isReviewingAll = false;
+  activeQuestions = [...quizData];
+  userAnswers = new Array(activeQuestions.length).fill(null);
   currentIdx = 0;
+  totalTimeElapsed = 0;
+  questionTimeSpent = new Array(activeQuestions.length).fill(0);
+
+  document.getElementById("drillBanner").classList.remove("open");
   document.getElementById("questionCard").style.display = "flex";
   document.getElementById("navBar").style.display = "flex";
   document.getElementById("listToggleBtn").style.display = "inline-block";
   document.getElementById("scoreCard").style.display = "none";
+
+  if (currentMode === 'exam') {
+    startExamTimer();
+  }
   initQuiz();
 }
 

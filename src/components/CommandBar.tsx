@@ -22,7 +22,8 @@ import {
   ExternalLink,
   RefreshCw,
   ArrowUpCircle,
-  Trash2
+  Trash2,
+  PanelRight
 } from 'lucide-react';
 import { ViewMode, SortField, SortDirection } from '../types';
 import { playNavSound } from '../utils/audio';
@@ -58,6 +59,19 @@ interface CommandBarProps {
   selectedCount?: number;
   onDeleteSelected?: () => void;
   onOpenMultiDelete?: () => void;
+  showPreviewPane?: boolean;
+  onTogglePreviewPane?: () => void;
+}
+
+// Format path segments cleanly (e.g. quizzes -> Quizzes, year_iii -> Year III)
+export function formatSegmentName(segment: string): string {
+  if (!segment) return '';
+  if (segment.toLowerCase() === 'quizzes') return 'Quizzes';
+  if (segment.toLowerCase() === 'up') return 'UP';
+  return segment
+    .split('_')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 export const CommandBar: React.FC<CommandBarProps> = ({
@@ -91,12 +105,15 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   selectedCount = 0,
   onDeleteSelected,
   onOpenMultiDelete,
+  showPreviewPane = false,
+  onTogglePreviewPane,
 }) => {
   const [copiedPath, setCopiedPath] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
 
   // Compute breadcrumbs
   const pathParts = currentPath.split('/').filter(Boolean);
+  const displayParts = pathParts.length > 0 ? pathParts : ['quizzes'];
   
   const handleCopyPath = () => {
     navigator.clipboard.writeText(currentPath);
@@ -191,22 +208,27 @@ export const CommandBar: React.FC<CommandBarProps> = ({
           <ChevronRight className="w-3 h-3 text-neutral-400 mx-1 shrink-0" />
 
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap min-w-0 flex-1">
-            {pathParts.map((part, index) => {
-              const subPath = pathParts.slice(0, index + 1).join('/');
-              const isLast = index === pathParts.length - 1;
+            {displayParts.map((part, index) => {
+              const subPath = displayParts.slice(0, index + 1).join('/');
+              const isLast = index === displayParts.length - 1;
+              const formattedName = formatSegmentName(part);
               return (
                 <React.Fragment key={subPath}>
                   <button
+                    type="button"
                     onClick={() => {
                       playNavSound();
                       onNavigatePath(subPath);
                     }}
-                    className={`flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
-                      isLast ? 'font-semibold text-neutral-900 dark:text-neutral-100' : 'text-neutral-600 dark:text-neutral-300'
+                    className={`flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors cursor-pointer text-xs ${
+                      isLast 
+                        ? 'font-bold text-neutral-900 dark:text-neutral-100 bg-neutral-100/80 dark:bg-neutral-800/80 shadow-2xs' 
+                        : 'text-neutral-600 dark:text-neutral-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:underline'
                     }`}
+                    title={`Click to navigate to ${formattedName} (${subPath})`}
                   >
-                    <Folder className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
-                    <span>{part}</span>
+                    <Folder className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
+                    <span>{formattedName}</span>
                   </button>
                   {!isLast && <ChevronRight className="w-3 h-3 text-neutral-400 shrink-0" />}
                 </React.Fragment>
@@ -444,6 +466,25 @@ export const CommandBar: React.FC<CommandBarProps> = ({
             <List className="w-3.5 h-3.5" />
           </button>
         </div>
+
+        {/* Toggle Details & Preview Pane (Windows 11 Explorer Preview) */}
+        <button
+          onClick={() => {
+            playNavSound();
+            onTogglePreviewPane?.();
+          }}
+          className={`p-1.5 border rounded-md transition-colors flex items-center gap-1.5 h-8 ${
+            showPreviewPane
+              ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-400 dark:border-blue-600 text-blue-600 dark:text-blue-300 font-semibold shadow-2xs'
+              : 'bg-white dark:bg-[#1f1f1f] border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+          }`}
+          title="Toggle Details & Preview Pane (Alt + P)"
+          aria-label="Toggle Details & Preview Pane"
+          aria-pressed={showPreviewPane}
+        >
+          <PanelRight className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline text-[11px]">Preview</span>
+        </button>
       </div>
     </div>
   );
