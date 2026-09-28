@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprehensive Clinical Biochemistry Case Studies (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Clinical Biochemistry Case Studies Test</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the primary driving cellular defect in an obese patient presenting with Type 2 Diabetes Mellitus and compensatory hyperinsulinemia?",
+        options: [
+          "Complete autoimmune cytolytic destruction of pancreatic beta-cells by CD8+ T cells",
+          "Peripheral insulin resistance characterized by post-receptor signaling defects and impaired GLUT-4 translocation",
+          "Uncontrolled autonomous hypersecretion of glucagon by islet alpha-cells",
+          "Constitutive congenital absence of renal SGLT2 transporters"
+        ],
+        correct: 1,
+        explanation: "In Type 2 DM, pancreatic beta-cells initially retain synthetic capacity and secrete insulin; however, target tissues (skeletal muscle, adipocytes, liver) exhibit post-receptor defects and diminished GLUT-4 translocation, rendering them refractory to normal hormone levels."
+      },
+      {
+        q: "Why can circulating endogenous insulin concentrations be normal or paradoxically elevated in the early-to-intermediate stages of Type 2 Diabetes Mellitus?",
+        options: [
+          "Renal tubular reabsorption of filtered insulin increases tenfold in hyperglycemia.",
+          "The endocrine pancreas mounts a compensatory response to overcome peripheral resistance by hypersecreting insulin.",
+          "Insulin molecules become covalently cross-linked with circulating albumin.",
+          "Exogenous carbohydrates directly bind and block hepatic insulin-degrading enzymes."
+        ],
+        correct: 1,
+        explanation: "To overcome peripheral tissue receptor resistance, pancreatic beta-cells hypersecrete insulin (compensatory hyperinsulinemia). Hyperglycemia persists because defective post-receptor intracellular clearance prevents euglycemia despite elevated circulating hormone."
+      },
+      {
+        q: "What chemical reaction between glucose and erythrocyte hemoglobin underlies the clinical utility of Glycosylated Hemoglobin (HbA1c)?",
+        options: [
+          "Post-translational phosphorylation of serine residues by protein kinase C",
+          "Irreversible non-enzymatic glycation (the Maillard reaction) reflecting mean ambient glycemia over the 8–12 week red cell lifespan",
+          "Enzymatic transamination of globin chains catalyzed by hepatic transaminases",
+          "Competitive binding of glucose to heme iron rings displacing oxygen"
+        ],
+        correct: 1,
+        explanation: "HbA1c quantifies the percentage of erythrocyte hemoglobin modified by glucose via irreversible non-enzymatic glycation (Maillard reaction). Because red cells circulate for ~8–12 weeks (~2–3 months), HbA1c provides an integrated retrospective index of ambient glycemia without requiring acute fasting."
+      },
+      {
+        q: "What biochemical sequence leads to high-anion-gap metabolic acidosis (DKA) when cellular glucose entry is severely impaired?",
+        options: [
+          "Excessive urea cycle activation generating toxic free ammonium ions",
+          "Uninhibited adipose lipolysis releasing free fatty acids, which undergo hepatic mitochondrial β-oxidation into acetoacetate and β-hydroxybutyrate",
+          "Selective renal tubular retention of titratable dihydrogen phosphate",
+          "Overproduction of lactic acid from the continuous anaerobic breakdown of glycogen stores"
+        ],
+        correct: 1,
+        explanation: "When cells are starved of glucose, uninhibited lipolysis floods the liver with free fatty acids. Hepatic mitochondrial β-oxidation converts these into organic ketoacids (acetoacetate, β-hydroxybutyrate, acetone), which dissociate and overwhelm systemic buffers, producing metabolic acidosis."
+      },
+      {
+        q: "Which characteristic breathing pattern is clinically observed in patients attempting respiratory compensation for severe metabolic acidosis during Diabetic Ketoacidosis?",
+        options: [
+          "Cheyne-Stokes periodic breathing",
+          "Kussmaul respirations (rapid, deep breathing)",
+          "Biot's ataxic breathing with prolonged apneas",
+          "Inspiratory stridor from severe laryngospasm"
+        ],
+        correct: 1,
+        explanation: "Kussmaul breathing is the classic physiological respiratory compensation for severe metabolic ketoacidosis: high arterial proton concentrations stimulate central and peripheral chemoreceptors to drive deep, rapid hyperventilation that blows off volatile CO2."
+      },
+      {
+        q: "Why does serum albumin serve as a selective marker of CHRONIC liver synthetic failure rather than ACUTE hepatocellular necrosis?",
+        options: [
+          "Albumin is cleared exclusively via glomerular filtration within 6 hours of release.",
+          "Albumin possesses a prolonged biological half-life of approximately 20 days.",
+          "Acute hepatocellular necrosis induces compensatory renal albumin synthesis.",
+          "Albumin is synthesized outside the liver in peripheral lymphoid tissues."
+        ],
+        correct: 1,
+        explanation: "Serum albumin is synthesized exclusively by hepatocytes but has an extended circulating half-life of ~20 days. Consequently, acute hepatocellular insults do not immediately lower circulating albumin; persistent hypoalbuminemia (< 3.5 g/dL) indicates chronic parenchymal loss (e.g., cirrhosis)."
+      },
+      {
+        q: "Which hepatically synthesized pro-coagulant factor has an ultra-short biological half-life (~6 hours), making Prothrombin Time (PT/INR) a sensitive real-time marker of acute liver failure?",
+        options: [
+          "Factor I (Fibrinogen)",
+          "Factor II (Prothrombin)",
+          "Factor VII",
+          "Factor X"
+        ],
+        correct: 2,
+        explanation: "Coagulation Factor VII has the shortest biological half-life (~6 hours) among the liver-synthesized clotting factors. When hepatocellular synthetic reserve is acutely depleted (>80% functional loss), circulating Factor VII drops rapidly, swiftly prolonging the PT/INR."
+      },
+      {
+        q: "What is 'the cirrhotic paradox' regarding circulating serum transaminase (ALT and AST) concentrations in end-stage liver disease?",
+        options: [
+          "Transaminases are elevated to over 10,000 U/L despite normal liver histology.",
+          "Transaminases may appear completely normal or only mildly elevated because widespread fibrosis leaves very few viable hepatocytes remaining to leak enzymes.",
+          "AST is selectively converted into ALT inside the portal venous lumen.",
+          "High serum bilirubin chemically bleaches transaminases, preventing their detection."
+        ],
+        correct: 1,
+        explanation: "ALT and AST leak into blood only when viable hepatocytes undergo necrosis. In end-stage cirrhosis, extensive fibrotic scar tissue replaces normal parenchyma, leaving an insufficient mass of viable hepatocytes to elevate serum enzymes despite terminal hepatic failure."
+      },
+      {
+        q: "What physiological event triggers the induction and release of Alkaline Phosphatase (ALP) in hepatobiliary disease?",
+        options: [
+          "Direct cytolytic lysis of mitochondrial cristae in centrilobular hepatocytes",
+          "Physical obstruction of bile flow (cholestasis) or biliary inflammation, where accumulating bile salts solubilize membranes and upregulate ALP translation",
+          "Excessive clearance of unconjugated bilirubin across the enterocyte brush border",
+          "Renal proximal tubular retention of 1α-hydroxylase"
+        ],
+        correct: 1,
+        explanation: "ALP is bound to the canalicular microvillar membrane of hepatocytes and cholangiocytes. Biliary obstruction (cholestasis) causes accumulating bile acids to solubilize membrane-anchored enzymes and stimulate de novo synthesis and release of ALP into the bloodstream."
+      },
+      {
+        q: "How does assessing Gamma-Glutamyltransferase (GGT) resolve diagnostic ambiguity when an isolated elevated Alkaline Phosphatase (ALP) is identified?",
+        options: [
+          "GGT degrades bone-specific ALP isoenzymes in the renal collecting duct.",
+          "GGT is concentrated in hepatobiliary tissue but absent from osseous tissue; concordant elevation confirms a biliary origin, whereas normal GGT implicates bone pathology.",
+          "GGT is elevated only in cardiac muscle infarction and rhabdomyolysis.",
+          "GGT binds directly to parathyroid hormone, suppressing osteoblast activity."
+        ],
+        correct: 1,
+        explanation: "ALP is present in both hepatobiliary ductules and osteoblasts. Because GGT is localized in biliary epithelium but strictly absent from osseous tissue, an elevated ALP with a concomitantly high GGT verifies a hepatobiliary origin, whereas normal GGT points to bone disease."
+      },
+      {
+        q: "Why is Creatine Kinase (CK) regarded as the premier clinical biomarker for assessing acute skeletal muscle injury and rhabdomyolysis?",
+        options: [
+          "It is synthesized in the renal cortex and filtered into the collecting system during myalgia.",
+          "It is an abundant myocyte cytosolic enzyme whose serum elevation quantitatively correlates with active sarcolemmal disruption and muscle necrosis.",
+          "It cross-reacts with myocardial troponin I to accelerate muscular repolarization.",
+          "It is a trace mineral cofactor required for the covalent assembly of dystrophin."
+        ],
+        correct: 1,
+        explanation: "Skeletal myocytes contain high concentrations of cytoplasmic Creatine Kinase (specifically the CK-MM isoform). Disruption of the sarcolemma releases CK directly into the extracellular fluid and bloodstream, with serum levels correlating closely with the magnitude of muscle cytolysis."
+      },
+      {
+        q: "In acute rhabdomyolysis, what causes the pathognomonic urinalysis discrepancy where the dipstick tests strongly positive for 'blood' while microscopy shows NO intact erythrocytes?",
+        options: [
+          "Dipstick reagents are destroyed by the high concentrations of ketone bodies in the urine.",
+          "Reagent test strips rely on the pseudoperoxidase catalytic activity of heme rings, detecting filtered myoglobin without intact red blood cells on sediment exam.",
+          "Urine creatinine crystallizes into false red blood cell shapes on the strip pad.",
+          "Elevated urinary bilirubin leaches hemoglobin from intact red cells during centrifugation."
+        ],
+        correct: 1,
+        explanation: "Urine dipsticks detect 'blood' via the pseudoperoxidase catalytic activity of heme. The dipstick cannot differentiate between the heme group in erythrocyte hemoglobin and that in myocyte myoglobin. Consequently, myoglobinuria causes a positive dipstick for 'blood' despite the absence of intact RBCs on microscopy."
+      },
+      {
+        q: "Which life-threatening electrolyte disturbance occurs rapidly during massive acute rhabdomyolysis due to the release of intracellular ions from necrotic myocytes?",
+        options: [
+          "Severe hypokalemia",
+          "Acute hyperkalemia",
+          "Profound hypophosphatemia",
+          "Extreme hypercalcemia"
+        ],
+        correct: 1,
+        explanation: "Skeletal muscle fibers maintain high intracellular potassium concentrations. Rapid necrosis of large muscle volumes dumps potassium into the extracellular space, producing severe, acute hyperkalemia that can precipitate fatal ventricular arrhythmias."
+      },
+      {
+        q: "Through which mechanism does filtered monomeric myoglobin cause direct cellular injury to proximal tubular epithelial cells in rhabdomyolysis-induced AKI?",
+        options: [
+          "Endocytosis of myoglobin releases free ferrihemate iron, which catalyzes Fenton-type free radical reactions that drive lipid peroxidation and tubular necrosis.",
+          "Myoglobin binds apical SGLT2 transporters and permanently arrests glucose reabsorption.",
+          "Myoglobin directly inhibits basolateral sodium-potassium ATPase pumps throughout the loop of Henle.",
+          "Myoglobin stimulates local parathyroid hormone release, causing medullary nephrocalcinosis."
+        ],
+        correct: 0,
+        explanation: "In rhabdomyolysis, endocytosed myoglobin inside proximal tubular cells releases its ferrihemate iron core. Free iron catalyzes Fenton reactions generating toxic hydroxyl radicals, triggering membrane lipid peroxidation, cellular swelling, and acute tubular necrosis."
+      },
+      {
+        q: "How does intratubular cast obstruction develop during severe acute myoglobinuria in rhabdomyolysis?",
+        options: [
+          "Filtered myoglobin reacts with Tamm-Horsfall mucoprotein in the acidic environment of the distal tubules to form dense, obstructing casts.",
+          "Filtered myoglobin precipitates with unabsorbed calcium soaps in the proximal convoluted tubule.",
+          "Myoglobin crystallizes into calcium oxalate monohydrate prisms across the glomerulus.",
+          "High serum potassium triggers the rapid aggregation of albumin into broad waxy casts."
+        ],
+        correct: 0,
+        explanation: "In the acidic luminal environment of distal tubules, filtered monomeric myoglobin precipitates with Tamm-Horsfall mucoprotein, forming dense, intraluminal obstructing casts that mechanically occlude tubular flow and cause renal failure."
+      },
+      {
+        q: "Which clinical presentation is the classic diagnostic hallmark of an acute Nephritic syndrome?",
+        options: [
+          "Massive heavy proteinuria (> 3.5 g/24h), profound hypoalbuminemia (< 3.0 g/dL), and generalized anasarca",
+          "Macroscopic hematuria (cola-colored urine), dysmorphic red blood cells, pathognomonic RBC casts, and volume-dependent hypertension",
+          "Isolated polyuria and polydipsia with normal urine sediment and high fasting glucose",
+          "Severely elevated serum alkaline phosphatase with normal transaminases and tea-colored urine"
+        ],
+        correct: 1,
+        explanation: "Nephritic syndrome is driven by acute glomerular inflammation that mechanically disrupts capillary walls, producing hematuria with dysmorphic red blood cells, pathognomonic Red Blood Cell (RBC) casts, oliguria, hypertension, and mild periorbital edema."
+      },
+      {
+        q: "Why does the identification of Red Blood Cell (RBC) Casts on urinary sediment microscopy definitively localize hematuria to the renal glomeruli?",
+        options: [
+          "RBC casts are synthesized by the bladder urothelium during cystitis.",
+          "Erythrocytes enter tubules through inflamed glomerular capillary ruptures and become encased in cylindrical Tamm-Horsfall mucoprotein molds in the distal nephron.",
+          "Red cells undergo non-enzymatic glycation in the ureter to form casts.",
+          "RBC casts represent clotted blood originating exclusively from renal calculi in the renal pelvis."
+        ],
+        correct: 1,
+        explanation: "Red blood cells can only form casts when they leak across disrupted glomerular capillary walls into the tubular lumen, where they are trapped in cylindrical Tamm-Horsfall mucoprotein matrices in the distal nephron, ruling out bleeding from the lower urinary tract."
+      },
+      {
+        q: "In Nephrotic Syndrome, what is the primary pathophysiological trigger that leads to severe generalized pitting edema (anasarca)?",
+        options: [
+          "Loss of podocyte charge and pore permselectivity causing massive proteinuria (> 3.5 g/day), resulting in severe hypoalbuminemia and decreased intravascular oncotic pressure",
+          "Primary bacterial infection of the intertubular cortical interstitium",
+          "Massive acute hyperkalemia causing myocardial flaccidity and backward venous congestion",
+          "Excessive tubular secretion of Tamm-Horsfall mucoprotein into the peritubular capillaries"
+        ],
+        correct: 0,
+        explanation: "Severe podocyte effacement disrupts the glomerular filtration barrier, causing heavy proteinuria (> 3.5 g/day). The resulting profound hypoalbuminemia (< 3.0 g/dL) collapses plasma colloid oncotic pressure, shifting intravascular fluid into the interstitial spaces (anasarca)."
+      },
+      {
+        q: "Why do patients with Nephrotic Syndrome develop secondary hyperlipidemia (hypercholesterolemia and elevated triglycerides)?",
+        options: [
+          "Excessive dietary absorption of fat caused by lack of pancreatic lipase",
+          "Decreased plasma oncotic pressure stimulates non-specific compensatory hepatic protein and lipoprotein synthesis, alongside reduced peripheral lipolysis",
+          "Severe podocyte effacement allows systemic excretion of HDL while retaining LDL",
+          "Inability of renal proximal tubules to filter circulating free fatty acids"
+        ],
+        correct: 1,
+        explanation: "Profound hypoalbuminemia and the resultant fall in plasma oncotic pressure trigger the liver to ramp up synthesis of circulating proteins, including apoB-containing lipoproteins (VLDL, LDL). Concurrently, clearance of lipids is impaired, yielding severe hypercholesterolemia."
+      },
+      {
+        q: "Why does chronic intrahepatic cholestasis (impaired bile acid secretion into the duodenum) cause secondary malabsorption of Vitamins A, D, E, and K?",
+        options: [
+          "Bile acids are required to convert water-soluble vitamins into lipid-soluble vitamins.",
+          "Without adequate bile salt concentrations, mixed micelles cannot form in the aqueous chyme, preventing enterocyte brush-border absorption of fat-soluble vitamins.",
+          "Cholestasis causes a congenital mutation in enterocyte calbindin transporters.",
+          "Excess bilirubin in the intestinal lumen destroys vitamin coenzymes by oxidation."
+        ],
+        correct: 1,
+        explanation: "Fat-soluble vitamins (A, D, E, K) are hydrophobic and require bile salts for lipid emulsification and mixed micelle assembly in the intestinal lumen. Without bile flow, micelles cannot form, preventing brush-border uptake and causing fat and vitamin malabsorption (steatorrhea)."
+      },
+      {
+        q: "What molecular mechanism explains why secondary Vitamin A deficiency manifests clinically as night blindness (nyctalopia)?",
+        options: [
+          "Depletion of 11-cis-retinal prevents the resynthesis of Rhodopsin within retinal rod photoreceptors, impairing scotopic (dim-light) visual adaptation.",
+          "Vitamin A deficiency causes physical detachment of the corneal epithelium from Bowman's membrane within 48 hours.",
+          "Lack of retinoic acid causes hyperactivation of the optic nerve myelin sheath.",
+          "Deficiency of retinol stops the transcription of osteoclast-activating factors in the retina."
+        ],
+        correct: 0,
+        explanation: "Retinal rod photoreceptor cells are responsible for low-light (scotopic) vision and rely on the photopigment Rhodopsin (formed by opsin covalently bound to 11-cis-retinal). Depletion of vitamin A impairs rhodopsin regeneration, compromising dark adaptation (nyctalopia)."
+      },
+      {
+        q: "How does secondary Vitamin D deficiency resulting from chronic malabsorption lead to bone pain and adult osteomalacia?",
+        options: [
+          "It directly activates osteoclastic lysosomes to secrete hydrochloric acid onto bone surfaces.",
+          "Impaired enterocyte calcium and phosphate absorption causes hypocalcemia and secondary hyperparathyroidism, resulting in failure to mineralize organic osteoid matrix with hydroxyapatite.",
+          "It causes toxic deposition of uncarboxylated osteocalcin within the renal medulla.",
+          "It downregulates Type I collagen gene transcription in periosteal osteoblasts."
+        ],
+        correct: 1,
+        explanation: "Vitamin D deficiency impairs active duodenal absorption of calcium and phosphate, leading to secondary hyperparathyroidism and renal phosphate wasting. The depleted calcium-phosphate product prevents hydroxyapatite mineralization, leaving soft, unmineralized osteoid (osteomalacia)."
+      },
+      {
+        q: "Why does Vitamin K deficiency cause spontaneous mucosal bleeding, cutaneous ecchymoses, and a markedly prolonged Prothrombin Time (PT/INR)?",
+        options: [
+          "Vitamin K is required to cleave fibrinogen directly into insoluble fibrin polymers.",
+          "Reduced Vitamin K is the essential cofactor for γ-glutamyl carboxylase, which post-translationally carboxylates glutamic acid residues on factors II, VII, IX, and X into calcium-binding Gla domains.",
+          "Vitamin K binds to vascular endothelial cells to inhibit local prostacyclin synthesis.",
+          "Lack of Vitamin K stimulates premature hepatic degradation of serum albumin."
+        ],
+        correct: 1,
+        explanation: "Vitamin K is an obligate cofactor for γ-glutamyl carboxylase, which post-translationally modifies Factors II, VII, IX, and X by converting glutamic acid residues into γ-carboxyglutamate (Gla) domains. Gla residues are required to bind calcium and anchor to platelet membranes during coagulation."
+      },
+      {
+        q: "What neurological signs can develop in severe, chronic Vitamin E (α-tocopherol) deficiency secondary to fat malabsorption?",
+        options: [
+          "Spastic hemiplegia and acute expressive aphasia",
+          "Distal paresthesias, posterior column sensory ataxia, and spinocerebellar degeneration due to oxidative membrane damage in large myelinated axons",
+          "Trismus, Risus Sardonicus, and opisthotonic muscular spasms",
+          "Visual agnosia and generalized tonic-clonic status epilepticus"
+        ],
+        correct: 1,
+        explanation: "Vitamin E is a lipid-soluble antioxidant that protects polyunsaturated fatty acids in neuronal membranes from oxidative peroxidation. Chronic deficiency damages large myelinated axons in the posterior columns and spinocerebellar tracts, causing ataxia, loss of proprioception, and paresthesias."
+      },
+      {
+        q: "What is the stoichiometric chemical formula of the inorganic crystalline mineral phase deposited by osteoblasts to provide load-bearing skeletal hardness?",
+        options: [
+          "CaCO3",
+          "Ca10(PO4)6(OH)2",
+          "Ca3(PO4)2",
+          "CaC2O4"
+        ],
+        correct: 1,
+        explanation: "Bone matrix achieves compressive strength and mechanical rigidity through the precipitation of Hydroxyapatite, chemically formulated as Ca10(PO4)6(OH)2, within the organic Type I collagen osteoid scaffold."
+      },
+      {
+        q: "Why does acute hypophosphatemia cause severe generalized muscle weakness, proximal myopathy, and potential ventilatory failure?",
+        options: [
+          "Phosphate ions directly block acetylcholine release at the neuromuscular junction.",
+          "Depletion of inorganic phosphate arrests the synthesis of cellular ATP and phosphocreatine, and reduces erythrocyte 2,3-BPG, impairing tissue oxygen delivery.",
+          "Low phosphate triggers sudden hypokalemic depolarization of the sarcolemma.",
+          "Hypophosphatemia causes rapid detachment of titin filaments from sarcomeric Z discs."
+        ],
+        correct: 1,
+        explanation: "Phosphate is an obligate substrate for ATP synthesis and erythrocyte 2,3-BPG production. Depletion causes cellular bioenergetic failure (impairing cross-bridge cycling and SERCA pumps) and shifts the hemoglobin curve leftward, reducing oxygen delivery and causing diaphragmatic and skeletal muscle failure."
+      },
+      {
+        q: "Which renal enzyme converts inactive 25-hydroxyvitamin D [calcidiol] into the biologically active hormone 1,25-dihydroxyvitamin D [calcitriol]?",
+        options: [
+          "Hepatic 25-hydroxylase (CYP2R1)",
+          "Proximal tubular 1α-hydroxylase (CYP27B1)",
+          "Distal tubular 24-hydroxylase (CYP24A1)",
+          "Brush-border alkaline phosphatase"
+        ],
+        correct: 1,
+        explanation: "Proximal convoluted tubule cells express 1α-hydroxylase (CYP27B1), which hydroxylates circulating calcidiol into active calcitriol [1,25-(OH)2D3], a step potently stimulated by Parathyroid Hormone (PTH) and inhibited by FGF23."
+      },
+      {
+        q: "Through which transport mechanisms does Calcitriol upregulate the coordinated intestinal absorption of dietary Calcium and Phosphate?",
+        options: [
+          "Inducing enterocyte nuclear VDR transcription of apical calcium channels (TRPV6), calbindin transport protein, and sodium-phosphate cotransporters (NaPi-IIb)",
+          "Directly activating brush-border sodium-potassium-2-chloride (NKCC2) pumps",
+          "Stimulating enterocyte endocytosis of intact hydroxyapatite crystals",
+          "Suppressing duodenal gastric acid secretion to raise luminal pH to 9.0"
+        ],
+        correct: 0,
+        explanation: "Calcitriol binds the nuclear Vitamin D Receptor (VDR) in enterocytes to stimulate transcription of apical TRPV6 calcium channels, the intracellular transport protein Calbindin, basolateral extrusion pumps, and apical NaPi-IIb sodium-phosphate cotransporters."
+      },
+      {
+        q: "A 3-year-old child presents with short stature, delayed walking milestones, bilateral tibial bowing (genu varum), and widened wrists. What is the diagnosis?",
+        options: [
+          "Duchenne Muscular Dystrophy",
+          "Nutritional Rickets secondary to severe Vitamin D deficiency",
+          "Post-streptococcal glomerulonephritis",
+          "Infectious Tetanus"
+        ],
+        correct: 1,
+        explanation: "Nutritional rickets results from severe vitamin D deficiency during active pediatric skeletal growth. Unmineralized osteoid accumulates at epiphyseal growth plates, causing widened wrists, costochondral enlargement (rachitic rosary), and lower-extremity bowing (genu varum) under weight-bearing."
+      },
+      {
+        q: "What laboratory finding typically accompanies elevated serum transaminases and prolonged PT/INR in decompensated chronic viral hepatitis?",
+        options: [
+          "Markedly depressed serum albumin (< 3.5 g/dL) and elevated total/direct bilirubin",
+          "Severely depressed alkaline phosphatase with undetectable urinary urobilinogen",
+          "Profound hypercalcemia (> 14 mg/dL) with shortened QT interval",
+          "Isolated elevated serum creatinine kinase (CK-MM > 50,000 U/L)"
+        ],
+        correct: 0,
+        explanation: "Decompensated chronic hepatitis exhibits active hepatocyte injury (elevated ALT/AST), impaired synthetic capacity (hypoalbuminemia < 3.5 g/dL and prolonged PT/INR), and defective excretory clearance of bile pigments (elevated total and direct bilirubin, causing scleral icterus)."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
