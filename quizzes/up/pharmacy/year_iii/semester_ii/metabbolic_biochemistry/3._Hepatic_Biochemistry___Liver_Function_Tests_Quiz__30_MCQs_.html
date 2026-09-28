@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hepatic Biochemistry & Liver Function Tests Quiz (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Box */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Hepatic Biochemistry & Liver Function Tests</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "Which major hepatic blood vessel transports nutrient-dense, deoxygenated blood directly from gastrointestinal capillary beds into hepatic sinusoids?",
+        options: [
+          "Hepatic Artery",
+          "Portal Vein",
+          "Hepatic Vein",
+          "Inferior Vena Cava"
+        ],
+        correct: 1,
+        explanation: "The portal vein carries nutrient-rich, deoxygenated blood from the gastrointestinal capillary beds directly to the liver sinusoids for first-pass processing, whereas the hepatic artery supplies oxygenated blood."
+      },
+      {
+        q: "Which primary metabolic cycle in the liver is responsible for clearing neurotoxic free ammonia (NH3) by converting it into an inert, water-soluble molecule for renal excretion?",
+        options: [
+          "Cori Cycle",
+          "Urea Cycle",
+          "Citric Acid (Krebs) Cycle",
+          "Glucose-Alanine Cycle"
+        ],
+        correct: 1,
+        explanation: "The urea cycle detoxifies neurotoxic ammonia (NH3) generated from amino acid deamination by condensing it with CO2 to form water-soluble urea, which is safely excreted by the kidneys."
+      },
+      {
+        q: "What is the primary physiological function of serum albumin synthesized by hepatocytes?",
+        options: [
+          "Initiating the extrinsic coagulation pathway via Factor VII activation",
+          "Serving as the primary determinant of plasma colloid oncotic pressure and transporting hydrophobic ligands",
+          "Catalyzing microsomal phase I oxidation reactions in the smooth endoplasmic reticulum",
+          "Binding free hemoglobin to prevent glomerular filtration in intravascular hemolysis"
+        ],
+        correct: 1,
+        explanation: "Serum albumin is the major non-immunoglobulin plasma protein synthesized by the liver; it maintains intravascular colloid oncotic pressure to prevent third-spacing/edema and reversibly transports hydrophobic ligands."
+      },
+      {
+        q: "In bilirubin metabolism, which specific hepatic enzyme conjugates hydrophobic unconjugated bilirubin with glucuronic acid to form water-soluble direct bilirubin?",
+        options: [
+          "Alanine Aminotransferase (ALT)",
+          "UDP-Glucuronosyltransferase (UGT1A1)",
+          "HMG-CoA Reductase",
+          "Gamma-Glutamyltransferase (GGT)"
+        ],
+        correct: 1,
+        explanation: "Hepatocellular conjugation is catalyzed by UDP-glucuronosyltransferase (specifically the UGT1A1 isoform), converting lipid-soluble unconjugated bilirubin into water-soluble conjugated (direct) bilirubin."
+      },
+      {
+        q: "How does unconjugated (indirect) bilirubin travel through the systemic circulation from reticuloendothelial cells to the sinusoidal hepatocyte membrane?",
+        options: [
+          "Freely dissolved in plasma as an ionized monomer",
+          "Reversibly complexed to serum albumin",
+          "Packaged within very-low-density lipoproteins (VLDL)",
+          "Bound directly to Factor VII and prothrombin"
+        ],
+        correct: 1,
+        explanation: "Unconjugated bilirubin is highly hydrophobic and lipophilic; it cannot dissolve in aqueous plasma and must be transported through systemic circulation tightly yet reversibly bound to serum albumin."
+      },
+      {
+        q: "Which general reaction type describes Phase II hepatic xenobiotic detoxification?",
+        options: [
+          "Cytochrome P450-mediated oxidation or hydrolysis exposing reactive polar groups",
+          "Transferase-catalyzed covalent conjugation with polar moieties like glucuronic acid, glutathione, or sulfate",
+          "Mitochondrial beta-oxidation cleaving acyl-CoA fatty acid chains",
+          "Non-enzymatic glycation of cell-surface receptor proteins"
+        ],
+        correct: 1,
+        explanation: "Phase II biotransformation involves transferase-catalyzed covalent attachment (conjugation) of bulky polar endogenous molecules (glucuronate, glutathione, sulfate) to create hydrophilic metabolites for biliary or urinary elimination."
+      },
+      {
+        q: "Which metabolic storage disorder of the liver is characterized by pathological systemic iron overload and parenchymal tissue deposition?",
+        options: [
+          "Wilson Disease",
+          "Hemochromatosis",
+          "Primary Biliary Cholangitis",
+          "Alpha-1 Antitrypsin Deficiency"
+        ],
+        correct: 1,
+        explanation: "Hemochromatosis is an inherited metabolic disorder characterized by excessive iron absorption and progressive parenchymal iron deposition, whereas Wilson disease involves pathological copper accumulation."
+      },
+      {
+        q: "Which dermatological stigmata of chronic liver disease consists of a central dilated arteriole with radiating microvascular capillaries, resulting from impaired hepatic estrogen clearance?",
+        options: [
+          "Caput Medusae",
+          "Spider Angioma",
+          "Palmar Erythema",
+          "Asterixis"
+        ],
+        correct: 1,
+        explanation: "Spider angiomas (spider telangiectasias) are central pulsating arterioles with radiating capillaries found on the upper trunk and face, caused by hyperestrogenemia due to impaired hepatic steroid hormone degradation."
+      },
+      {
+        q: "What is the clinical definition and diagnostic significance of asterixis in a patient with decompensated chronic liver disease?",
+        options: [
+          "A localized periumbilical venous collateral network indicating portal hypertension",
+          "A bilateral flapping tremor of dorsiflexed wrists reflecting metabolic neurotoxicity and hyperammonemia",
+          "A systolic vascular bruit auscultated directly over the epigastric hepatic artery",
+          "A symmetric glove-and-stocking sensory loss from diabetic distal microangiopathy"
+        ],
+        correct: 1,
+        explanation: "Asterixis is a negative myoclonus presenting as a rhythmic 'flapping' tremor of extended, dorsiflexed hands. It reflects metabolic encephalopathy driven by elevated systemic neurotoxins, notably ammonia."
+      },
+      {
+        q: "Which of the following laboratory markers is classified as a true indicator of hepatic SYNTHETIC FUNCTION rather than merely an enzyme marker of hepatocellular membrane injury?",
+        options: [
+          "Alanine Aminotransferase (ALT)",
+          "Aspartate Aminotransferase (AST)",
+          "Prothrombin Time / International Normalized Ratio (PT/INR)",
+          "Alkaline Phosphatase (ALP)"
+        ],
+        correct: 2,
+        explanation: "PT/INR and Albumin measure true hepatic synthetic function because they quantify macromolecules actively synthesized by viable hepatocytes. ALT, AST, and ALP are cellular enzymes that leak into circulation during injury or cholestasis."
+      },
+      {
+        q: "Why is Alanine Aminotransferase (ALT) considered a much more specific biomarker for hepatic parenchymal damage than Aspartate Aminotransferase (AST)?",
+        options: [
+          "ALT is concentrated primarily within hepatocyte cytoplasm, whereas AST is abundantly expressed in myocardium, skeletal muscle, kidney, and red blood cells.",
+          "ALT has a shorter circulatory half-life than AST, preventing false-positive accumulation.",
+          "AST is only found inside mitochondrial matrices of biliary ductal epithelial cells.",
+          "ALT is exclusively secreted into bile and only appears in plasma during bile duct rupture."
+        ],
+        correct: 0,
+        explanation: "ALT is localized predominantly in hepatocyte cytoplasm, making it highly specific for liver injury. In contrast, AST has cytoplasmic and mitochondrial isoenzymes distributed widely across cardiac muscle, skeletal muscle, renal tissue, and erythrocytes."
+      },
+      {
+        q: "A De Ritis ratio (AST/ALT ratio) greater than 2:1 strongly points to which specific clinical etiology of hepatic injury?",
+        options: [
+          "Non-alcoholic fatty liver disease (MASLD)",
+          "Alcohol-induced liver injury / alcoholic hepatitis",
+          "Acute viral hepatitis A infection",
+          "Extrahepatic choledocholithiasis"
+        ],
+        correct: 1,
+        explanation: "An AST/ALT ratio > 2:1 is highly characteristic of alcoholic liver injury due to alcohol-induced mitochondrial injury (releasing mitochondrial AST) and pyridoxal-5'-phosphate deficiency (which impairs ALT synthesis more than AST)."
+      },
+      {
+        q: "Why is serum albumin a poor diagnostic biomarker for evaluating ACUTE hepatocellular injury or sudden hepatic necrosis?",
+        options: [
+          "Albumin is synthesized outside the liver in peripheral lymphatic tissue.",
+          "Albumin possesses a prolonged biological half-life of approximately 20 days.",
+          "Acute liver injury causes an immediate compensatory hyperalbuminemia.",
+          "Albumin cannot be accurately quantified in the presence of elevated transaminases."
+        ],
+        correct: 1,
+        explanation: "Because serum albumin has an extended half-life of ~20 days, circulating levels decline slowly. Consequently, hypoalbuminemia reflects chronic hepatic synthetic failure (e.g., cirrhosis) rather than acute injury."
+      },
+      {
+        q: "Which hepatically synthesized coagulation factor possesses an ultra-short biological half-life (~6 hours), making PT/INR a sensitive, real-time indicator of acute hepatic synthetic failure?",
+        options: [
+          "Factor I (Fibrinogen)",
+          "Factor II (Prothrombin)",
+          "Factor VII",
+          "Factor X"
+        ],
+        correct: 2,
+        explanation: "Factor VII has the shortest half-life (~6 hours) among the vitamin K-dependent clotting factors. Because of this rapid turnover, acute cessation of hepatic protein synthesis rapidly prolongs PT/INR."
+      },
+      {
+        q: "A clinical laboratory reports Total Bilirubin = 4.8 mg/dL and Direct Bilirubin = 3.6 mg/dL. What is the calculated Indirect Bilirubin concentration?",
+        options: [
+          "1.2 mg/dL",
+          "8.4 mg/dL",
+          "0.75 mg/dL",
+          "3.6 mg/dL"
+        ],
+        correct: 0,
+        explanation: "Total Bilirubin = Direct Bilirubin + Indirect Bilirubin. Therefore, Indirect Bilirubin = Total Bilirubin (4.8 mg/dL) - Direct Bilirubin (3.6 mg/dL) = 1.2 mg/dL."
+      },
+      {
+        q: "At what total serum bilirubin threshold does frank, clinically noticeable scleral icterus (jaundice) typically become visible upon physical examination?",
+        options: [
+          "> 0.2 mg/dL",
+          "> 0.8 mg/dL",
+          "> 1.0 mg/dL",
+          "> 2.0 mg/dL"
+        ],
+        correct: 3,
+        explanation: "Normal total bilirubin is 0.2–0.8 mg/dL. Latent (subclinical) jaundice occurs between 1.0 and 2.0 mg/dL, whereas overt clinical scleral icterus and cutaneous jaundice emerge once levels exceed 2.0 mg/dL."
+      },
+      {
+        q: "Which clinical condition is classified as a POST-HEPATIC (obstructive) cause of jaundice?",
+        options: [
+          "Autoimmune hemolytic anemia with brisk intravascular hemolysis",
+          "Gilbert syndrome with defective UGT1A1 promoter activity",
+          "Choledocholithiasis (common bile duct gallstone impaction)",
+          "Crigler-Najjar syndrome type 1"
+        ],
+        correct: 2,
+        explanation: "Choledocholithiasis causes mechanical obstruction of the extrahepatic biliary ductal system, preventing bile transit into the intestine, representing post-hepatic (obstructive) jaundice."
+      },
+      {
+        q: "Which urinary and fecal findings are classic hallmarks of complete post-hepatic (obstructive) biliary tract occlusion?",
+        options: [
+          "Clear urine and hyperpigmented dark brown stools",
+          "Tea-colored dark urine and acholic (pale/clay-colored) stools",
+          "Milky white urine and bright green stools",
+          "Hematuria with normal stool pigmentation"
+        ],
+        correct: 1,
+        explanation: "In biliary obstruction, water-soluble conjugated bilirubin backs up into plasma and is excreted by kidneys, darkening the urine (tea-colored), while absence of bile pigments in the intestine results in acholic (clay-colored) stools."
+      },
+      {
+        q: "Why is Gamma-Glutamyltransferase (GGT) routinely evaluated in tandem with Alkaline Phosphatase (ALP) when investigating suspected cholestasis?",
+        options: [
+          "GGT converts bone-derived ALP into hepatic isoenzymes in the circulation.",
+          "GGT is present in biliary canaliculi but entirely absent from bone tissue, resolving the origin of an elevated ALP.",
+          "ALP is only elevated in viral infections, whereas GGT is exclusively elevated in bacterial abscesses.",
+          "GGT is a synthetic plasma protein that stabilizes circulating ALP molecules."
+        ],
+        correct: 1,
+        explanation: "ALP is present in both biliary epithelium and osteoblasts. Because GGT is found in hepatobiliary tissue but not in bone, an elevated ALP with high GGT confirms hepatobiliary origin, whereas normal GGT points to skeletal pathology."
+      },
+      {
+        q: "A patient presents with an isolated Alkaline Phosphatase (ALP) of 340 U/L, a completely normal GGT (18 U/L), and normal transaminases. Which etiology is most consistent with this pattern?",
+        options: [
+          "Choledocholithiasis with common duct impaction",
+          "Chronic alcohol abuse and hepatic steatosis",
+          "Primary Sclerosing Cholangitis",
+          "Osteoblastic bone metastases or active adolescent bone remodeling"
+        ],
+        correct: 3,
+        explanation: "Discordant elevation (elevated ALP with a completely normal GGT) rules out biliary involvement and strongly indicates osseous origin, such as osteoblastic bone metastases, Paget disease, or rapid adolescent skeletal growth."
+      },
+      {
+        q: "A patient with long-standing end-stage cirrhosis presents with normal or only minimally elevated serum ALT and AST levels. What is the pathophysiological explanation?",
+        options: [
+          "Advanced cirrhosis accelerates renal filtration of transaminases.",
+          "Widespread parenchymal fibrosis leaves few remaining viable hepatocytes capable of leaking enzymes into the circulation.",
+          "High serum bilirubin chemically inhibits the spectrophotometric assay for ALT.",
+          "Excess ammonia in the circulation binds and neutralizes circulating transaminases."
+        ],
+        correct: 1,
+        explanation: "ALT and AST leak when viable hepatocytes undergo necrosis. In end-stage cirrhosis, extensive fibrosis has replaced normal parenchyma, leaving a depleted mass of viable hepatocytes to release enzymes despite severe functional failure."
+      },
+      {
+        q: "In hemolytic (pre-hepatic) jaundice, what characteristic pattern of bilirubin subfractions and urine findings is observed?",
+        options: [
+          "Predominant conjugated hyperbilirubinemia with high urinary bilirubin",
+          "Predominant unconjugated hyperbilirubinemia with absence of bilirubin in urine",
+          "Equal elevations of direct and indirect bilirubin with dark tea-colored urine",
+          "Severe conjugated hyperbilirubinemia with acholic pale stools"
+        ],
+        correct: 1,
+        explanation: "Accelerated hemolysis overwhelms hepatic conjugation, producing predominant unconjugated hyperbilirubinemia. Because unconjugated bilirubin is bound to albumin and not water-soluble, it cannot pass the glomerular filter, so urinary bilirubin is absent."
+      },
+      {
+        q: "What photochemical mechanism explains the efficacy of blue light phototherapy (λ = 430–490 nm) in treating unconjugated neonatal hyperbilirubinemia?",
+        options: [
+          "It stimulates premature infant hepatocytes to rapidly synthesize adult UGT1A1 enzyme.",
+          "It photoisomerizes hydrophobic (4Z, 15Z)-bilirubin into water-soluble structural isomers (lumirubin) that can be excreted in bile and urine without conjugation.",
+          "It lyses neonatal red blood cells in skin capillaries to halt heme catabolism.",
+          "It oxidizes intestinal urobilinogen back into direct bilirubin for enterohepatic reabsorption."
+        ],
+        correct: 1,
+        explanation: "Phototherapy uses blue light (430–490 nm) to penetrate capillary beds and drive photoisomerization, transforming toxic hydrophobic (4Z, 15Z)-bilirubin into water-soluble photoisomers (like lumirubin) that are excreted directly into bile and urine without glucuronide conjugation."
+      },
+      {
+        q: "Why is unconjugated hyperbilirubinemia in neonates uniquely dangerous, carrying the risk of kernicterus (bilirubin encephalopathy)?",
+        options: [
+          "Unconjugated bilirubin is lipophilic and readily crosses an immature, permeable blood-brain barrier.",
+          "Unconjugated bilirubin acts as a competitive antagonist at renal loop of Henle transporters.",
+          "Unconjugated bilirubin directly cleaves plasma coagulation Factor VII, precipitating intracranial hemorrhage.",
+          "Unconjugated bilirubin binds pancreatic beta-cells, causing refractory hypoglycemia."
+        ],
+        correct: 0,
+        explanation: "Unconjugated bilirubin is highly lipid-soluble. In neonates with an underdeveloped blood-brain barrier, elevated levels cross into the central nervous system, depositing in basal ganglia and causing kernicterus."
+      },
+      {
+        q: "Which pattern of transaminase elevation is typical of acute ischemic hepatitis ('shock liver') or severe toxic acetaminophen necrosis?",
+        options: [
+          "Mild transaminase elevation (50–100 U/L)",
+          "Normal transaminases with marked hypoalbuminemia",
+          "Marked transaminase elevations exceeding 1000+ U/L",
+          "Isolated elevation of GGT with normal ALT and AST"
+        ],
+        correct: 2,
+        explanation: "Acute massive ischemic necrosis (shock liver) and acute acetaminophen poisoning trigger widespread, sudden hepatocyte cytolysis, characteristically causing dramatic transaminase elevations often exceeding 1,000 to 10,000+ U/L."
+      },
+      {
+        q: "In evaluating prolonged PT/INR in a patient with suspected biliary obstruction or malnutrition, which diagnostic intervention helps differentiate hepatic parenchymal failure from Vitamin K deficiency?",
+        options: [
+          "Assessing serum ammonia before and after a protein challenge",
+          "Administering a trial of parenteral Vitamin K and rechecking PT/INR",
+          "Performing a 75 g oral glucose tolerance test",
+          "Administering intravenous albumin to restore oncotic pressure"
+        ],
+        correct: 1,
+        explanation: "Vitamin K deficiency (from poor diet or malabsorption due to lack of bile salts) corrects after parenteral Vitamin K administration, normalizing PT/INR. Failure to correct indicates true parenchymal synthetic failure."
+      },
+      {
+        q: "Which anatomical structure concentrates and stores bile prior to cholecystokinin-mediated discharge into the common bile duct?",
+        options: [
+          "Portal Sinusoid",
+          "Gallbladder",
+          "Ampulla of Vater",
+          "Canal of Hering"
+        ],
+        correct: 1,
+        explanation: "The gallbladder is the subhepatic muscular reservoir that concentrates and stores bile synthesized by the liver until meal-stimulated cholecystokinin (CCK) triggers its contraction into the biliary tree."
+      },
+      {
+        q: "Which of the following conditions represents an AUTOIMMUNE disorder primarily targeting the intrahepatic biliary epithelium?",
+        options: [
+          "Metabolic Dysfunction-Associated Steatohepatitis (MASH)",
+          "Primary Biliary Cholangitis (PBC)",
+          "Hemochromatosis",
+          "Wilson Disease"
+        ],
+        correct: 1,
+        explanation: "Primary Biliary Cholangitis (PBC) is an autoimmune liver disease characterized by immune-mediated inflammatory destruction of the interlobular small intrahepatic bile ducts."
+      },
+      {
+        q: "What causes caput medusae in patients with advanced liver cirrhosis?",
+        options: [
+          "Spontaneous bacterial transversion causing necrotizing fasciitis across the anterior abdominal wall",
+          "Severe hypoalbuminemia reducing oncotic pressure to zero in subcutaneous tissue",
+          "Dilated, tortuous periumbilical portosystemic collateral veins decompressing high portal pressure into systemic circuits",
+          "Direct mechanical compression of the inferior vena cava by an enlarged right hepatic lobe"
+        ],
+        correct: 2,
+        explanation: "Caput medusae develops when severe portal hypertension recanalizes the umbilical vein, shunting congested portal blood through periumbilical subcutaneous veins into systemic circuits."
+      },
+      {
+        q: "Which clinical test combination confirms that a patient's prolonged PT/INR is secondary to extensive loss of functional parenchymal reserve rather than simple extrahepatic cholestasis?",
+        options: [
+          "Normal transaminases combined with an elevated GGT",
+          "Persistent PT/INR prolongation despite parenteral Vitamin K administration, accompanied by marked hypoalbuminemia",
+          "Immediate normalization of PT/INR within 2 hours of oral calcium carbonate",
+          "Isolated elevation in unconjugated bilirubin with normal direct bilirubin"
+        ],
+        correct: 1,
+        explanation: "When prolonged PT/INR fails to correct following parenteral vitamin K, and is accompanied by low albumin, it confirms severe hepatocellular synthetic failure (>80% functional liver mass loss) rather than biliary malabsorption."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
