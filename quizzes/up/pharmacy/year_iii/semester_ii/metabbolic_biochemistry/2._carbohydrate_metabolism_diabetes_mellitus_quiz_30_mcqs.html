@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbohydrate Metabolism & Diabetes Mellitus Quiz (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header & Progress Bar */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Option Tiles */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Instant Feedback States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Carbohydrate Metabolism & Diabetes Mellitus Test</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "What is the normal physiological fasting blood glucose reference range in a healthy individual?",
+        options: [
+          "40–60 mg/dL",
+          "70–110 mg/dL",
+          "120–160 mg/dL",
+          "180–220 mg/dL"
+        ],
+        correct: 1,
+        explanation: "Normal physiological systemic blood glucose is tightly maintained within a narrow window of approximately 70–110 mg/dL to prevent acute neuroglycopenia or chronic hyperglycemic microvascular/macrovascular damage."
+      },
+      {
+        q: "Which metabolic pathway is defined as the de novo synthesis of endogenous glucose from non-carbohydrate precursors (e.g., lactate, glycerol, amino acids)?",
+        options: [
+          "Glycolysis",
+          "Glycogenolysis",
+          "Gluconeogenesis",
+          "Glycogenesis"
+        ],
+        correct: 2,
+        explanation: "Gluconeogenesis is the metabolic pathway that generates new glucose molecules from non-carbohydrate substrates (lactate, glycerol, and glucogenic amino acids), primarily in the liver during prolonged fasting."
+      },
+      {
+        q: "What are the primary cytoplasmic reducing equivalents and metabolic intermediates generated by the Pentose Phosphate Pathway (PPP)?",
+        options: [
+          "Pyruvate and ATP",
+          "NADPH and Ribose-5-phosphate",
+          "Acetoacetate and Beta-Hydroxybutyrate",
+          "Lactate and FAD"
+        ],
+        correct: 1,
+        explanation: "The Pentose Phosphate Pathway (PPP) shunts glucose-6-phosphate to produce NADPH (essential for reductive biosynthesis and antioxidant defense) and ribose-5-phosphate (essential for nucleotide synthesis)."
+      },
+      {
+        q: "Which specific glucose transporter undergoes insulin-stimulated translocation to the plasma membrane in skeletal muscle and adipose tissue?",
+        options: [
+          "GLUT-1",
+          "GLUT-2",
+          "GLUT-3",
+          "GLUT-4"
+        ],
+        correct: 3,
+        explanation: "Insulin stimulates peripheral glucose uptake in skeletal muscle and adipose tissue by triggering the intracellular translocation of glucose transporter-4 (GLUT-4) vesicles to the cell surface."
+      },
+      {
+        q: "During the postprandial 'fed state', how does insulin affect hepatic glucose production?",
+        options: [
+          "It stimulates both hepatic gluconeogenesis and glycogenolysis.",
+          "It suppresses both hepatic gluconeogenesis and glycogenolysis.",
+          "It accelerates ketone oxidation while stimulating glycogenolysis.",
+          "It activates glucagon-like receptors to mobilize liver glycogen."
+        ],
+        correct: 1,
+        explanation: "Insulin lowers circulating blood glucose by promoting glycogen synthesis (glycogenesis) while directly suppressing both hepatic glucose-producing pathways: gluconeogenesis and glycogenolysis."
+      },
+      {
+        q: "Which hormone is synthesized by pancreatic islet alpha-cells and stimulates hepatic glycogen breakdown and adipose lipolysis during fasting?",
+        options: [
+          "Insulin",
+          "Glucagon",
+          "Somatostatin",
+          "Amylin"
+        ],
+        correct: 1,
+        explanation: "Glucagon is the 'fasting state' counter-regulatory hormone secreted by pancreatic alpha-cells that promotes hepatic glycogenolysis and gluconeogenesis, as well as adipose lipolysis, to elevate circulating glucose."
+      },
+      {
+        q: "What proportion of all global diagnosed diabetes cases is accounted for by Type 2 Diabetes Mellitus?",
+        options: [
+          "Approximately 10%",
+          "Approximately 35%",
+          "Approximately 60%",
+          "Over 95%"
+        ],
+        correct: 3,
+        explanation: "Epidemiological benchmarks establish that over 95% of documented adult diabetes cases worldwide represent Type 2 Diabetes Mellitus, with Type 1 DM accounting for most of the remainder (~10%)."
+      },
+      {
+        q: "What is the primary underlying immunopathogenic mechanism responsible for Type 1 Diabetes Mellitus?",
+        options: [
+          "Post-receptor kinase defects in peripheral skeletal muscle",
+          "Targeted autoimmune cytolytic destruction of pancreatic beta-cells by autoreactive T lymphocytes",
+          "Exocrine acinar enzyme autodigestion resulting in chronic pancreatitis",
+          "Selective antibody-mediated destruction of pancreatic alpha-cells"
+        ],
+        correct: 1,
+        explanation: "Type 1 Diabetes Mellitus is an autoimmune disorder where autoreactive T lymphocytes selectively destroy insulin-producing pancreatic islet beta-cells, culminating in absolute endogenous insulin deficiency."
+      },
+      {
+        q: "Which characteristic best describes the etiology of Type 2 Diabetes Mellitus?",
+        options: [
+          "Absolute insulin lack secondary to viral destruction of all islet tissue",
+          "Subnormal biological tissue response (insulin resistance) combined with progressive secretory beta-cell failure",
+          "Complete genetic deletion of the insulin gene (INS) on chromosome 11",
+          "Persistent non-osmotic suppression of hypothalamic glucose sensors"
+        ],
+        correct: 1,
+        explanation: "Type 2 DM is characterized by subnormal biological tissue responsiveness to insulin (insulin resistance) compounded over time by progressive secretory exhaustion and failure of pancreatic beta-cells."
+      },
+      {
+        q: "What is the average renal tubular absorptive threshold for glucose, above which glycosuria and osmotic diuresis occur?",
+        options: [
+          "~70 mg/dL",
+          "~110 mg/dL",
+          "~180 mg/dL",
+          "~320 mg/dL"
+        ],
+        correct: 2,
+        explanation: "When systemic blood glucose exceeds the renal threshold of approximately 180 mg/dL, the tubular transport capacity is saturated, spilling glucose into the urine and causing osmotic diuresis (polyuria)."
+      },
+      {
+        q: "In diabetic pathophysiology, what is the direct mechanism underlying excessive cellular hunger (polyphagia)?",
+        options: [
+          "Hyperosmolar dehydration of hypothalamic thirst centers",
+          "Persistent cellular starvation due to impaired insulin-mediated glucose uptake and utilization",
+          "Excessive gastric clearance mediated by postprandial amylin surges",
+          "Glucosuria directly leaching electrolytes from the gastrointestinal mucosa"
+        ],
+        correct: 1,
+        explanation: "Despite high extracellular circulating glucose, the lack of effective insulin signaling prevents peripheral cellular uptake, triggering cellular starvation signals to hypothalamic satiety centers that drive unrelenting hunger (polyphagia)."
+      },
+      {
+        q: "Which acute metabolic complication is predominantly observed in Type 1 DM and characterized by metabolic acidosis, Kussmaul respirations, and acetone breath?",
+        options: [
+          "Hyperosmolar Hyperglycemic Nonketotic State (HHS)",
+          "Diabetic Ketoacidosis (DKA)",
+          "Severe Neuroglycopenic Hypoglycemia",
+          "Lactic Acidosis secondary to acute renal failure"
+        ],
+        correct: 1,
+        explanation: "Diabetic Ketoacidosis (DKA) results from absolute insulin deficiency, unleashing unrestrained lipolysis and hepatic ketogenesis (acetoacetate, beta-hydroxybutyrate, acetone), presenting with acidosis and Kussmaul breathing."
+      },
+      {
+        q: "What acute blood glucose threshold defines severe neuroglycopenic hypoglycemia requiring urgent intervention?",
+        options: [
+          "< 54 mg/dL",
+          "< 70 mg/dL",
+          "< 90 mg/dL",
+          "< 100 mg/dL"
+        ],
+        correct: 0,
+        explanation: "Severe hypoglycemia is defined at blood glucose levels < 54 mg/dL, causing acute neuroglycopenic crisis (confusion, diaphoresis, tremors, seizures, and coma) requiring immediate carbohydrate or glucagon rescue."
+      },
+      {
+        q: "Which metabolic crisis is predominantly seen in Type 2 DM and features extreme hyperglycemia and serum osmolality > 320 mOsm/kg WITHOUT significant ketoacidosis?",
+        options: [
+          "Diabetic Ketoacidosis (DKA)",
+          "Hyperosmolar Hyperglycemic State (HHS)",
+          "Euglycemic ketoacidosis",
+          "Sympathoadrenal shock"
+        ],
+        correct: 1,
+        explanation: "Hyperosmolar Hyperglycemic State (HHS) occurs primarily in Type 2 DM patients who have enough residual insulin to prevent massive lipolysis and ketogenesis, but experience severe hyperglycemia, marked dehydration, and osmolality > 320 mOsm/kg."
+      },
+      {
+        q: "Which of the following is classified as a microvascular (microangiopathic) complication of chronic diabetes mellitus?",
+        options: [
+          "Accelerated coronary artery disease and myocardial infarction",
+          "Atherosclerotic ischemic stroke",
+          "Diabetic nephropathy with mesangial expansion and albuminuria",
+          "Peripheral arterial disease with intermittent claudication"
+        ],
+        correct: 2,
+        explanation: "Diabetic nephropathy, retinopathy, and neuropathy are classical microvascular microangiopathic complications, whereas coronary artery disease, stroke, and peripheral arterial disease are macrovascular."
+      },
+      {
+        q: "What specific timeframe of mean ambient glycemia does Glycosylated Hemoglobin (HbA1c) represent?",
+        options: [
+          "Past 24 to 48 hours",
+          "Preceding 1 to 2 weeks",
+          "Preceding 8 to 12 weeks (~2 to 3 months)",
+          "Past 12 months"
+        ],
+        correct: 2,
+        explanation: "HbA1c quantifies non-enzymatic hemoglobin glycation over the average lifespan of circulating erythrocytes, providing an integrated record of mean glycemia across the preceding 8 to 12 weeks (2–3 months)."
+      },
+      {
+        q: "According to American Diabetes Association (ADA) diagnostic criteria, which Fasting Blood Glucose (FBG) threshold confirms a diagnosis of Diabetes Mellitus?",
+        options: [
+          "≥ 100 mg/dL",
+          "≥ 110 mg/dL",
+          "≥ 126 mg/dL",
+          "≥ 140 mg/dL"
+        ],
+        correct: 2,
+        explanation: "An FBG ≥ 126 mg/dL (after an overnight fast of > 8 hours) meets the diagnostic consensus threshold for diabetes mellitus (normal is ≤ 99 mg/dL; prediabetes is 100–125 mg/dL)."
+      },
+      {
+        q: "A patient completes a 2-hour Oral Glucose Tolerance Test (OGTT, 75 g) and yields a venous plasma glucose of 168 mg/dL. How is this categorized?",
+        options: [
+          "Normal glucose tolerance",
+          "Prediabetes (Impaired Glucose Tolerance)",
+          "Overt Diabetes Mellitus",
+          "Hypoglycemic unresponsiveness"
+        ],
+        correct: 1,
+        explanation: "On a 2-hour 75 g OGTT, values < 140 mg/dL are normal, 140–199 mg/dL indicate prediabetes (impaired glucose tolerance), and ≥ 200 mg/dL define overt diabetes."
+      },
+      {
+        q: "What is the ADA diagnostic cutoff for Glycosylated Hemoglobin (HbA1c) to diagnose overt Diabetes Mellitus?",
+        options: [
+          "≥ 5.6%",
+          "≥ 6.0%",
+          "≥ 6.5%",
+          "≥ 7.0%"
+        ],
+        correct: 2,
+        explanation: "An HbA1c ≥ 6.5% confirms the diagnosis of diabetes mellitus. A level between 5.7% and 6.4% is classified as prediabetes, and < 5.6% is normal."
+      },
+      {
+        q: "What is the standard individualized HbA1c target for most nonpregnant adult diabetic patients during longitudinal management?",
+        options: [
+          "< 5.0%",
+          "< 6.0%",
+          "< 7.0%",
+          "< 8.5%"
+        ],
+        correct: 2,
+        explanation: "The widely accepted clinical guideline target for nonpregnant adult diabetic patients is an HbA1c < 7.0%, which significantly reduces microvascular and macrovascular complications."
+      },
+      {
+        q: "When must screening for diabetic retinopathy via dilated fundoscopy be initiated?",
+        options: [
+          "Immediately upon diagnosis for Type 2 DM; within 5 years of onset for Type 1 DM",
+          "Immediately upon diagnosis for Type 1 DM; after 10 years for Type 2 DM",
+          "Only when the patient develops visual acuity deficits in both eyes",
+          "Annually starting at age 65 regardless of diabetes subtype"
+        ],
+        correct: 0,
+        explanation: "Because Type 2 DM often has an insidious, asymptomatic onset that can precede clinical diagnosis by years, dilated eye exams must occur immediately upon diagnosis. In Type 1 DM, screening begins within 5 years of onset."
+      },
+      {
+        q: "In an intensive basal-bolus insulin regimen for Type 1 DM, what is the primary physiological role of the basal insulin component?",
+        options: [
+          "To cover carbohydrate surges immediately following large meals",
+          "To suppress inter-meal and nocturnal hepatic glucose output",
+          "To induce acute glucosuria via renal tubule inhibition",
+          "To stimulate glucagon release during periods of light exercise"
+        ],
+        correct: 1,
+        explanation: "Basal insulin (intermediate- or long-acting analogs) provides a steady, background level of insulin that suppresses hepatic gluconeogenesis and glycogenolysis between meals and during sleep."
+      },
+      {
+        q: "What is the primary mechanism of action of Metformin (the standard first-line biguanide)?",
+        options: [
+          "Stimulating pancreatic beta-cell insulin exocytosis via ATP-sensitive potassium channels",
+          "Decreasing hepatic gluconeogenesis and enhancing peripheral tissue insulin sensitivity",
+          "Inhibiting sodium-glucose cotransporter-2 in the proximal convoluted tubules",
+          "Antagonizing intestinal alpha-glucosidase brush-border enzymes"
+        ],
+        correct: 1,
+        explanation: "Metformin acts primarily by decreasing hepatic glucose production (gluconeogenesis) and increasing peripheral insulin sensitivity, all without causing hypoglycemia or stimulating weight gain."
+      },
+      {
+        q: "Which major clinical safety warning and monitoring requirement is specifically associated with Metformin therapy?",
+        options: [
+          "Risk of severe ketoacidosis during adolescent bone growth spurts",
+          "Risk of lactic acidosis; requires monitoring renal function (eGFR)",
+          "Risk of proliferative retinopathy from rapid lipid clearance",
+          "Risk of excessive fluid retention causing rapid biconcave lens deformation"
+        ],
+        correct: 1,
+        explanation: "Metformin carries a black box warning for lactic acidosis, particularly in patients with renal impairment; hence, estimated Glomerular Filtration Rate (eGFR) must be routinely evaluated before and during therapy."
+      },
+      {
+        q: "Which class of oral antidiabetic agents acts as secretagogues by stimulating pancreatic beta-cell insulin exocytosis, carrying a significant risk of hypoglycemia and weight gain?",
+        options: [
+          "DPP-4 inhibitors",
+          "Sulfonylureas",
+          "SGLT2 inhibitors",
+          "Thiazolidinediones"
+        ],
+        correct: 1,
+        explanation: "Sulfonylureas (e.g., glimepiride, gliclazide, glipizide) directly stimulate beta-cells to secrete insulin independent of ambient glucose, which poses a notable risk of hypoglycemia and progressive weight gain."
+      },
+      {
+        q: "How do Sodium-Glucose Cotransporter-2 (SGLT2) inhibitors lower blood glucose and provide cardiovascular/renal protection?",
+        options: [
+          "By inhibiting intestinal oligosaccharide hydrolysis in the brush border",
+          "By inhibiting glucose reabsorption in the renal proximal tubules to promote glucosuria",
+          "By activating nuclear PPAR-gamma transcription factors in adipocytes",
+          "By delaying gastric emptying and increasing central satiety"
+        ],
+        correct: 1,
+        explanation: "SGLT2 inhibitors (e.g., empagliflozin, dapagliflozin) block glucose reabsorption in the proximal convoluted tubules, promoting urinary glucose excretion (glucosuria) and delivering proven heart failure and renal benefits."
+      },
+      {
+        q: "Which potential adverse drug reactions are uniquely linked to SGLT2 inhibitor therapy?",
+        options: [
+          "Mycotic genital infections, volume depletion, and euglycemic DKA",
+          "Severe flatulence, abdominal bloating, and intractable diarrhea",
+          "Peripheral edema, fluid retention, and worsening congestive heart failure",
+          "Pancreatic islet amyloidosis and progressive hair loss"
+        ],
+        correct: 0,
+        explanation: "Because SGLT2 inhibitors induce glucosuria and osmotic diuresis, common and serious risks include mycotic genital infections, hypotension/volume depletion, and rare euglycemic diabetic ketoacidosis (euDKA)."
+      },
+      {
+        q: "Which class of diabetes medications binds nuclear PPAR-gamma receptors to augment insulin sensitivity, but carries a major risk of fluid retention and heart failure exacerbation?",
+        options: [
+          "Thiazolidinediones (TZDs)",
+          "Alpha-glucosidase inhibitors",
+          "DPP-4 inhibitors",
+          "GLP-1 receptor agonists"
+        ],
+        correct: 0,
+        explanation: "Thiazolidinediones (e.g., pioglitazone) are PPAR-gamma agonists that augment peripheral insulin sensitivity, but cause fluid retention, peripheral edema, and can precipitate or exacerbate congestive heart failure."
+      },
+      {
+        q: "Which antidiabetic drug class works by stimulating glucose-dependent insulin release, suppressing glucagon secretion, and delaying gastric emptying, while providing cardio-renal benefits and weight loss?",
+        options: [
+          "Sulfonylureas",
+          "Glucagon-like peptide-1 (GLP-1) receptor agonists",
+          "Alpha-glucosidase inhibitors",
+          "Bile acid sequestrants"
+        ],
+        correct: 1,
+        explanation: "GLP-1 receptor agonists (e.g., liraglutide, semaglutide) mimic incretin hormones: they stimulate glucose-dependent insulin secretion, suppress postprandial glucagon, slow gastric emptying, and promote significant weight loss."
+      },
+      {
+        q: "Under which clinical circumstance is the initiation of exogenous insulin therapy explicitly indicated in a patient with Type 2 Diabetes Mellitus?",
+        options: [
+          "Presence of mild, asymptomatic Impaired Fasting Glucose",
+          "Active systemic catabolism, ketosis, hyperosmolar crises (HHS), or acute DKA",
+          "Transient flatulence following initiation of medical nutrition therapy",
+          "Isolated elevation in alkaline phosphatase during adolescent bone remineralization"
+        ],
+        correct: 1,
+        explanation: "Insulin therapy in Type 2 DM is urgently indicated when patients show severe decompensation, active catabolism, ketosis, emergent DKA, hyperosmolar hyperglycemic state (HHS), or secondary failure of oral multi-agent regimens."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
