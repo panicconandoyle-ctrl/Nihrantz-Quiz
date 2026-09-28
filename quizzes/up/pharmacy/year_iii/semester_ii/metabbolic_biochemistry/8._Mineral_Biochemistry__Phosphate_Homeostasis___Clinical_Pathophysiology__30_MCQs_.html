@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mineral Biochemistry: Phosphate Homeostasis & Clinical Pathophysiology (30 MCQs)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+    }
+
+    body {
+      background-color: #f6f7fb;
+      color: #2e3856;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 80px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Progress Bar Card */
+    .top-bar {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+    }
+
+    .top-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .tracker-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #646f90;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #eef1ff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4255ff;
+      transition: width 0.3s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn-toggle-grid {
+      background: #eef1ff;
+      border: 1px solid #d9dffc;
+      color: #4255ff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-toggle-grid:hover {
+      background: #dce3ff;
+      transform: translateY(-1px);
+    }
+
+    .answered-badge {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    /* Question Drawer / Grid */
+    .grid-drawer {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      margin-bottom: 4px;
+    }
+
+    .grid-drawer.open {
+      display: block;
+    }
+
+    .grid-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #646f90;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 8px;
+    }
+
+    .grid-cell {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e6e9f2;
+      background-color: #ffffff;
+      color: #2e3856;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-cell:hover {
+      border-color: #4255ff;
+      color: #4255ff;
+    }
+
+    .grid-cell.active {
+      border: 2px solid #4255ff !important;
+      box-shadow: 0 0 0 2px rgba(66, 85, 255, 0.2);
+    }
+
+    .grid-cell.answered {
+      background-color: #eef1ff;
+      border-color: #b5c3ff;
+      color: #4255ff;
+    }
+
+    /* Main Quiz Card */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 14px rgba(46, 56, 86, 0.05);
+      position: relative;
+    }
+
+    .question-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #4255ff;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #2e3856;
+      margin-bottom: 22px;
+    }
+
+    /* Options */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e6e9f2;
+      background: #ffffff;
+      color: #2e3856;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #4255ff;
+      background-color: #fafbff;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #eef1ff;
+      color: #4255ff;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+      display: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* Option States */
+    .option-btn.correct {
+      background-color: #d7f7eb !important;
+      border-color: #18ae79 !important;
+      color: #0e6948 !important;
+    }
+
+    .option-btn.correct .badge {
+      background-color: #18ae79;
+      color: #ffffff;
+      border-color: #18ae79;
+    }
+
+    .option-btn.correct .status-tag {
+      display: inline-block;
+      background-color: #18ae79;
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      background-color: #ffdfe0 !important;
+      border-color: #ff6871 !important;
+      color: #b31d27 !important;
+    }
+
+    .option-btn.incorrect .badge {
+      background-color: #ff6871;
+      color: #ffffff;
+      border-color: #ff6871;
+    }
+
+    .option-btn.incorrect .status-tag {
+      display: inline-block;
+      background-color: #ff6871;
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Note Card */
+    .explanation-card {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background-color: #f7f9fd;
+      border-left: 4px solid #4255ff;
+      border-top: 1px solid #e6e9f2;
+      border-right: 1px solid #e6e9f2;
+      border-bottom: 1px solid #e6e9f2;
+      display: none;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2e3856;
+      margin-bottom: 6px;
+    }
+
+    .explanation-body {
+      font-size: 13px;
+      color: #646f90;
+      line-height: 1.5;
+    }
+
+    /* Navigation Controls */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      border: 1px solid #e6e9f2;
+      color: #2e3856;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f6f7fb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4255ff;
+      border: 1px solid #4255ff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e38c9;
+      transform: translateY(-1px);
+    }
+
+    /* Scorecard View */
+    .scorecard {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .scorecard.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid #4255ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 16px auto 24px auto;
+      background: #eef1ff;
+    }
+
+    .score-pct {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2e3856;
+    }
+
+    .score-sub {
+      font-size: 12px;
+      color: #646f90;
+      font-weight: bold;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-stat {
+      font-size: 14px;
+      color: #646f90;
+    }
+
+    .score-stat strong {
+      display: block;
+      font-size: 20px;
+      color: #2e3856;
+      margin-top: 4px;
+    }
+
+    /* Branding & Footer */
+    .footer-container {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #e6e9f2;
+      padding-top: 16px;
+    }
+
+    .attribution {
+      font-size: 13px;
+      font-weight: bold;
+      font-style: italic;
+      color: #646f90;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9dffc;
+      background-color: #ffffff;
+      color: #4255ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .social-btn:hover {
+      background-color: #4255ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Top Progress Bar Card -->
+    <div class="top-bar">
+      <div class="top-bar-meta">
+        <span class="quiz-title">Phosphate Homeostasis & Pathophysiology Test</span>
+        <span class="tracker-text" id="tracker-text">Question 1 of 30</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn-toggle-grid" id="toggle-grid-btn" onclick="toggleDrawer()">View List</button>
+        <span class="answered-badge" id="answered-counter">0 / 30 Answered</span>
+      </div>
+    </div>
+
+    <!-- Question Drawer / Grid -->
+    <div class="grid-drawer" id="grid-drawer">
+      <div class="grid-title">Jump to Question</div>
+      <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="card" id="quiz-card">
+      <div class="question-header" id="question-counter">Question 1</div>
+      <div class="question-text" id="question-text">Loading question...</div>
+
+      <div class="options-group" id="options-group">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <!-- Educational Explanation / Rationales -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="explanation-title">Educational Rationale</div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <button class="nav-btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+    <!-- Scorecard View (Hidden by default) -->
+    <div class="card scorecard" id="scorecard">
+      <h2 style="font-size: 22px; color: #2e3856; margin-bottom: 6px;">Assessment Complete!</h2>
+      <p style="font-size: 14px; color: #646f90;">Here is your performance summary:</p>
+
+      <div class="score-circle">
+        <span class="score-pct" id="score-pct">0%</span>
+        <span class="score-sub">Total Score</span>
+      </div>
+
+      <div class="score-breakdown">
+        <div class="score-stat">Correct: <strong id="correct-count" style="color: #0e6948;">0</strong></div>
+        <div class="score-stat">Incorrect: <strong id="incorrect-count" style="color: #b31d27;">0</strong></div>
+        <div class="score-stat">Total: <strong>30</strong></div>
+      </div>
+
+      <button class="nav-btn btn-primary" onclick="restartQuiz()">Take Test Again</button>
+    </div>
+
+    <!-- Branding & Social Footer -->
+    <div class="footer-container">
+      <div class="attribution">Prepared by BUNRETH Nihrantz</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener noreferrer" class="social-btn" title="Telegram">T</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "In human physiological systems and clinical laboratory diagnostics, which specific chemical entity is evaluated to assess phosphorus status?",
+        options: [
+          "Free elemental phosphorus (P)",
+          "Inorganic phosphate oxyanion (PO4^3-)",
+          "Phosphorous acid in its lower oxidation state",
+          "Phosphine gas metabolites"
+        ],
+        correct: 1,
+        explanation: "Within human biological systems and clinical medicine, physiological investigations and laboratory profiles evaluate Phosphate (PO4^3-), the polyatomic oxyanion formed by phosphorus covalently bonded to oxygen[cite: 8]."
+      },
+      {
+        q: "What proportion of the total body phosphorus pool (~1.0 kg) is sequestered within the mineralized matrix of bones and teeth as hydroxyapatite?",
+        options: [
+          "10%",
+          "50%",
+          "80% to 85%",
+          "99%"
+        ],
+        correct: 2,
+        explanation: "Approximately 80% to 85% of total body phosphorus is mineralized in bones and teeth as insoluble hydroxyapatite[cite: 8]. (Unlike calcium, which is 99% in bone, ~10% of phosphate is in skeletal muscle and ~10% in soft tissues/ECF[cite: 7, 8])."
+      },
+      {
+        q: "Which apical cotransporter mediates active, sodium-dependent phosphate absorption across the enterocyte brush-border membrane in the small intestine?",
+        options: [
+          "SGLT1 (SLC5A1)",
+          "NaPi-IIb (SLC34A2)",
+          "NKCC2 (SLC12A1)",
+          "ENaC (SCNN1A)"
+        ],
+        correct: 1,
+        explanation: "Active intestinal phosphate transport occurs predominantly in the duodenum and jejunum via apical sodium-dependent phosphate cotransporters, primarily NaPi-IIb (SLC34A2), alongside passive paracellular diffusion[cite: 8]."
+      },
+      {
+        q: "What is the Recommended Dietary Allowance (RDA) of phosphate for healthy adults (≥ 19 years)?",
+        options: [
+          "100 mg/day",
+          "460 mg/day",
+          "700 mg/day",
+          "1,250 mg/day"
+        ],
+        correct: 2,
+        explanation: "The adult RDA for phosphate is 700 mg/day for both non-pregnant adults and during pregnancy/lactation[cite: 8]. Children aged 9–18 years require 1,250 mg/day to support rapid skeletal expansion[cite: 8]."
+      },
+      {
+        q: "What is the normal reference concentration range for serum inorganic phosphate in a healthy adult?",
+        options: [
+          "1.0–2.0 mg/dL (0.30–0.65 mmol/L)",
+          "2.5–4.5 mg/dL (0.80–1.45 mmol/L)",
+          "4.0–7.0 mg/dL (1.30–2.25 mmol/L)",
+          "9.0–11.0 mg/dL (2.25–2.75 mmol/L)"
+        ],
+        correct: 1,
+        explanation: "The normal clinical serum phosphate reference interval for adults is 2.5–4.5 mg/dL (0.80–1.45 mmol/L)[cite: 8]. Pediatric reference ranges are higher (4.0–7.0 mg/dL)[cite: 8]."
+      },
+      {
+        q: "Why do growing children have a higher physiological serum phosphate baseline (4.0–7.0 mg/dL) than adults?",
+        options: [
+          "Impaired renal glomerular filtration during normal childhood",
+          "Elevated GH- and IGF-1-driven tubular reabsorption to exceed the solubility product for hydroxyapatite deposition during endochondral ossification",
+          "Total absence of parathyroid hormone secretion in pediatric chief cells",
+          "Physiological enterocyte resistance to fibroblast growth factor 23"
+        ],
+        correct: 1,
+        explanation: "Children maintain higher circulating serum phosphate levels to support skeletal growth[cite: 8]. Growth hormone and IGF-1 upregulate renal cotransporter expression to maintain higher serum phosphate, enabling calcium-phosphate concentrations to exceed the solubility product for hydroxyapatite mineralization[cite: 8]."
+      },
+      {
+        q: "Under normal steady-state physiological conditions, what percentage of filtered inorganic phosphate is reabsorbed in the renal proximal convoluted tubule?",
+        options: [
+          "10% to 15%",
+          "30% to 40%",
+          "50% to 60%",
+          "80% to 85%"
+        ],
+        correct: 3,
+        explanation: "Under baseline conditions, approximately 80% to 85% of filtered inorganic phosphate is actively reabsorbed in the proximal convoluted tubule via apical sodium-phosphate cotransporters (NaPi-IIa and NaPi-IIc)[cite: 8]."
+      },
+      {
+        q: "How does Parathyroid Hormone (PTH) induce renal phosphaturia in the proximal convoluted tubule?",
+        options: [
+          "By stimulating apical insertion of SGLT2 transporters",
+          "By promoting retrieval and lysosomal degradation of NaPi-IIa and NaPi-IIc cotransporters from the brush-border membrane",
+          "By opening chloride channels in the thick ascending limb of Henle",
+          "By inhibiting mitochondrial carbonic anhydrase in intercalated cells"
+        ],
+        correct: 1,
+        explanation: "PTH binds basolateral PTH1 receptors in the proximal tubule, triggering cAMP-mediated retrieval (endocytosis) and lysosomal degradation of apical NaPi-IIa and NaPi-IIc cotransporters, blunting reabsorption and causing marked phosphaturia[cite: 8]."
+      },
+      {
+        q: "Which osteocyte-derived phosphaturic hormone acts with the α-Klotho coreceptor in the kidneys to enhance phosphate excretion and suppress 1α-hydroxylase activity?",
+        options: [
+          "Fibroblast Growth Factor 23 (FGF23)",
+          "Calcitonin",
+          "Erythropoietin (EPO)",
+          "Angiotensin II"
+        ],
+        correct: 0,
+        explanation: "FGF23 is an osteocyte-derived hormone that binds FGFR1/α-Klotho complexes in the kidney to promote renal phosphate excretion (downregulating NaPi cotransporters) and suppress renal 1α-hydroxylase, diminishing calcitriol synthesis[cite: 8]."
+      },
+      {
+        q: "What is the biological rationale for Parathyroid Hormone (PTH) stimulating renal calcium retention while simultaneously inducing renal phosphate excretion (phosphaturia)?",
+        options: [
+          "Phosphate excretion is required to synthesize calcitonin in the thyroid gland.",
+          "Mobilizing calcium from bone also releases phosphate; dumping phosphate in urine prevents the Ca × P solubility product from exceeding 55 mg²/dL², avoiding metastatic calcification.",
+          "Phosphate competes with calcium for albumin-binding sites in the blood.",
+          "Phosphate excretion lowers systemic blood pressure during hypercalcemic emergencies."
+        ],
+        correct: 1,
+        explanation: "When PTH stimulates bone resorption, both calcium and phosphate are released into systemic blood[cite: 8]. Excreting phosphate in urine prevents the calcium-phosphate solubility product (Ca × P) from exceeding 55 mg²/dL², which prevents soft-tissue and vascular calcification[cite: 8]."
+      },
+      {
+        q: "Which chemical bond type links adjacent ribose and deoxyribose pentose sugars to assemble the genomic backbone of DNA and RNA?",
+        options: [
+          "Peptide bonds",
+          "Phosphodiester bonds",
+          "Glycosidic bonds",
+          "Disulfide linkages"
+        ],
+        correct: 1,
+        explanation: "Phosphodiester bonds link the 3'-carbon of one sugar molecule to the 5'-carbon of another via a central phosphate group, forming the repeating structural backbone of DNA and RNA[cite: 8]."
+      },
+      {
+        q: "In cellular bioenergetics, which high-energy bonds in ATP and GTP liberate free Gibbs energy upon hydrolysis to drive myofibrillar cross-bridge cycling and active transport?",
+        options: [
+          "Phosphoanhydride bonds",
+          "Hydrogen bonds",
+          "Ester bonds",
+          "Ether bonds"
+        ],
+        correct: 0,
+        explanation: "ATP contains high-energy phosphoanhydride bonds between its terminal phosphate groups; hydrolysis of these bonds yields ~30.5 kJ/mol of free energy used to drive cellular work, biosyntheses, and contraction[cite: 8]."
+      },
+      {
+        q: "How does the phosphorylation of neutral hexoses (e.g., converting glucose to Glucose-6-Phosphate via hexokinase) affect intracellular carbohydrate metabolism?",
+        options: [
+          "It stimulates immediate GLUT-4 facilitated diffusion out of the cell.",
+          "It adds a negative charge that traps the hexose intracellularly, committing it to metabolic pathways (glycolysis, glycogenesis, PPP).",
+          "It converts the sugar into an insoluble glycogen crystalloid within seconds.",
+          "It directly hydrolyzes the mitochondrial ATP-phosphocreatine shuttle."
+        ],
+        correct: 1,
+        explanation: "Phosphorylation imparts a negative charge to neutral glucose, preventing it from crossing the hydrophobic plasma membrane, which traps it intracellularly and commits it to glycolysis, glycogenesis, or the pentose phosphate pathway[cite: 8]."
+      },
+      {
+        q: "Which major biological coenzymes incorporate inorganic phosphate as an integral part of their chemical structure?",
+        options: [
+          "Retinol and Cholecalciferol",
+          "NAD+, NADP+, and Coenzyme A",
+          "Ascorbic acid and Biotin",
+          "Intrinsic Factor and Heparan sulfate"
+        ],
+        correct: 1,
+        explanation: "Inorganic phosphate is a key component of redox dinucleotides (NAD+, NADH, NADP+, NADPH) and Coenzyme A (via 4'-phosphopantetheine and 3'-phosphoadenosine diphosphate)[cite: 6, 8]."
+      },
+      {
+        q: "How does the inorganic phosphate buffer system (HPO4^2- / H2PO4-) operate as the primary component of 'titratable acid' in the renal tubular lumen?",
+        options: [
+          "Filtered H2PO4- binds bicarbonate to generate volatile carbon dioxide.",
+          "Filtered HPO4^2- binds actively secreted protons (H+) to form H2PO4-, allowing proton elimination without causing an excessive drop in urine pH.",
+          "Phosphate actively degrades Tamm-Horsfall mucoproteins into ammonia.",
+          "Phosphate binds potassium to stimulate aldosterone release."
+        ],
+        correct: 1,
+        explanation: "In renal tubular lumens, filtered hydrogen phosphate (HPO4^2-, weak base) binds secreted H+ to form dihydrogen phosphate (H2PO4-, weak acid)[cite: 8]. With a pKa of 6.8, this buffers secreted acid, allowing significant proton elimination as titratable acid without driving luminal pH below the nephron limit (~4.5)[cite: 8]."
+      },
+      {
+        q: "Why does severe acute respiratory alkalosis trigger an acute transcellular shift of phosphate, leading to sudden hypophosphatemia?",
+        options: [
+          "Hypocapnia directly lyses osteoclasts in alveolar capillaries.",
+          "Intracellular alkalosis activates phosphofructokinase (PFK), accelerating glycolysis and consuming cytosolic inorganic phosphate to produce phosphorylated hexoses.",
+          "Low CO2 stimulates renal NaPi-IIc cotransporters to pump phosphate into urine.",
+          "Alkalemia induces rapid precipitation of calcium carbonate in smooth muscle."
+        ],
+        correct: 1,
+        explanation: "Intracellular alkalosis stimulates the rate-limiting glycolytic enzyme phosphofructokinase (PFK)[cite: 8]. Accelerated phosphorylation of glucose consumes free intracellular inorganic phosphate, creating an inward concentration gradient that shifts extracellular phosphate into cells, causing acute hypophosphatemia[cite: 8]."
+      },
+      {
+        q: "What is the primary driving mechanism of life-threatening acute hypophosphatemia during Refeeding Syndrome in chronically malnourished patients?",
+        options: [
+          "Massive bacterial destruction of phosphate in the jejunal lumen",
+          "Rapid carbohydrate reintroduction triggers an insulin surge that stimulates anabolism, cellular uptake, and glycolytic phosphorylation, depleting extracellular phosphate.",
+          "Overactivation of parathyroid chief cells by trace amino acids",
+          "Sudden renal glomerular basement membrane tearing"
+        ],
+        correct: 1,
+        explanation: "In starvation, whole-body phosphate stores are depleted[cite: 8]. Rapid carbohydrate intake triggers an insulin surge that drives glucose and phosphate into cells for protein synthesis, glycogen synthesis, and glycolysis, rapidly stripping extracellular fluid of phosphate (< 1.0 mg/dL)[cite: 8]."
+      },
+      {
+        q: "Why does severe hypophosphatemia (< 2.5 mg/dL) cause tissue hypoxia and acute cellular metabolic energy failure?",
+        options: [
+          "It inhibits pulmonary surfactant synthesis in type II alveolar pneumocytes.",
+          "It depletes intracellular ATP and diminishes erythrocyte 2,3-bisphosphoglycerate (2,3-BPG), shifting the oxygen-hemoglobin curve leftward and impairing oxygen unloading.",
+          "It causes immediate erythrocyte hemolysis by overactivating SERCA pumps.",
+          "It blocks the binding of oxygen to myoglobin heme iron in skeletal muscle."
+        ],
+        correct: 1,
+        explanation: "Phosphate depletion decreases synthesis of both ATP (energy failure, diaphragmatic weakness) and erythrocyte 2,3-BPG[cite: 8]. Reduced 2,3-BPG increases hemoglobin's affinity for oxygen (left-shift of the dissociation curve), impairing oxygen delivery to tissues[cite: 8]."
+      },
+      {
+        q: "Which clinical manifestation can arise from severe hypophosphatemia-induced ATP depletion in skeletal and respiratory musculature?",
+        options: [
+          "Carpopedal spasm and Risus Sardonicus",
+          "Proximal myopathy, rhabdomyolysis, and acute ventilatory failure secondary to diaphragmatic dysfunction",
+          "Accelerated Mönckeberg medial calcific arteriosclerosis",
+          "Cutaneous calciphylaxis with necrotic ulcerations"
+        ],
+        correct: 1,
+        explanation: "Without adequate phosphate, muscle cells cannot maintain ATP levels for membrane pumps and cross-bridge cycling, leading to proximal muscle weakness, rhabdomyolysis, and diaphragmatic failure requiring mechanical ventilation[cite: 8]."
+      },
+      {
+        q: "What is the primary etiological cause of chronic Hyperphosphatemia (> 4.5 mg/dL) in adult populations worldwide?",
+        options: [
+          "Excessive dietary intake of dairy products in healthy individuals",
+          "Chronic Kidney Disease (CKD Stages 4–5) due to progressive loss of functional nephron filtration mass",
+          "Primary hypoparathyroidism following thyroidectomy",
+          "Adolescent growth spurts stimulated by growth hormone"
+        ],
+        correct: 1,
+        explanation: "Chronic Kidney Disease (Stages 4–5) is the leading cause of hyperphosphatemia globally because the reduction in functioning nephron mass impairs glomerular filtration of phosphate below daily metabolic loads[cite: 5, 8]."
+      },
+      {
+        q: "Which acute oncology emergency causes massive hyperphosphatemia due to rapid intracellular lysis of neoplastic cells following cytotoxic chemotherapy?",
+        options: [
+          "Tumor Lysis Syndrome (TLS)",
+          "Fanconi Syndrome",
+          "Multiple Endocrine Neoplasia Type 1",
+          "Nelson Syndrome"
+        ],
+        correct: 0,
+        explanation: "Tumor Lysis Syndrome occurs when chemotherapy rapidly destroys large burdens of neoplastic cells (e.g., leukemias, lymphomas), pouring intracellular contents (phosphate, potassium, uric acid) into systemic circulation[cite: 8]."
+      },
+      {
+        q: "What is the immediate biochemical consequence of an acute, massive surge in circulating serum phosphate?",
+        options: [
+          "Acute hypercalcemia and polyuria",
+          "Spontaneous binding of phosphate to free ionized calcium (Ca2+), precipitating calcium-phosphate salts and causing acute hypocalcemia",
+          "Immediate suppression of parathyroid hormone synthesis",
+          "Upregulation of renal 1α-hydroxylase enzyme activity"
+        ],
+        correct: 1,
+        explanation: "High serum phosphate binds free ionized calcium, driving precipitation of insoluble calcium-phosphate salts in soft tissues and causing a precipitous drop in ionized calcium (hypocalcemia), which can trigger tetany[cite: 8]."
+      },
+      {
+        q: "Vascular smooth muscle cells undergo phenotypic transdifferentiation into osteoblast-like cells, causing medial vascular calcification, when the Calcium-Phosphate product exceeds what threshold?",
+        options: [
+          "Ca × P > 25 mg²/dL²",
+          "Ca × P > 35 mg²/dL²",
+          "Ca × P > 55 mg²/dL²",
+          "Ca × P > 100 mg²/dL²"
+        ],
+        correct: 2,
+        explanation: "When the serum Calcium-Phosphate solubility product (Ca × P) exceeds 55 mg²/dL², mineral solubility is surpassed, prompting vascular smooth muscle cells to express bone-related genes and deposit hydroxyapatite into vascular walls (Mönckeberg sclerosis)[cite: 8]."
+      },
+      {
+        q: "Which severe, life-threatening complication of chronic hyperphosphatemia and end-stage renal disease is characterized by small-vessel mural calcification, painful cutaneous ischemic necrosis, and sepsis?",
+        options: [
+          "Calciphylaxis (Calcific Uremic Arteriolopathy)",
+          "Rachitic rosary",
+          "Pellagra dermopathy",
+          "Gowers sign"
+        ],
+        correct: 0,
+        explanation: "Calciphylaxis (calcific uremic arteriolopathy) is a devastating complication in dialysis patients with high Ca × P product, marked by vascular medial calcification, microvascular thrombosis, painful ischemic skin necrosis, and fatal sepsis[cite: 8]."
+      },
+      {
+        q: "Which pharmacological agent is a non-calcium, non-aluminum polymeric phosphate binder indicated for meals in patients with hyperphosphatemia secondary to CKD?",
+        options: [
+          "Sevelamer",
+          "Calcitriol",
+          "Ergocalciferol",
+          "Isoniazid"
+        ],
+        correct: 0,
+        explanation: "Sevelamer is a non-absorbed, non-calcium-based polymeric anion exchange resin that binds dietary phosphate in the intestinal lumen to facilitate fecal excretion, preventing hyperphosphatemia without adding calcium burden[cite: 8]."
+      },
+      {
+        q: "In pediatric Nutritional Rickets caused by severe Vitamin D deficiency, what skeletal abnormality is caused by the accumulation of unmineralized osteoid under gravitational load?",
+        options: [
+          "Bilateral tibial and femoral bowing (genu varum)",
+          "Calcification of the Achilles tendon",
+          "Osteopetrotic cortical hyperostosis",
+          "Premature craniosynostosis"
+        ],
+        correct: 0,
+        explanation: "In rickets, deficiency of 25(OH)D and calcitriol impairs intestinal calcium and phosphate uptake, causing secondary hyperparathyroidism and hypophosphatemia[cite: 8]. Unmineralized cartilaginous osteoid accumulates at epiphyseal growth plates and bows under gravitational weight (genu varum)[cite: 8]."
+      },
+      {
+        q: "What physical finding describes the enlargement of the costochondral junctions in children presenting with active rickets?",
+        options: [
+          "Casal necklace",
+          "Rachitic rosary",
+          "Gottron papules",
+          "Caput Medusae"
+        ],
+        correct: 1,
+        explanation: "Rachitic rosary refers to the prominent nodular beading of costochondral junctions along the anterolateral chest wall, caused by expanding unmineralized osteoid and cartilaginous hypertrophy in rickets[cite: 8]."
+      },
+      {
+        q: "What laboratory pattern of serum calcium, phosphate, and alkaline phosphatase (ALP) is characteristic of active Nutritional Rickets?",
+        options: [
+          "Elevated Calcium, elevated Phosphate, and normal ALP",
+          "Low-normal Calcium, severely depressed Phosphate, and markedly elevated ALP",
+          "Severely elevated Calcium, depressed Phosphate, and low ALP",
+          "Normal Calcium, normal Phosphate, and undetectable ALP"
+        ],
+        correct: 1,
+        explanation: "Nutritional rickets presents with low-normal calcium (maintained by compensatory secondary hyperparathyroidism), depressed serum phosphate (due to PTH-induced phosphaturia), and markedly elevated Alkaline Phosphatase (ALP) reflecting accelerated, disorganized osteoblastic activity[cite: 8]."
+      },
+      {
+        q: "How does chronic use of aluminum- or magnesium-containing antacids lead to secondary Hypophosphatemia?",
+        options: [
+          "They permanently inactivate sodium-phosphate cotransporters in proximal tubules.",
+          "Aluminum and magnesium cations chelate dietary phosphate in the intestinal lumen, forming insoluble, non-absorbable precipitates excreted in feces.",
+          "They stimulate osteocytes to hypersecrete FGF23.",
+          "They accelerate the degradation of 2,3-bisphosphoglycerate inside red cells."
+        ],
+        correct: 1,
+        explanation: "Aluminum and magnesium ions bind inorganic phosphate in the stomach and small intestine, forming insoluble, non-absorbable complexes (e.g., aluminum phosphate) that are excreted in stool, causing systemic phosphate depletion with chronic use[cite: 8]."
+      },
+      {
+        q: "What is the primary step in the medical management of chronic hyperphosphatemia in advanced Chronic Kidney Disease (CKD)?",
+        options: [
+          "Aggressive intravenous potassium phosphate infusions",
+          "Dietary phosphate restriction combined with mealtime non-calcium phosphate binders (e.g., Sevelamer) and renal replacement therapy",
+          "Total parathyroidectomy within 24 hours of diagnosis",
+          "High-dose loop diuretics without fluid replacement"
+        ],
+        correct: 1,
+        explanation: "Management of hyperphosphatemia in CKD focuses on restricting dietary phosphate intake, taking non-calcium phosphate binders (e.g., sevelamer, lanthanum) with meals to bind luminal phosphate, and ensuring adequate dialysis clearance[cite: 8]."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    const userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById("question-counter");
+    const trackerTextEl = document.getElementById("tracker-text");
+    const progressBarEl = document.getElementById("progress-bar");
+    const answeredCounterEl = document.getElementById("answered-counter");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsGroupEl = document.getElementById("options-group");
+    const explanationCardEl = document.getElementById("explanation-card");
+    const explanationTextEl = document.getElementById("explanation-text");
+    const prevBtnEl = document.getElementById("prev-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const quizCardEl = document.getElementById("quiz-card");
+    const scorecardEl = document.getElementById("scorecard");
+    const gridDrawerEl = document.getElementById("grid-drawer");
+    const questionGridEl = document.getElementById("question-grid");
+
+    function initQuiz() {
+      buildGrid();
+      renderQuestion();
+      updateProgress();
+    }
+
+    function buildGrid() {
+      questionGridEl.innerHTML = "";
+      quizData.forEach((_, idx) => {
+        const cell = document.createElement("button");
+        cell.className = "grid-cell";
+        cell.id = `grid-cell-${idx}`;
+        cell.textContent = idx + 1;
+        cell.onclick = () => jumpToQuestion(idx);
+        questionGridEl.appendChild(cell);
+      });
+    }
+
+    function toggleDrawer() {
+      const isOpen = gridDrawerEl.classList.toggle("open");
+      document.getElementById("toggle-grid-btn").textContent = isOpen ? "Hide List" : "View List";
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIdx];
+      const isAnswered = userAnswers[currentQuestionIdx] !== null;
+
+      questionCounterEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      trackerTextEl.textContent = `Question ${currentQuestionIdx + 1} of ${quizData.length}`;
+      questionTextEl.textContent = q.q;
+      optionsGroupEl.innerHTML = "";
+
+      const alphabet = ["A", "B", "C", "D"];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.disabled = isAnswered;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = alphabet[optIdx];
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "option-text";
+        textSpan.textContent = optText;
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "status-tag";
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.appendChild(statusTag);
+
+        if (isAnswered) {
+          const userPick = userAnswers[currentQuestionIdx];
+          if (optIdx === q.correct) {
+            btn.classList.add("correct");
+            statusTag.textContent = "CORRECT";
+          } else if (optIdx === userPick) {
+            btn.classList.add("incorrect");
+            statusTag.textContent = "INCORRECT";
+          }
+        } else {
+          btn.onclick = () => handleSelectOption(optIdx);
+        }
+
+        optionsGroupEl.appendChild(btn);
+      });
+
+      if (isAnswered) {
+        explanationTextEl.textContent = q.explanation;
+        explanationCardEl.classList.add("show");
+      } else {
+        explanationCardEl.classList.remove("show");
+      }
+
+      // Nav controls
+      prevBtnEl.disabled = currentQuestionIdx === 0;
+      if (currentQuestionIdx === quizData.length - 1) {
+        nextBtnEl.textContent = "Finish Test";
+      } else {
+        nextBtnEl.textContent = "Next";
+      }
+
+      updateGridHighlight();
+    }
+
+    function handleSelectOption(selectedIdx) {
+      if (userAnswers[currentQuestionIdx] !== null) return;
+
+      userAnswers[currentQuestionIdx] = selectedIdx;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const pct = (answeredCount / quizData.length) * 100;
+      progressBarEl.style.width = `${pct}%`;
+      answeredCounterEl.textContent = `${answeredCount} / ${quizData.length} Answered`;
+
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (userAnswers[idx] !== null) {
+            cell.classList.add("answered");
+          } else {
+            cell.classList.remove("answered");
+          }
+        }
+      });
+    }
+
+    function updateGridHighlight() {
+      quizData.forEach((_, idx) => {
+        const cell = document.getElementById(`grid-cell-${idx}`);
+        if (cell) {
+          if (idx === currentQuestionIdx) {
+            cell.classList.add("active");
+          } else {
+            cell.classList.remove("active");
+          }
+        }
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIdx = idx;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIdx < quizData.length - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) {
+          correctCount++;
+        }
+      });
+
+      const incorrectCount = quizData.length - correctCount;
+      const scorePct = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById("score-pct").textContent = `${scorePct}%`;
+      document.getElementById("correct-count").textContent = correctCount;
+      document.getElementById("incorrect-count").textContent = incorrectCount;
+
+      quizCardEl.style.display = "none";
+      gridDrawerEl.classList.remove("open");
+      document.getElementById("toggle-grid-btn").style.display = "none";
+      scorecardEl.classList.add("show");
+    }
+
+    function restartQuiz() {
+      for (let i = 0; i < userAnswers.length; i++) {
+        userAnswers[i] = null;
+      }
+      currentQuestionIdx = 0;
+      scorecardEl.classList.remove("show");
+      quizCardEl.style.display = "block";
+      document.getElementById("toggle-grid-btn").style.display = "inline-block";
+      document.getElementById("toggle-grid-btn").textContent = "View List";
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
