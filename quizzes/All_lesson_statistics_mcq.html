@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biostatistics Comprehensive Exam Simulator</title>
+  <style>
+    :root {
+      --font-scale: 16px;
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --text: #2e3856;
+      --text-muted: #64748b;
+      --accent: #4255ff;
+      --accent-hover: #3142e0;
+      --border: #e6e9f2;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --correct-bg: #ecfdf5;
+      --correct-border: #10b981;
+      --correct-text: #065f46;
+      --wrong-bg: #fef2f2;
+      --wrong-border: #ef4444;
+      --wrong-text: #991b1b;
+      --flag-color: #f59e0b;
+      --strikethrough: #94a3b8;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b0f19;
+      --surface: #151c2e;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --border: #28334e;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --correct-bg: rgba(16, 185, 129, 0.15);
+      --correct-border: #10b981;
+      --correct-text: #6ee7b7;
+      --wrong-bg: rgba(239, 68, 68, 0.15);
+      --wrong-border: #ef4444;
+      --wrong-text: #fca5a5;
+      --flag-color: #fbbf24;
+      --strikethrough: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-size: var(--font-scale);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Header Nav */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.75rem 1.25rem;
+    }
+
+    .nav-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+    }
+
+    .badge-mode {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .controls-cluster {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button.icon-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    button.icon-btn:hover {
+      background: var(--border);
+    }
+
+    .timer-badge {
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      display: none;
+    }
+
+    .timer-badge.urgent {
+      color: #ef4444;
+      border-color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 5rem 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    /* Launch Config Screen */
+    .config-hero {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .config-hero h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .config-hero p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(66, 85, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .launch-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Workspace Elements */
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .q-tags {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pill-difficulty {
+      background: rgba(66, 85, 255, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .action-icons {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .stem-box {
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      cursor: text;
+    }
+
+    /* Option Cards */
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .opt-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.9rem 1.1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--surface);
+      position: relative;
+      user-select: none;
+    }
+
+    .opt-card:hover:not(.locked) {
+      border-color: var(--accent);
+      background: rgba(66, 85, 255, 0.03);
+    }
+
+    .opt-card.selected {
+      border-color: var(--accent);
+      background: rgba(66, 85, 255, 0.08);
+      font-weight: 600;
+    }
+
+    .opt-card.struck {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+
+    .opt-card.correct-ans {
+      background: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+      color: var(--correct-text) !important;
+      font-weight: 600;
+    }
+
+    .opt-card.wrong-ans {
+      background: var(--wrong-bg) !important;
+      border-color: var(--wrong-border) !important;
+      color: var(--wrong-text) !important;
+    }
+
+    .opt-key {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-card.selected .opt-key {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 2px;
+    }
+
+    .strike-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      opacity: 0.5;
+    }
+
+    .strike-btn:hover {
+      opacity: 1;
+      background: var(--border);
+    }
+
+    /* Rationales */
+    .explanation-box {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .exp-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+
+    .exp-section {
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .exp-section h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    /* Scratchpad */
+    .scratchpad-wrap {
+      margin-top: 1rem;
+    }
+
+    .scratchpad-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-weight: 600;
+      padding: 0.25rem 0;
+    }
+
+    .scratchpad-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
+      resize: vertical;
+    }
+
+    /* Bottom Bar Controls */
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Drawer / Question Matrix */
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -360px;
+      width: 340px;
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+      z-index: 200;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+    }
+
+    .drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-search {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .drawer-filter {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      flex: 1;
+      padding: 0.3rem 0;
+      font-size: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 0.25rem;
+    }
+
+    .matrix-node {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .matrix-node.current {
+      border: 2px solid var(--accent);
+    }
+
+    .matrix-node.answered {
+      background: rgba(66, 85, 255, 0.15);
+      border-color: var(--accent);
+    }
+
+    .matrix-node.flagged::after {
+      content: "★";
+      position: absolute;
+      top: 2px;
+      right: 3px;
+      font-size: 0.65rem;
+      color: var(--flag-color);
+    }
+
+    /* Flashcard View */
+    .flashcard-wrap {
+      perspective: 1000px;
+      margin: 1.5rem 0;
+      min-height: 280px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 280px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--card-shadow);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .flashcard.flipped {
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
+    }
+
+    .flashcard-hint {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Scorecard / Analytics */
+    .scorecard {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .donut-wrap {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    .donut-wrap svg {
+      transform: rotate(-90deg);
+    }
+
+    .donut-circle-bg {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 12;
+    }
+
+    .donut-circle-fill {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 12;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1s ease;
+      stroke-linecap: round;
+    }
+
+    .donut-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .score-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-pill {
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .topic-breakdown {
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+
+    .topic-item {
+      margin-bottom: 1rem;
+    }
+
+    .topic-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .topic-bar-bg {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .topic-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    .analytics-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    /* Sticky Branding Footer */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 90;
+      padding: 0.65rem 1.25rem;
+    }
+
+    .footer-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .attribution-text {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .social-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .social-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .social-pill:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+      header, footer, .controls-cluster, .bottom-bar, .action-icons, .scratchpad-wrap { display: none !important; }
+      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 2rem !important; page-break-inside: avoid; }
+      .explanation-box { display: block !important; border: 1px solid #ccc !important; background: #fafafa !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Nav -->
+  <header>
+    <div class="nav-container">
+      <div class="brand-title">
+        <span>Biostatistics Comprehensive</span>
+        <span class="badge-mode" id="modeBadge">Practice</span>
+      </div>
+      <div class="controls-cluster">
+        <span class="timer-badge" id="timerBadge">00:00</span>
+        <button class="icon-btn" onclick="adjustFont(-1)" title="Decrease font size">A-</button>
+        <button class="icon-btn" onclick="adjustFont(1)" title="Increase font size">A+</button>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle dark/light">🌙</button>
+        <button class="icon-btn" onclick="toggleDrawer()" id="matrixBtn" title="Question matrix">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main>
+    <!-- View 1: Launch / Config -->
+    <div class="card config-hero" id="launchView">
+      <h1>Biostatistics Comprehensive Exam Simulator</h1>
+      <p>Hypothesis Testing, Differences, Two-Sample Inferences, Correlation, and Chi-Square Testing</p>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Simulation Mode</label>
+          <select id="cfgMode">
+            <option value="practice">Practice Mode (Instant Feedback & Explanations)</option>
+            <option value="exam">Timed Exam Mode (Silent Answers & Final Scorecard)</option>
+            <option value="flashcard">Flashcard Review (Active Recall 3D Flip)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Topic / Curriculum Scope</label>
+          <select id="cfgSection">
+            <option value="all">All Modules (75 Questions)</option>
+            <option value="Session 9 – Hypothesis Testing">Session 9: Hypothesis Testing</option>
+            <option value="Session 10 – Two Means & Two Proportions">Session 10: Two Means & Two Proportions</option>
+            <option value="Unit 10 – Testing Differences">Unit 10: Testing Differences</option>
+            <option value="Unit – Correlation Analysis">Unit: Correlation Analysis</option>
+            <option value="Unit 14 – Chi-Square Test">Unit 14: Chi-Square Test</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Question Count</label>
+          <select id="cfgCount">
+            <option value="all">All Selected Questions</option>
+            <option value="15">Quick 15 Questions</option>
+            <option value="30">30 Questions</option>
+            <option value="50">50 Questions</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter Status</label>
+          <select id="cfgFilter">
+            <option value="all">Entire Selected Pool</option>
+            <option value="flagged">Flagged Items Only</option>
+            <option value="unattempted">Unattempted Items Only</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="launch-actions">
+        <button class="btn-primary" onclick="initSession()">Launch Study Session</button>
+        <button class="icon-btn" onclick="clearAllProgress()" style="padding: 0.85rem 1.25rem;">Clear All Saved Progress</button>
+      </div>
+    </div>
+
+    <!-- View 2: Question Interactive Board -->
+    <div class="card" id="quizView" style="display: none;">
+      <div class="q-meta">
+        <div class="q-tags">
+          <span class="pill" id="qNumberPill">Q 1 of 75</span>
+          <span class="pill" id="qTopicPill">Hypothesis Testing</span>
+          <span class="pill pill-difficulty" id="qDiffPill">High-Yield</span>
+        </div>
+        <div class="action-icons">
+          <button class="icon-btn" id="ttsBtn" onclick="readStemAloud()" title="Read stem aloud">🔊 TTS</button>
+          <button class="icon-btn" id="flagBtn" onclick="toggleFlag()" title="Flag for review">★ Flag</button>
+        </div>
+      </div>
+
+      <div class="stem-box" id="qStem">Question text goes here...</div>
+
+      <!-- Multiple Choice Options -->
+      <div class="options-stack" id="optionsContainer">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Explanation Box -->
+      <div class="explanation-box" id="explanationBox">
+        <div class="exp-title">Comprehensive Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <!-- Scratchpad -->
+      <div class="scratchpad-wrap">
+        <button class="scratchpad-toggle" onclick="toggleScratchpad()">
+          <span>📝 Notes & Scratchpad</span>
+        </button>
+        <textarea class="scratchpad-textarea" id="scratchpadInput" placeholder="Jot down memory hooks, notes, or formulas..."></textarea>
+      </div>
+
+      <!-- Bottom Nav Bar -->
+      <div class="bottom-bar">
+        <button class="icon-btn" onclick="prevQuestion()" id="prevBtn">← Previous</button>
+        <span style="font-size: 0.85rem; color: var(--text-muted);" id="qCounterDisplay">1 / 75</span>
+        <button class="icon-btn" onclick="nextQuestion()" id="nextBtn">Next →</button>
+      </div>
+    </div>
+
+    <!-- View 3: Flashcard Workspace -->
+    <div class="card" id="flashcardView" style="display: none; text-align: center;">
+      <div class="q-meta">
+        <span class="pill" id="fcTopicPill">Topic</span>
+        <span class="pill" id="fcCounter">1 / 75</span>
+      </div>
+
+      <div class="flashcard-wrap" onclick="flipFlashcard()">
+        <div class="flashcard" id="flashcardEl">
+          <div id="fcFront" style="font-size: 1.25rem; font-weight: 700;">Question Prompt</div>
+          <div id="fcBack" style="display: none; font-size: 1.15rem; color: var(--correct-text);">Correct Answer</div>
+          <div class="flashcard-hint">Click card or press Space to flip</div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="icon-btn" onclick="prevFlashcard()">← Previous</button>
+        <button class="icon-btn" onclick="nextFlashcard()">Next →</button>
+      </div>
+    </div>
+
+    <!-- View 4: Analytics Scorecard -->
+    <div class="card scorecard" id="scorecardView" style="display: none;">
+      <h2 style="margin-bottom: 0.5rem;">Performance Assessment Report</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;" id="scorecardSubtitle">Biostatistics Exam Breakdown</p>
+
+      <div class="donut-wrap">
+        <svg width="160" height="160">
+          <circle class="donut-circle-bg" cx="80" cy="80" r="70"></circle>
+          <circle class="donut-circle-fill" id="donutFill" cx="80" cy="80" r="70"></circle>
+        </svg>
+        <div class="donut-center-text" id="donutText">0%</div>
+      </div>
+
+      <div class="score-stats">
+        <div class="stat-pill">
+          <div class="stat-val" id="scoreRaw">0/75</div>
+          <div class="stat-lbl">Total Score</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-val" id="timeSpent">0m 0s</div>
+          <div class="stat-lbl">Time Spent</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-val" id="flagCount">0</div>
+          <div class="stat-lbl">Flagged Items</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-val" id="examStatus">PASS</div>
+          <div class="stat-lbl">Result (≥70%)</div>
+        </div>
+      </div>
+
+      <div class="topic-breakdown">
+        <h3 style="font-size: 1rem; margin-bottom: 1rem;">Subject Competency Breakdown</h3>
+        <div id="topicProgressContainer">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <div class="analytics-btns">
+        <button class="btn-primary" onclick="drillMissed()">Drill Missed Questions</button>
+        <button class="icon-btn" onclick="exportToAnki()">Export to Anki (CSV)</button>
+        <button class="icon-btn" onclick="window.print()">Print / PDF Summary</button>
+        <button class="icon-btn" onclick="resetToConfig()">New Session</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Slide-Out Matrix Drawer -->
+  <div class="drawer" id="matrixDrawer">
+    <div class="drawer-header">
+      <h3 style="font-size: 1.05rem;">Question Navigator</h3>
+      <button class="icon-btn" onclick="toggleDrawer()">✕</button>
+    </div>
+    <input type="text" class="drawer-search" id="drawerSearch" placeholder="Search questions..." oninput="renderMatrixGrid()">
+    <div class="drawer-filter">
+      <button class="filter-btn active" onclick="setMatrixFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setMatrixFilter('answered', this)">Answered</button>
+      <button class="filter-btn" onclick="setMatrixFilter('unanswered', this)">Unanswered</button>
+      <button class="filter-btn" onclick="setMatrixFilter('flagged', this)">Flagged</button>
+    </div>
+    <div class="matrix-grid" id="matrixGrid">
+      <!-- Generated via JS -->
+    </div>
+  </div>
+
+  <!-- Sleek Sticky Branding Footer -->
+  <footer>
+    <div class="footer-container">
+      <span class="attribution-text">Prepared by Bunreth Nihrantz</span>
+      <div class="social-pills">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener" class="social-pill" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener" class="social-pill" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener" class="social-pill" title="Telegram">T</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================================
+       COMPLETE 75-QUESTION BANK (Sections 1 through 5)
+       ========================================================================= */
+    const quizData = [
+      // SECTION 1: Session 9 – Hypothesis Testing (Quiz) [10 Questions]
+      {
+        id: 1,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "A sampling distribution is best described as:",
+        options: [
+          "The distribution of individual data values in one sample",
+          "The probability distribution of a sample statistic across all possible samples of a fixed size n",
+          "The distribution of the entire population",
+          "A graph showing only the sample mean of one sample"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            By definition, a sampling distribution is the theoretical probability distribution of a sample statistic (such as x̄ or p̂) obtained from all possible random samples of size n drawn from a population.
+          </div>
+          <div class="exp-section">
+            <h4>Why Option B is Correct</h4>
+            Option B accurately specifies that it models the distribution of a calculated statistic across repeated sampling iterations of a fixed size n.
+          </div>`
+      },
+      {
+        id: 2,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "According to the Central Limit Theorem, as sample size n increases, the sampling distribution of the sample mean approaches:",
+        options: [
+          "A skewed distribution",
+          "A uniform distribution",
+          "A normal distribution",
+          "The same shape as the population, regardless of n"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The Central Limit Theorem (CLT) states that as sample size n increases (typically n ≥ 30), the sampling distribution of the sample mean approaches a Gaussian (normal) distribution, regardless of the underlying population shape.
+          </div>`
+      },
+      {
+        id: 3,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "Moderate",
+        q: "The formula for the mean of the sampling distribution of x̄ is:",
+        options: [
+          "μ_x̄ = μ",
+          "μ_x̄ = σ / √n",
+          "μ_x̄ = x̄ / n",
+          "μ_x̄ = σ²"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The expected value (mean) of the sample mean μ_x̄ is identical to the underlying population mean μ. The sample mean is an unbiased estimator of the population mean.
+          </div>`
+      },
+      {
+        id: 4,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "Which of the following correctly describes the standard error (SE)?",
+        options: [
+          "The standard deviation of individual values in the population",
+          "The standard deviation of a sampling distribution",
+          "The mean of the sample",
+          "The sample size divided by the population size"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The standard error (SE) is defined as the standard deviation of a statistic's sampling distribution, measuring estimation variability across samples.
+          </div>`
+      },
+      {
+        id: 5,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "As sample size n increases, the standard error of the mean will:",
+        options: [
+          "Increase",
+          "Decrease",
+          "Stay exactly the same",
+          "Become negative"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Because the standard error of the mean is calculated as SE = σ / √n, increasing the denominator (sample size n) decreases the standard error, improving estimation precision.
+          </div>`
+      },
+      {
+        id: 6,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "The null hypothesis (H₀) is best described as:",
+        options: [
+          "The claim the researcher hopes to prove",
+          "A statement that always contains an inequality",
+          "The default claim of 'no effect' or 'no difference', containing an equality",
+          "Only used in two-tailed tests"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The null hypothesis (H₀) serves as the baseline assumption of no effect or no difference, and formally always contains an equality condition (=, ≤, or ≥).
+          </div>`
+      },
+      {
+        id: 7,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "Moderate",
+        q: "A company claims at least 70% of customers are satisfied. Which pair of hypotheses correctly represents this claim?",
+        options: [
+          "H₀: p = 0.70, Hₐ: p ≠ 0.70",
+          "H₀: p ≥ 0.70, Hₐ: p < 0.70",
+          "H₀: p < 0.70, Hₐ: p ≥ 0.70",
+          "H₀: p ≤ 0.70, Hₐ: p > 0.70"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            'At least 70%' translates to ≥ 0.70. Because it includes equality, it belongs in the null hypothesis (H₀: p ≥ 0.70). The alternative hypothesis is its strict mathematical complement (Hₐ: p < 0.70).
+          </div>`
+      },
+      {
+        id: 8,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "When the population standard deviation is unknown, which test statistic should be used for a mean?",
+        options: [
+          "z = (x̄ − μ₀) / (σ / √n)",
+          "t = (x̄ − μ₀) / (s / √n)",
+          "z = (p̂ − p₀) / √(p₀(1 − p₀) / n)",
+          "z = σ / √n"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            When the population standard deviation (σ) is unknown, it is substituted with the sample standard deviation (s), requiring the Student's t-test statistic.
+          </div>`
+      },
+      {
+        id: 9,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "High-Yield",
+        q: "A hypothesis test produces a p-value of 0.032, and α = 0.05. What is the correct decision?",
+        options: [
+          "Fail to reject H₀, because 0.032 > α",
+          "Reject H₀, because the p-value ≤ α",
+          "Accept H₀ as proven true",
+          "The test is inconclusive and must be repeated"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The formal decision rule states: if p-value ≤ α, reject H₀. Since 0.032 ≤ 0.05, the null hypothesis is rejected.
+          </div>`
+      },
+      {
+        id: 10,
+        topic: "Session 9 – Hypothesis Testing",
+        difficulty: "Advanced",
+        q: "Which statement about the p-value is TRUE?",
+        options: [
+          "It is the probability that H₀ is true",
+          "It is the probability of observing a result at least as extreme as the sample result, assuming H₀ is true",
+          "It proves Hₐ is true when it is small",
+          "It measures the size of the effect, not statistical significance"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The p-value is a conditional probability: P(Data or more extreme | H₀ is true). It does NOT express the probability that H₀ itself is true.
+          </div>`
+      },
+
+      // SECTION 2: Session 10 – Testing the Difference Between Two Means and Two Proportions [15 Questions]
+      {
+        id: 11,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "Moderate",
+        q: "What is a sampling distribution?",
+        options: [
+          "The distribution of all individuals in a population",
+          "The distribution of a statistic obtained from repeated samples",
+          "The distribution of raw data from one sample",
+          "The distribution of population parameters"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A sampling distribution reflects the distribution of values taken by a sample statistic across repeated random samples from the same population.
+          </div>`
+      },
+      {
+        id: 12,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "Which statement best describes the standard error (SE)?",
+        options: [
+          "The standard deviation of the population",
+          "The difference between the sample and population mean",
+          "The standard deviation of a sampling distribution",
+          "The variance of the sample"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Standard error specifically quantifies the standard deviation of a sampling distribution.
+          </div>`
+      },
+      {
+        id: 13,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "If the sample size increases, what generally happens to the standard error of the sample mean?",
+        options: [
+          "It increases",
+          "It decreases",
+          "It remains unchanged",
+          "It becomes equal to zero"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Since SE = σ / √n, an increasing sample size in the denominator drives the standard error down.
+          </div>`
+      },
+      {
+        id: 14,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "Which pair represents the null and alternative hypotheses?",
+        options: [
+          "H₀ and H₁",
+          "H₁ and H₃",
+          "H_ϕ and H",
+          "H_q and H"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The null hypothesis is universally denoted as H₀ and the alternative hypothesis as H₁ (or Hₐ).
+          </div>`
+      },
+      {
+        id: 15,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "A researcher wants to determine whether the average blood pressure of patients is different from 120 mmHg. Which is the most appropriate alternative hypothesis?",
+        options: [
+          "H₁: μ = 120",
+          "H₁: μ > 120",
+          "H₁: μ < 120",
+          "H₁: μ ≠ 120"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The term 'different from' implies a two-tailed (non-directional) test, denoted by the inequality H₁: μ ≠ 120.
+          </div>`
+      },
+      {
+        id: 16,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "Advanced",
+        q: "What does a p-value represent?",
+        options: [
+          "The probability that H₀ is definitely true",
+          "The probability of observing the data, or more extreme data, assuming H₀ is true",
+          "The probability that Hₐ is true",
+          "The sample size required for the study"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            It evaluates the likelihood of obtaining sample evidence as extreme or more extreme than observed, under the assumption that the null hypothesis holds true.
+          </div>`
+      },
+      {
+        id: 17,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "If p = 0.03 and the significance level is α = 0.05, what is the correct decision?",
+        options: [
+          "Fail to reject H₀",
+          "Reject H₀",
+          "Accept H₀ as definitely true",
+          "Increase the sample size"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Because p = 0.03 ≤ α = 0.05, the result achieves statistical significance and H₀ is rejected.
+          </div>`
+      },
+      {
+        id: 18,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "Moderate",
+        q: "Which test is most appropriate for comparing the mean of a sample with a known population mean when the population standard deviation is known?",
+        options: [
+          "One-sample z-test",
+          "Paired t-test",
+          "Two-proportion z-test",
+          "Chi-square test"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            When the true population standard deviation σ is known, evaluating a single mean against a benchmark benchmark uses a one-sample z-test.
+          </div>`
+      },
+      {
+        id: 19,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "Which situation represents paired data?",
+        options: [
+          "Blood pressure of patients from two unrelated hospitals",
+          "Test scores of two different groups of students",
+          "Blood pressure measured in the same patients before and after treatment",
+          "Proportion of smokers in two different villages"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Paired data involves dependent or matched pairs, commonly repeated measures on the exact same subjects before and after an intervention.
+          </div>`
+      },
+      {
+        id: 20,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "Which test is appropriate for comparing the means of two independent groups?",
+        options: [
+          "Paired t-test",
+          "Independent two-sample t-test",
+          "One-proportion z-test",
+          "One-sample z-test"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Comparing means between two unrelated, distinct cohorts requires an independent two-sample t-test.
+          </div>`
+      },
+      {
+        id: 21,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "Moderate",
+        q: "A 95% confidence interval for a mean difference is −2.1 to 4.5. What can be concluded?",
+        options: [
+          "There is definitely a significant difference",
+          "There is no statistically significant difference at α = 0.05",
+          "The p-value must be less than 0.05",
+          "The null hypothesis must be rejected"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Because the confidence interval spans across zero (contains 0), a difference of zero remains plausible; thus, there is no statistically significant difference at the 5% level (p > 0.05).
+          </div>`
+      },
+      {
+        id: 22,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "When comparing two proportions, which test is commonly used?",
+        options: [
+          "Two-proportion z-test",
+          "Paired t-test",
+          "One-sample t-test",
+          "Pearson correlation"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Comparing success proportions (p₁ vs. p₂) between two independent groups uses a two-proportion pooled z-test.
+          </div>`
+      },
+      {
+        id: 23,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "Moderate",
+        q: "A researcher compares the proportion of vaccinated students between Class A and Class B. Which parameter represents the difference being tested?",
+        options: [
+          "μ₁ − μ₂",
+          "p₁ − p₂",
+          "σ₁ − σ₂",
+          "x̄₁ − x̄₂"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            True population proportions are designated by p; hence, the parameter representing their true difference is p₁ − p₂.
+          </div>`
+      },
+      {
+        id: 24,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "Moderate",
+        q: "If the 95% confidence interval for a difference between two proportions is −0.04 to 0.12, what is the appropriate interpretation?",
+        options: [
+          "The difference is statistically significant",
+          "The two proportions are exactly equal",
+          "There is insufficient evidence of a significant difference at α = 0.05",
+          "The alternative hypothesis must be accepted"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Since 0 is included inside the interval [−0.04, 0.12], there is insufficient evidence to conclude a statistically significant difference between the proportions.
+          </div>`
+      },
+      {
+        id: 25,
+        topic: "Session 10 – Two Means & Two Proportions",
+        difficulty: "High-Yield",
+        q: "Which statement is correct when p-value > α?",
+        options: [
+          "Reject H₀",
+          "Reject H₁",
+          "Fail to reject H₀",
+          "The result is statistically significant"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            When p-value > α, the sample data does not provide sufficient evidence against the null hypothesis, leading to the decision: 'Fail to reject H₀'.
+          </div>`
+      },
+
+      // SECTION 3: Unit 10 – Testing Differences [20 Questions]
+      {
+        id: 26,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "What type of data is used in a paired t-test?",
+        options: [
+          "Independent samples",
+          "Unrelated proportions",
+          "Dependent (related) samples",
+          "Randomly selected groups"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Paired t-tests are reserved for dependent, matched, or repeated-measure samples where observations are linked.
+          </div>`
+      },
+      {
+        id: 27,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Moderate",
+        q: "What is the main assumption in testing paired data?",
+        options: [
+          "Same sample size in each group",
+          "Equal variances",
+          "Normal distribution of differences",
+          "Equal means"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            In a paired t-test, the differences between pairs (d = x₁ − x₂) must be approximately normally distributed.
+          </div>`
+      },
+      {
+        id: 28,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "Which value indicates a statistically significant difference?",
+        options: [
+          "p-value > 0.05",
+          "p-value ≈ 0.50",
+          "p-value < 0.05",
+          "p-value = 1"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A p-value below 0.05 conventionally demonstrates statistical significance at the 5% alpha level.
+          </div>`
+      },
+      {
+        id: 29,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Moderate",
+        q: "What does a confidence interval that does NOT include zero suggest?",
+        options: [
+          "No difference",
+          "Significant difference",
+          "Negative correlation",
+          "Equal variance"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            When an interval estimate for a difference excludes 0, a difference of zero is rejected, confirming a statistically significant difference.
+          </div>`
+      },
+      {
+        id: 30,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "What type of test is used for comparing two independent means?",
+        options: [
+          "Paired t-test",
+          "Z-test for proportions",
+          "Independent t-test",
+          "Chi-square test"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Comparing means between two distinct, non-overlapping groups utilizes a two-sample independent t-test.
+          </div>`
+      },
+      {
+        id: 31,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "Which test is suitable for comparing proportions between two groups?",
+        options: [
+          "Independent t-test",
+          "Z-test for two proportions",
+          "ANOVA",
+          "Chi-square test"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Comparing proportions between two independent groups is performed using a two-proportion z-test.
+          </div>`
+      },
+      {
+        id: 32,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Moderate",
+        q: "When sample sizes are small, which distribution is used?",
+        options: [
+          "Z-distribution",
+          "Chi-square distribution",
+          "t-distribution",
+          "Poisson distribution"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            For small sample sizes with unknown population standard deviation, the heavier-tailed Student's t-distribution is used to capture uncertainty.
+          </div>`
+      },
+      {
+        id: 33,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "Which of the following applies to independent samples?",
+        options: [
+          "Same individuals measured twice",
+          "Randomly selected groups with no overlap",
+          "Data with missing values",
+          "One group split into subgroups"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Independent samples consist of distinct, non-overlapping individuals where selection in one group has no relation to selection in the other.
+          </div>`
+      },
+      {
+        id: 34,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Advanced",
+        q: "What does the pooled standard error measure?",
+        options: [
+          "Variation in a single group",
+          "Standard error of the mean",
+          "Combined variation between two proportions",
+          "Difference in variances"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The pooled standard error calculates the aggregated, weighted standard error across two groups under the null hypothesis of equal parameters.
+          </div>`
+      },
+      {
+        id: 35,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "A very low p-value leads to what decision?",
+        options: [
+          "Fail to reject H₀",
+          "Accept H₀",
+          "Reject H₀",
+          "Assume normality"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A small p-value indicates that the observed data is extremely unlikely under H₀, leading to rejection of the null hypothesis.
+          </div>`
+      },
+      {
+        id: 36,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "What is the null hypothesis when comparing two means?",
+        options: [
+          "Means are different",
+          "Variances are equal",
+          "Means are equal",
+          "Proportions are equal"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The null hypothesis assumes no difference, which translates to equality: H₀: μ₁ = μ₂ (or μ₁ − μ₂ = 0).
+          </div>`
+      },
+      {
+        id: 37,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Moderate",
+        q: "In paired sample testing, the unit of analysis is:",
+        options: [
+          "The individual values",
+          "The mean of each group",
+          "The difference between matched pairs",
+          "The pooled sample size"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Paired analysis converts two dependent values per subject into a single difference metric: d_i = x₁ᵢ − x₂ᵢ.
+          </div>`
+      },
+      {
+        id: 38,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "Which test is used to analyze difference in proportions?",
+        options: [
+          "Paired t-test",
+          "F-test",
+          "Pooled Z-test",
+          "ANOVA"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Testing the difference between two sample proportions typically uses a pooled two-sample z-test.
+          </div>`
+      },
+      {
+        id: 39,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "What does a two-tailed hypothesis test evaluate?",
+        options: [
+          "Direction of the relationship",
+          "Both directions of difference",
+          "Right tail only",
+          "Only equal proportions"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A two-tailed test evaluates deviations in both directions (whether the parameter is significantly higher or lower).
+          </div>`
+      },
+      {
+        id: 40,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Moderate",
+        q: "What is needed to construct a confidence interval?",
+        options: [
+          "p-value",
+          "Z-score or t-score",
+          "Mean square error",
+          "Sample correlation"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Confidence intervals require a point estimate ± (critical value z* or t*) × (Standard Error).
+          </div>`
+      },
+      {
+        id: 41,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "Moderate",
+        q: "A Z-value near 0 would suggest:",
+        options: [
+          "Strong evidence against H₀",
+          "Significant difference",
+          "No strong evidence to reject H₀",
+          "Test is invalid"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A test statistic near zero indicates that the sample estimate is very close to the null hypothesized value, giving no evidence to reject H₀.
+          </div>`
+      },
+      {
+        id: 42,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "Which test is used when population standard deviation is known?",
+        options: [
+          "t-test",
+          "Chi-square",
+          "Z-test",
+          "F-test"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            When the true population standard deviation σ is known, the standard normal z-test is indicated.
+          </div>`
+      },
+      {
+        id: 43,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "The level of significance (α) commonly used is:",
+        options: [
+          "0.95",
+          "0.1",
+          "0.005",
+          "0.05"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            α = 0.05 (5%) is the standard significance threshold in biomedical and psychological research.
+          </div>`
+      },
+      {
+        id: 44,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "What is the standard error used for?",
+        options: [
+          "To calculate means",
+          "To compute p-values and confidence intervals",
+          "To check for outliers",
+          "To test normality"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The standard error scales sample estimates to generate test statistics, compute p-values, and form margin-of-error bounds for confidence intervals.
+          </div>`
+      },
+      {
+        id: 45,
+        topic: "Unit 10 – Testing Differences",
+        difficulty: "High-Yield",
+        q: "What is the first step in hypothesis testing?",
+        options: [
+          "Calculate standard deviation",
+          "Draw conclusions",
+          "Formulate H₀ and H₁",
+          "Check confidence interval"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Every formal hypothesis test begins by establishing the null hypothesis (H₀) and alternative hypothesis (H₁).
+          </div>`
+      },
+
+      // SECTION 4: Unit – Correlation Analysis [20 Questions]
+      {
+        id: 46,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What does a correlation analysis measure?",
+        options: [
+          "Causation between variables",
+          "Strength and direction of the relationship between variables",
+          "Variance of a dataset",
+          "The mean difference between groups"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Correlation evaluates both the strength and direction of the association between two variables.
+          </div>`
+      },
+      {
+        id: 47,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "Which of the following represents a strong positive correlation?",
+        options: [
+          "r = −0.9",
+          "r = 0.1",
+          "r = 0.8",
+          "r = −0.3"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            r = +0.8 is positive and close to +1.0, reflecting a strong positive linear relationship.
+          </div>`
+      },
+      {
+        id: 48,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What type of data is Pearson's correlation suitable for?",
+        options: [
+          "Ordinal",
+          "Nominal",
+          "Continuous and normally distributed",
+          "Binary"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pearson's r is parametric and requires continuous quantitative data that follows a bivariate normal distribution.
+          </div>`
+      },
+      {
+        id: 49,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What is the maximum value of the Pearson correlation coefficient?",
+        options: [
+          "0",
+          "1",
+          "−1",
+          "2"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pearson's r is strictly bounded within [−1, +1], making +1 the theoretical maximum.
+          </div>`
+      },
+      {
+        id: 50,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What does a correlation of r = 0 indicate?",
+        options: [
+          "Perfect negative relationship",
+          "No linear relationship",
+          "Strong positive relationship",
+          "Non-linear relationship"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            r = 0 indicates the absence of any linear relationship between the two variables.
+          </div>`
+      },
+      {
+        id: 51,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "When should Spearman's rank correlation be used?",
+        options: [
+          "When data are continuous and linear",
+          "When data are nominal",
+          "When data are ordinal or non-normal",
+          "When sample size is above 1000"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Spearman's rank correlation is non-parametric and ideal for ranked ordinal data or non-normally distributed continuous variables.
+          </div>`
+      },
+      {
+        id: 52,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "Moderate",
+        q: "Which assumption is NOT required for Pearson's correlation?",
+        options: [
+          "Linearity",
+          "Normal distribution",
+          "Monotonicity",
+          "No outliers"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pearson's r requires linearity, normality, and absence of extreme outliers. Monotonicity is the assumption for Spearman's rank correlation.
+          </div>`
+      },
+      {
+        id: 53,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What is the meaning of a p-value < 0.05 in correlation analysis?",
+        options: [
+          "The correlation is strong",
+          "The correlation is not significant",
+          "The correlation is statistically significant",
+          "The data is not normal"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            p < 0.05 indicates statistically significant evidence that the true population correlation ρ is different from 0.
+          </div>`
+      },
+      {
+        id: 54,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What does a two-way scatter plot help visualize?",
+        options: [
+          "Mean of variables",
+          "Standard deviation",
+          "Relationship between two variables",
+          "Distribution of one variable"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A scatter plot plots bivariate data points across Cartesian coordinates (X, Y) to explore patterns and relationships between two variables.
+          </div>`
+      },
+      {
+        id: 55,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "Moderate",
+        q: "Which coefficient measures monotonic relationships?",
+        options: [
+          "Pearson's r",
+          "Standard deviation",
+          "Variance",
+          "Spearman's ρ"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Spearman's rank correlation coefficient (ρ or r_s) evaluates monotonic associations using ranked data.
+          </div>`
+      },
+      {
+        id: 56,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "Advanced",
+        q: "What does the formula for Pearson's r contain?",
+        options: [
+          "Sum of squares of means",
+          "Difference between medians",
+          "Product of deviations from means",
+          "Square roots of variances only"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The covariance numerator in Pearson's r sums the cross-products of deviations: Σ(x − x̄)(y − ȳ).
+          </div>`
+      },
+      {
+        id: 57,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "Which plot is best to assess linearity?",
+        options: [
+          "Bar chart",
+          "Histogram",
+          "Scatter plot",
+          "Pie chart"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A scatter plot is the primary graphical tool for visually verifying whether an association is linear.
+          </div>`
+      },
+      {
+        id: 58,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What is the value of r in a perfect negative linear correlation?",
+        options: [
+          "1",
+          "0",
+          "−1",
+          "0.5"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A perfect inverse linear association produces the minimum possible Pearson coefficient: r = −1.0.
+          </div>`
+      },
+      {
+        id: 59,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "Moderate",
+        q: "Which situation may lead to misleading Pearson's correlation?",
+        options: [
+          "Homogeneity",
+          "Outliers",
+          "Random sampling",
+          "Linear data"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pearson's r is sensitive to outliers, which can artificially inflate or attenuate the estimated correlation.
+          </div>`
+      },
+      {
+        id: 60,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "Spearman's correlation is ideal for which type of data?",
+        options: [
+          "Categorical",
+          "Interval",
+          "Ordinal",
+          "Binary"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Spearman's rank correlation ranks observations, making it ideal for ordinal variables.
+          </div>`
+      },
+      {
+        id: 61,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What is the direction of correlation when one variable increases and the other decreases?",
+        options: [
+          "No correlation",
+          "Positive correlation",
+          "Negative correlation",
+          "Strong correlation"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            When two variables move in opposite directions, the relationship is negative (inverse).
+          </div>`
+      },
+      {
+        id: 62,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "Advanced",
+        q: "Which correlation method requires homoscedasticity?",
+        options: [
+          "Chi-square",
+          "Pearson's",
+          "Spearman's",
+          "T-test"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pearson's correlation and linear regression assume homoscedasticity (equal variance of residuals across levels of the predictor).
+          </div>`
+      },
+      {
+        id: 63,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "Which one is a non-parametric test?",
+        options: [
+          "Pearson's",
+          "ANOVA",
+          "Spearman's",
+          "Regression"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Spearman's rank correlation is distribution-free and classified as a non-parametric test.
+          </div>`
+      },
+      {
+        id: 64,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "Moderate",
+        q: "Pearson's r value close to 0.7 is interpreted as:",
+        options: [
+          "No correlation",
+          "Strong correlation",
+          "Moderate positive correlation",
+          "Negative correlation"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            In medical biostatistics, an |r| around 0.7 to 0.8 is widely interpreted as a strong positive correlation.
+          </div>`
+      },
+      {
+        id: 65,
+        topic: "Unit – Correlation Analysis",
+        difficulty: "High-Yield",
+        q: "What is NOT true about correlation?",
+        options: [
+          "It proves causation",
+          "It indicates association",
+          "It can be positive or negative",
+          "It can be visualized using scatter plot"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Correlation proves statistical association, but correlation never implies or proves causation.
+          </div>`
+      },
+
+      // SECTION 5: Unit 14 – Chi-Square Test [10 Questions]
+      {
+        id: 66,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "What type of data is used in a Chi-Square test?",
+        options: [
+          "Continuous data",
+          "Binary data",
+          "Categorical data",
+          "Ratio data"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Chi-Square tests evaluate counts and frequency distributions across categorical variables.
+          </div>`
+      },
+      {
+        id: 67,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "What is the Chi-Square test primarily used to evaluate?",
+        options: [
+          "Difference between means",
+          "Correlation between two variables",
+          "Association between categorical variables",
+          "Linear regression model"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A Chi-Square test of independence tests whether two categorical variables are statistically independent or associated.
+          </div>`
+      },
+      {
+        id: 68,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "Moderate",
+        q: "Which of the following is an assumption of the Chi-Square test?",
+        options: [
+          "Normal distribution",
+          "Equal variances",
+          "Independent observations",
+          "Paired sample"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Observations must be independent; each subject contributes to only one contingency cell.
+          </div>`
+      },
+      {
+        id: 69,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "What is the formula to calculate the expected frequency?",
+        options: [
+          "(Row Total + Column Total) / Grand Total",
+          "Row Total × Column Total",
+          "(Row Total × Column Total) / Grand Total",
+          "(Row Total − Column Total) / Grand Total"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Under independence, expected cell frequency is calculated as E = (Row Total × Column Total) / Grand Total.
+          </div>`
+      },
+      {
+        id: 70,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "What is the formula for the Chi-Square statistic?",
+        options: [
+          "Σ [(O − E) / E]",
+          "Σ [(O + E) / O]",
+          "Σ [(O − E)² / E]",
+          "Σ [(O × E) / (O + E)]"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The test statistic sums the standardized squared discrepancies: χ² = Σ [(O − E)² / E].
+          </div>`
+      },
+      {
+        id: 71,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "In a Chi-Square test, what does a p-value ≤ 0.05 typically indicate?",
+        options: [
+          "Strong correlation",
+          "The null hypothesis is rejected",
+          "No relationship",
+          "Insufficient data"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A p-value ≤ 0.05 leads to rejection of the null hypothesis of independence, concluding a significant association exists.
+          </div>`
+      },
+      {
+        id: 72,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "Moderate",
+        q: "What should be the expected frequency in at least 80% of cells?",
+        options: [
+          "< 1",
+          "Exactly 5",
+          "≥ 5",
+          "> 10"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Cochran's rule requires expected cell frequencies to be ≥ 5 in at least 80% of cells and no cell < 1.
+          </div>`
+      },
+      {
+        id: 73,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "Which of the following is a type of Chi-Square test?",
+        options: [
+          "Z-Test",
+          "T-Test",
+          "Test of Independence",
+          "Mann-Whitney U Test"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The Chi-Square Test of Independence tests whether two categorical classifications are statistically related.
+          </div>`
+      },
+      {
+        id: 74,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "Moderate",
+        q: "How are Chi-Square results usually compared for significance?",
+        options: [
+          "Using standard deviation",
+          "Using correlation coefficient",
+          "Using critical value from Chi-Square table",
+          "Using regression line"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The calculated χ² is compared against critical values from a Chi-Square distribution table at degrees of freedom df = (r − 1)(c − 1).
+          </div>`
+      },
+      {
+        id: 75,
+        topic: "Unit 14 – Chi-Square Test",
+        difficulty: "High-Yield",
+        q: "In the example provided, how many students liked coffee?",
+        options: [
+          "30",
+          "20",
+          "50",
+          "40"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            In standard 2×2 contingency table examples (e.g., Male vs. Female / Coffee vs. Tea), the marginal total liking coffee is 50 students.
+          </div>`
+      }
+    ];
+
+    /* =========================================================================
+       APP STATE ENGINE
+       ========================================================================= */
+    let activeQuestions = [];
+    let currentIndex = 0;
+    let userAnswers = {};
+    let flaggedItems = new Set();
+    let strikethroughs = {};
+    let notes = {};
+    let currentMode = 'practice';
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let timerDuration = 0;
+    let matrixFilter = 'all';
+
+    const LS_KEY_PROGRESS = 'biostat_quiz_state_v3';
+
+    function saveState() {
+      const state = {
+        userAnswers,
+        flaggedItems: Array.from(flaggedItems),
+        notes,
+        secondsElapsed
+      };
+      try {
+        localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify(state));
+      } catch (err) {
+        console.warn("Storage error", err);
+      }
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem(LS_KEY_PROGRESS);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          userAnswers = parsed.userAnswers || {};
+          flaggedItems = new Set(parsed.flaggedItems || []);
+          notes = parsed.notes || {};
+          secondsElapsed = parsed.secondsElapsed || 0;
+        } catch(e) {
+          console.error("Could not parse saved progress", e);
+        }
+      }
+    }
+
+    function clearAllProgress() {
+      if (confirm("Reset all saved answers, notes, and flags across all 75 questions?")) {
+        localStorage.removeItem(LS_KEY_PROGRESS);
+        userAnswers = {};
+        flaggedItems.clear();
+        strikethroughs = {};
+        notes = {};
+        secondsElapsed = 0;
+        alert("Progress cleared. You can now launch a fresh session!");
+      }
+    }
+
+    function initSession() {
+      currentMode = document.getElementById('cfgMode').value;
+      const sectionCfg = document.getElementById('cfgSection').value;
+      const countCfg = document.getElementById('cfgCount').value;
+      const filterCfg = document.getElementById('cfgFilter').value;
+
+      // Filter by section
+      let pool = [...quizData];
+      if (sectionCfg !== 'all') {
+        pool = pool.filter(q => q.topic === sectionCfg);
+      }
+
+      // Filter by user status
+      if (filterCfg === 'flagged') {
+        pool = pool.filter(q => flaggedItems.has(q.id));
+        if (pool.length === 0) {
+          alert("No items currently flagged in this section! Defaulting to all questions in scope.");
+          pool = (sectionCfg !== 'all') ? quizData.filter(q => q.topic === sectionCfg) : [...quizData];
+        }
+      } else if (filterCfg === 'unattempted') {
+        pool = pool.filter(q => userAnswers[q.id] === undefined);
+        if (pool.length === 0) {
+          alert("All questions in this section have been attempted! Resetting to all questions in scope.");
+          pool = (sectionCfg !== 'all') ? quizData.filter(q => q.topic === sectionCfg) : [...quizData];
+        }
+      }
+
+      // Limit count
+      if (countCfg !== 'all') {
+        const limit = parseInt(countCfg, 10);
+        pool = pool.slice(0, limit);
+      }
+
+      activeQuestions = pool;
+      currentIndex = 0;
+
+      // Header Mode Pill
+      const badge = document.getElementById('modeBadge');
+      badge.textContent = currentMode.toUpperCase();
+
+      // UI View Visibility
+      document.getElementById('launchView').style.display = 'none';
+      document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
+
+      if (currentMode === 'flashcard') {
+        document.getElementById('quizView').style.display = 'none';
+        document.getElementById('flashcardView').style.display = 'block';
+        initFlashcards();
+      } else {
+        document.getElementById('flashcardView').style.display = 'none';
+        document.getElementById('quizView').style.display = 'block';
+        initQuizMode();
+      }
+
+      initTimer();
+      renderMatrixGrid();
+    }
+
+    function resetToConfig() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      userAnswers = {};
+      strikethroughs = {};
+      saveState();
+
+      document.getElementById('timerBadge').style.display = 'none';
+      document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('flashcardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
+      
+      const launch = document.getElementById('launchView');
+      launch.style.display = 'block';
+      document.getElementById('modeBadge').textContent = "PRACTICE";
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function initTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      const timerEl = document.getElementById('timerBadge');
+      timerEl.style.display = 'inline-block';
+      timerEl.classList.remove('urgent');
+
+      if (currentMode === 'exam') {
+        timerDuration = activeQuestions.length * 90; // 1.5 min per question
+        let remaining = timerDuration;
+        updateTimerDisplay(remaining);
+
+        timerInterval = setInterval(() => {
+          remaining--;
+          secondsElapsed++;
+          updateTimerDisplay(remaining);
+
+          if (remaining <= 300) {
+            timerEl.classList.add('urgent');
+          }
+          if (remaining <= 0) {
+            clearInterval(timerInterval);
+            alert("Time has expired! Submitting your exam.");
+            finalizeExam();
+          }
+        }, 1000);
+      } else {
+        secondsElapsed = 0;
+        updateTimerDisplay(secondsElapsed);
+        timerInterval = setInterval(() => {
+          secondsElapsed++;
+          updateTimerDisplay(secondsElapsed);
+        }, 1000);
+      }
+    }
+
+    function updateTimerDisplay(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      document.getElementById('timerBadge').textContent = 
+        `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function initQuizMode() {
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      const q = activeQuestions[currentIndex];
+      if (!q) return;
+
+      document.getElementById('qNumberPill').textContent = `Q ${currentIndex + 1} of ${activeQuestions.length}`;
+      document.getElementById('qTopicPill').textContent = q.topic;
+      document.getElementById('qDiffPill').textContent = q.difficulty;
+      document.getElementById('qCounterDisplay').textContent = `${currentIndex + 1} / ${activeQuestions.length}`;
+
+      const flagBtn = document.getElementById('flagBtn');
+      if (flaggedItems.has(q.id)) {
+        flagBtn.style.color = 'var(--flag-color)';
+        flagBtn.textContent = '★ Flagged';
+      } else {
+        flagBtn.style.color = 'var(--text)';
+        flagBtn.textContent = '☆ Flag';
+      }
+
+      document.getElementById('qStem').innerHTML = q.q;
+
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const selected = userAnswers[q.id];
+      const hasAnswered = selected !== undefined;
+      const struckSet = strikethroughs[q.id] || new Set();
+
+      q.options.forEach((optText, idx) => {
+        const card = document.createElement('div');
+        card.className = 'opt-card';
+        if (hasAnswered && currentMode === 'practice') card.classList.add('locked');
+        if (selected === idx) card.classList.add('selected');
+        if (struckSet.has(idx)) card.classList.add('struck');
+
+        if (hasAnswered && currentMode === 'practice') {
+          if (idx === q.correct) {
+            card.classList.add('correct-ans');
+          } else if (selected === idx && selected !== q.correct) {
+            card.classList.add('wrong-ans');
+          }
+        }
+
+        card.onclick = (e) => {
+          if (e.target.classList.contains('strike-btn')) return;
+          if (hasAnswered && currentMode === 'practice') return;
+          selectOption(idx);
+        };
+
+        card.oncontextmenu = (e) => {
+          e.preventDefault();
+          toggleStrike(idx);
+        };
+
+        card.innerHTML = `
+          <div class="opt-key">${letters[idx]}</div>
+          <div class="opt-text">${optText}</div>
+          <button class="strike-btn" title="Eliminate choice" onclick="toggleStrike(${idx})">✕</button>
+        `;
+        container.appendChild(card);
+      });
+
+      const expBox = document.getElementById('explanationBox');
+      if (currentMode === 'practice' && hasAnswered) {
+        document.getElementById('explanationContent').innerHTML = q.explanation;
+        expBox.style.display = 'block';
+      } else {
+        expBox.style.display = 'none';
+      }
+
+      const notesInput = document.getElementById('scratchpadInput');
+      notesInput.value = notes[q.id] || '';
+
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+      const nextBtn = document.getElementById('nextBtn');
+      if (currentIndex === activeQuestions.length - 1) {
+        nextBtn.textContent = (currentMode === 'exam') ? 'Submit Exam' : 'Finish Session';
+      } else {
+        nextBtn.textContent = 'Next →';
+      }
+
+      renderMatrixGrid();
+    }
+
+    function selectOption(optIndex) {
+      const q = activeQuestions[currentIndex];
+      userAnswers[q.id] = optIndex;
+      saveState();
+      renderCurrentQuestion();
+    }
+
+    function toggleStrike(optIndex) {
+      const q = activeQuestions[currentIndex];
+      if (!strikethroughs[q.id]) {
+        strikethroughs[q.id] = new Set();
+      }
+      if (strikethroughs[q.id].has(optIndex)) {
+        strikethroughs[q.id].delete(optIndex);
+      } else {
+        strikethroughs[q.id].add(optIndex);
+      }
+      renderCurrentQuestion();
+    }
+
+    function toggleFlag() {
+      const q = activeQuestions[currentIndex];
+      if (flaggedItems.has(q.id)) {
+        flaggedItems.delete(q.id);
+      } else {
+        flaggedItems.add(q.id);
+      }
+      saveState();
+      renderCurrentQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrentQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        finalizeExam();
+      }
+    }
+
+    function toggleScratchpad() {
+      const area = document.getElementById('scratchpadInput');
+      area.style.display = (area.style.display === 'block') ? 'none' : 'block';
+    }
+
+    document.getElementById('scratchpadInput').addEventListener('input', (e) => {
+      const q = activeQuestions[currentIndex];
+      if (q) {
+        notes[q.id] = e.target.value;
+        saveState();
+      }
+    });
+
+    function readStemAloud() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const text = activeQuestions[currentIndex].q;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 1.0;
+        window.speechSynthesis.speak(utter);
+      } else {
+        alert("Text-to-speech is not supported on this browser.");
+      }
+    }
+
+    let fcFlipped = false;
+
+    function initFlashcards() {
+      fcFlipped = false;
+      renderFlashcard();
+    }
+
+    function renderFlashcard() {
+      const q = activeQuestions[currentIndex];
+      if (!q) return;
+
+      document.getElementById('fcTopicPill').textContent = q.topic;
+      document.getElementById('fcCounter').textContent = `${currentIndex + 1} / ${activeQuestions.length}`;
+
+      const card = document.getElementById('flashcardEl');
+      const front = document.getElementById('fcFront');
+      const back = document.getElementById('fcBack');
+
+      card.classList.remove('flipped');
+      fcFlipped = false;
+
+      front.style.display = 'block';
+      back.style.display = 'none';
+
+      front.innerHTML = `<strong>${q.q}</strong>`;
+      back.innerHTML = `
+        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">CORRECT ANSWER</div>
+        <div style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">${q.options[q.correct]}</div>
+        <div style="font-size: 0.95rem; text-align: left; color: var(--text);">${q.explanation}</div>
+      `;
+    }
+
+    function flipFlashcard() {
+      const card = document.getElementById('flashcardEl');
+      const front = document.getElementById('fcFront');
+      const back = document.getElementById('fcBack');
+
+      fcFlipped = !fcFlipped;
+      if (fcFlipped) {
+        card.classList.add('flipped');
+        front.style.display = 'none';
+        back.style.display = 'block';
+      } else {
+        card.classList.remove('flipped');
+        front.style.display = 'block';
+        back.style.display = 'none';
+      }
+    }
+
+    function nextFlashcard() {
+      if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderFlashcard();
+      }
+    }
+
+    function prevFlashcard() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderFlashcard();
+      }
+    }
+
+    function toggleDrawer() {
+      document.getElementById('matrixDrawer').classList.toggle('open');
+    }
+
+    function setMatrixFilter(filter, btn) {
+      matrixFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMatrixGrid();
+    }
+
+    function renderMatrixGrid() {
+      const grid = document.getElementById('matrixGrid');
+      grid.innerHTML = '';
+      const query = (document.getElementById('drawerSearch').value || '').toLowerCase();
+
+      activeQuestions.forEach((q, idx) => {
+        const isAnswered = userAnswers[q.id] !== undefined;
+        const isFlagged = flaggedItems.has(q.id);
+        const matchesSearch = q.q.toLowerCase().includes(query) || q.topic.toLowerCase().includes(query);
+
+        if (!matchesSearch) return;
+
+        if (matrixFilter === 'answered' && !isAnswered) return;
+        if (matrixFilter === 'unanswered' && isAnswered) return;
+        if (matrixFilter === 'flagged' && !isFlagged) return;
+
+        const node = document.createElement('div');
+        node.className = 'matrix-node';
+        if (idx === currentIndex) node.classList.add('current');
+        if (isAnswered) node.classList.add('answered');
+        if (isFlagged) node.classList.add('flagged');
+
+        node.textContent = idx + 1;
+        node.onclick = () => {
+          currentIndex = idx;
+          if (currentMode === 'flashcard') {
+            renderFlashcard();
+          } else {
+            renderCurrentQuestion();
+          }
+          toggleDrawer();
+        };
+
+        grid.appendChild(node);
+      });
+    }
+
+    function finalizeExam() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('flashcardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
+      document.getElementById('scorecardView').style.display = 'block';
+
+      let correctCount = 0;
+      let topicBreakdown = {};
+
+      activeQuestions.forEach(q => {
+        const chosen = userAnswers[q.id];
+        const isCorrect = chosen === q.correct;
+        if (isCorrect) correctCount++;
+
+        if (!topicBreakdown[q.topic]) {
+          topicBreakdown[q.topic] = { total: 0, correct: 0 };
+        }
+        topicBreakdown[q.topic].total++;
+        if (isCorrect) topicBreakdown[q.topic].correct++;
+      });
+
+      const totalQ = activeQuestions.length;
+      const pct = totalQ > 0 ? Math.round((correctCount / totalQ) * 100) : 0;
+
+      document.getElementById('scoreRaw').textContent = `${correctCount}/${totalQ}`;
+      document.getElementById('timeSpent').textContent = formatSeconds(secondsElapsed);
+      document.getElementById('flagCount').textContent = flaggedItems.size;
+
+      const statusEl = document.getElementById('examStatus');
+      if (pct >= 70) {
+        statusEl.textContent = 'PASS';
+        statusEl.style.color = '#10b981';
+      } else {
+        statusEl.textContent = 'RETRY';
+        statusEl.style.color = '#ef4444';
+      }
+
+      const donutFill = document.getElementById('donutFill');
+      const donutText = document.getElementById('donutText');
+      donutText.textContent = `${pct}%`;
+      const circumference = 2 * Math.PI * 70;
+      const offset = circumference - (pct / 100) * circumference;
+      donutFill.style.strokeDashoffset = offset;
+      donutFill.style.stroke = (pct >= 70) ? '#10b981' : '#ef4444';
+
+      const topicContainer = document.getElementById('topicProgressContainer');
+      topicContainer.innerHTML = '';
+      for (const [topName, stats] of Object.entries(topicBreakdown)) {
+        const topPct = Math.round((stats.correct / stats.total) * 100);
+        const item = document.createElement('div');
+        item.className = 'topic-item';
+        item.innerHTML = `
+          <div class="topic-info">
+            <span>${topName}</span>
+            <span>${stats.correct}/${stats.total} (${topPct}%)</span>
+          </div>
+          <div class="topic-bar-bg">
+            <div class="topic-bar-fill" style="width: ${topPct}%;"></div>
+          </div>
+        `;
+        topicContainer.appendChild(item);
+      }
+    }
+
+    function drillMissed() {
+      const missed = activeQuestions.filter(q => userAnswers[q.id] !== q.correct);
+      if (missed.length === 0) {
+        alert("Exceptional work! You have 0 missed questions in this session.");
+        return;
+      }
+      activeQuestions = missed;
+      currentIndex = 0;
+      currentMode = 'practice';
+      document.getElementById('modeBadge').textContent = 'PRACTICE (REMEDIATION)';
+      document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'block';
+      initTimer();
+      renderCurrentQuestion();
+    }
+
+    function exportToAnki() {
+      let csvContent = "data:text/csv;charset=utf-8,Front,Back\n";
+      activeQuestions.forEach(q => {
+        const cleanFront = `"${q.q.replace(/"/g, '""')}"`;
+        const answerText = `Correct Answer: ${q.options[q.correct]}<br><br>${q.explanation.replace(/[\n\r]/g, ' ').replace(/"/g, '""')}`;
+        const cleanBack = `"${answerText}"`;
+        csvContent += `${cleanFront},${cleanBack}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Biostatistics_Comprehensive_Anki.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function formatSeconds(totalSec) {
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${m}m ${s}s`;
+    }
+
+    let currentFontSize = 16;
+    function adjustFont(delta) {
+      currentFontSize = Math.max(12, Math.min(22, currentFontSize + delta));
+      document.documentElement.style.setProperty('--font-scale', `${currentFontSize}px`);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.body.removeAttribute('data-theme');
+        document.getElementById('themeBtn').textContent = '🌙';
+      } else {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('themeBtn').textContent = '☀️';
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+      const key = e.key.toUpperCase();
+      if (['1', 'A'].includes(key)) selectOption(0);
+      if (['2', 'B'].includes(key)) selectOption(1);
+      if (['3', 'C'].includes(key)) selectOption(2);
+      if (['4', 'D'].includes(key)) selectOption(3);
+      if (key === 'ARROWLEFT') prevQuestion();
+      if (key === 'ARROWRIGHT') nextQuestion();
+      if (key === 'F') toggleFlag();
+      if (key === ' ') {
+        if (currentMode === 'flashcard') {
+          e.preventDefault();
+          flipFlashcard();
+        }
+      }
+    });
+
+    loadState();
+  </script>
+</body>
+</html>
