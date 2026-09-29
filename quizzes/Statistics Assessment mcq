@@ -232,6 +232,14 @@
       transform: translateY(-1px);
     }
 
+    .launch-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     /* Workspace Elements */
     .q-meta {
       display: flex;
@@ -757,7 +765,6 @@
       transform: translateY(-2px);
     }
 
-    /* Print View */
     @media print {
       body {
         background: #fff !important;
@@ -835,7 +842,10 @@
         </div>
       </div>
 
-      <button class="btn-primary" onclick="initSession()">Launch Study Session</button>
+      <div class="launch-actions">
+        <button class="btn-primary" onclick="initSession()">Launch Study Session</button>
+        <button class="icon-btn" onclick="clearAllProgress()" style="padding: 0.85rem 1.25rem;">Clear All Saved Progress</button>
+      </div>
     </div>
 
     <!-- View 2: Question Interactive Board -->
@@ -981,9 +991,6 @@
   </footer>
 
   <script>
-    /* =========================================================================
-       1. DATA DEFINITIONS & CLINICAL/ACADEMIC QUESTIONS
-       ========================================================================= */
     const quizData = [
       {
         id: 1,
@@ -1038,7 +1045,7 @@
             <h4>Distractor Breakdown</h4>
             • A is incorrect: Explanatory/independent variables are conventionally mapped to the horizontal X-axis.<br>
             • C is incorrect: Magnitude does not dictate axis assignment; scientific role (predictor vs. outcome) does.<br>
-            • D is incorrect: Axis conventions are crucial for standard interpretation and linear regression slope ($y = \beta_0 + \beta_1 x$).
+            • D is incorrect: Axis conventions are crucial for standard interpretation and linear regression slope ($y = \\beta_0 + \\beta_1 x$).
           </div>`
       },
       {
@@ -1139,7 +1146,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            Spearman's rank correlation ($r_s$ or $\rho$) is a non-parametric measure that evaluates monotonic relationships using ranks rather than raw values, making it robust against non-normal distributions and extreme outliers.
+            Spearman's rank correlation ($r_s$ or $\\rho$) is a non-parametric measure that evaluates monotonic relationships using ranks rather than raw values, making it robust against non-normal distributions and extreme outliers.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1167,7 +1174,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            A contingency table (cross-tabulation or $r \times c$ grid) displays bivariate frequency counts across mutual classifications of two categorical variables.
+            A contingency table (cross-tabulation or $r \\times c$ grid) displays bivariate frequency counts across mutual classifications of two categorical variables.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1195,7 +1202,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            Under the null hypothesis of independence, expected cell frequencies ($E_{ij}$) equal the product of marginal totals divided by the grand sample total: $E = \frac{R \times C}{N}$.
+            Under the null hypothesis of independence, expected cell frequencies ($E_{ij}$) equal the product of marginal totals divided by the grand sample total: $E = \\frac{R \\times C}{N}$.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1249,7 +1256,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            The chi-square test statistic sums standardized squared residuals across all cells: $\chi^2 = \sum \frac{(O - E)^2}{E}$.
+            The chi-square test statistic sums standardized squared residuals across all cells: $\\chi^2 = \\sum \\frac{(O - E)^2}{E}$.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1275,7 +1282,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            A p-value below the nominal significance threshold ($\alpha = 0.05$) provides sufficient statistical evidence to reject the null hypothesis of independence in favor of a significant association.
+            A p-value below the nominal significance threshold ($\\alpha = 0.05$) provides sufficient statistical evidence to reject the null hypothesis of independence in favor of a significant association.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1284,7 +1291,7 @@
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
             • B is incorrect: One fails to reject or rejects $H_0$; we never 'accept' $H_0$, and here evidence decisively contradicts $H_0$.<br>
-            • C is incorrect: A small p-value does not compromise test validity (assuming cell count assumptions $E \ge 5$ were met).<br>
+            • C is incorrect: A small p-value does not compromise test validity (assuming cell count assumptions $E \\ge 5$ were met).<br>
             • D is incorrect: When significant evidence is already observed, the decision criterion is satisfied.
           </div>`
       },
@@ -1303,7 +1310,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            A sampling distribution is the theoretical probability distribution of a given sample statistic (such as the sample mean $\bar{x}$) computed from infinite repeated random samples of identical size $n$ drawn from the same target population.
+            A sampling distribution is the theoretical probability distribution of a given sample statistic (such as the sample mean $\\bar{x}$) computed from infinite repeated random samples of identical size $n$ drawn from the same target population.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1313,7 +1320,7 @@
             <h4>Distractor Breakdown</h4>
             • A is incorrect: That is the population distribution.<br>
             • C is incorrect: That is the sample frequency distribution.<br>
-            • D is incorrect: Population parameters ($\mu, \sigma$) are fixed constants, not variables with distributions in frequentist statistics.
+            • D is incorrect: Population parameters ($\\mu, \\sigma$) are fixed constants, not variables with distributions in frequentist statistics.
           </div>`
       },
       {
@@ -1331,7 +1338,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            Standard Error (SE) quantifies the precision of an estimate; it is defined mathematically and conceptually as the standard deviation of the sampling distribution of a statistic ($SE = \sigma / \sqrt{n}$).
+            Standard Error (SE) quantifies the precision of an estimate; it is defined mathematically and conceptually as the standard deviation of the sampling distribution of a statistic ($SE = \\sigma / \\sqrt{n}$).
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1339,8 +1346,8 @@
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
-            • A is incorrect: That is the population SD ($\sigma$).<br>
-            • B is incorrect: That defines sampling error or bias ($\bar{x} - \mu$).<br>
+            • A is incorrect: That is the population SD ($\\sigma$).<br>
+            • B is incorrect: That defines sampling error or bias ($\\bar{x} - \\mu$).<br>
             • D is incorrect: That is sample variance ($s^2$).
           </div>`
       },
@@ -1359,7 +1366,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            Standard error is inversely proportional to the square root of sample size: $SE = \frac{s}{\sqrt{n}}$. Increasing $n$ shrinks the denominator, reducing the standard error and boosting estimation precision.
+            Standard error is inversely proportional to the square root of sample size: $SE = \\frac{s}{\\sqrt{n}}$. Increasing $n$ shrinks the denominator, reducing the standard error and boosting estimation precision.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1369,7 +1376,7 @@
             <h4>Distractor Breakdown</h4>
             • A is incorrect: SE contracts rather than inflates with larger samples.<br>
             • C is incorrect: Sample size directly impacts precision; it never remains unchanged.<br>
-            • D is incorrect: Unless $n \to \infty$ or the entire finite population is enumerated without error, SE remains positive.
+            • D is incorrect: Unless $n \\to \\infty$ or the entire finite population is enumerated without error, SE remains positive.
           </div>`
       },
       {
@@ -1413,17 +1420,17 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            When an investigator assesses whether a parameter is merely 'different' without prespecifying directionality (greater or lower), a two-tailed alternative hypothesis with a non-equality operator ($\ne$) must be formulated.
+            When an investigator assesses whether a parameter is merely 'different' without prespecifying directionality (greater or lower), a two-tailed alternative hypothesis with a non-equality operator ($\\ne$) must be formulated.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
-            Option D is correct: The phrase 'is different from' signifies a two-tailed inquiry: $H_1: \mu \neq 120$.
+            Option D is correct: The phrase 'is different from' signifies a two-tailed inquiry: $H_1: \\mu \\neq 120$.
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
-            • A is incorrect: Equalities define the null hypothesis ($H_0: \mu = 120$), never the alternative.<br>
-            • B is incorrect: $H_1: \mu > 120$ is a directional one-tailed test used only if specifying 'higher/greater than'.<br>
-            • C is incorrect: $H_1: \mu < 120$ is a one-tailed test specifying 'lower than'.
+            • A is incorrect: Equalities define the null hypothesis ($H_0: \\mu = 120$), never the alternative.<br>
+            • B is incorrect: $H_1: \\mu > 120$ is a directional one-tailed test used only if specifying 'higher/greater than'.<br>
+            • C is incorrect: $H_1: \\mu < 120$ is a one-tailed test specifying 'lower than'.
           </div>`
       },
       {
@@ -1441,7 +1448,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            The p-value is a conditional probability: $P(\text{Data or more extreme} \mid H_0 \text{ is true})$. It does NOT denote the probability that $H_0$ itself is true.
+            The p-value is a conditional probability: $P(\\text{Data or more extreme} \\mid H_0 \\text{ is true})$. It does NOT denote the probability that $H_0$ itself is true.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1469,7 +1476,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            The formal decision rule states: If $p \le \alpha$, reject $H_0$. If $p > \alpha$, fail to reject $H_0$.
+            The formal decision rule states: If $p \\le \\alpha$, reject $H_0$. If $p > \\alpha$, fail to reject $H_0$.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1477,8 +1484,8 @@
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
-            • A is incorrect: Failing to reject requires $p > \alpha$.<br>
-            • C is incorrect: Science never 'accepts' the null hypothesis as true due to the risk of Type II errors ($\beta$).<br>
+            • A is incorrect: Failing to reject requires $p > \\alpha$.<br>
+            • C is incorrect: Science never 'accepts' the null hypothesis as true due to the risk of Type II errors ($\\beta$).<br>
             • D is incorrect: A conclusive decision has been achieved under pre-specified parameters.
           </div>`
       },
@@ -1497,11 +1504,11 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            When contrasting a continuous sample mean $\bar{x}$ against a known population benchmark $\mu_0$ and the true population standard deviation $\sigma$ is known, the standard normal One-sample z-test ($z = \frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}}$) is utilized.
+            When contrasting a continuous sample mean $\\bar{x}$ against a known population benchmark $\\mu_0$ and the true population standard deviation $\\sigma$ is known, the standard normal One-sample z-test ($z = \\frac{\\bar{x} - \\mu_0}{\\sigma / \\sqrt{n}}$) is utilized.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
-            Option A is correct: Known $\sigma$ combined with evaluating a single sample mean vs. benchmark satisfies the criteria for a one-sample z-test.
+            Option A is correct: Known $\\sigma$ combined with evaluating a single sample mean vs. benchmark satisfies the criteria for a one-sample z-test.
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
@@ -1556,13 +1563,13 @@
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
-            Option B is correct: It formally tests whether the difference between two unrelated group means ($\mu_1 - \mu_2$) differs significantly from zero.
+            Option B is correct: It formally tests whether the difference between two unrelated group means ($\\mu_1 - \\mu_2$) differs significantly from zero.
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
             • A is incorrect: Paired t-test requires matched or repeated observations from the same subjects.<br>
             • C is incorrect: One-proportion z-test compares a single categorical rate against a known value.<br>
-            • D is incorrect: One-sample z-test compares a single group against a population reference when $\sigma$ is known.
+            • D is incorrect: One-sample z-test compares a single group against a population reference when $\\sigma$ is known.
           </div>`
       },
       {
@@ -1580,7 +1587,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            For continuous differences ($\mu_1 - \mu_2$), the null value representing 'no difference' is 0. If the 95% confidence interval straddles zero (spans negative to positive), the null value is plausible and cannot be rejected at $\alpha = 0.05$.
+            For continuous differences ($\\mu_1 - \\mu_2$), the null value representing 'no difference' is 0. If the 95% confidence interval straddles zero (spans negative to positive), the null value is plausible and cannot be rejected at $\\alpha = 0.05$.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1606,7 +1613,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            Comparing binary outcome proportions ($p_1$ vs. $p_2$) across two independent cohorts uses a two-proportion pooled z-test (or a $2 \times 2$ chi-square test of independence).
+            Comparing binary outcome proportions ($p_1$ vs. $p_2$) across two independent cohorts uses a two-proportion pooled z-test (or a $2 \\times 2$ chi-square test of independence).
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1633,7 +1640,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            Population proportions are symbolized by $p$ (or Greek letter $\pi$). Testing the difference in true rates between two populations examines the parameter $p_1 - p_2$.
+            Population proportions are symbolized by $p$ (or Greek letter $\\pi$). Testing the difference in true rates between two populations examines the parameter $p_1 - p_2$.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1641,9 +1648,9 @@
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
-            • A is incorrect: $\mu_1 - \mu_2$ represents the difference between population means.<br>
-            • C is incorrect: $\sigma_1 - \sigma_2$ represents the difference between population standard deviations.<br>
-            • D is incorrect: $\bar{x}_1 - \bar{x}_2$ denotes the sample statistic for difference in means, not population proportions.
+            • A is incorrect: $\\mu_1 - \\mu_2$ represents the difference between population means.<br>
+            • C is incorrect: $\\sigma_1 - \\sigma_2$ represents the difference between population standard deviations.<br>
+            • D is incorrect: $\\bar{x}_1 - \\bar{x}_2$ denotes the sample statistic for difference in means, not population proportions.
           </div>`
       },
       {
@@ -1661,7 +1668,7 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            When an interval estimate for a difference in proportions ($p_1 - p_2$) spans across zero (from -0.04 to +0.12), zero remains a plausible true value, indicating insufficient evidence to declare a significant difference at $\alpha = 0.05$.
+            When an interval estimate for a difference in proportions ($p_1 - p_2$) spans across zero (from -0.04 to +0.12), zero remains a plausible true value, indicating insufficient evidence to declare a significant difference at $\\alpha = 0.05$.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
@@ -1688,38 +1695,34 @@
         explanation: `
           <div class="exp-section">
             <h4>Key Takeaway / High-Yield Summary</h4>
-            When the calculated p-value exceeds the pre-selected significance threshold $\alpha$, the observed discrepancy can reasonably be explained by chance alone; therefore, the analyst must 'Fail to reject $H_0$'.
+            When the calculated p-value exceeds the pre-selected significance threshold $\\alpha$, the observed discrepancy can reasonably be explained by chance alone; therefore, the analyst must 'Fail to reject $H_0$'.
           </div>
           <div class="exp-section">
             <h4>Why the Correct Answer is Right</h4>
-            Option C is correct: High p-values ($p > \alpha$) provide insufficient evidence against the null, leading to the decision: 'Fail to reject $H_0$'.
+            Option C is correct: High p-values ($p > \\alpha$) provide insufficient evidence against the null, leading to the decision: 'Fail to reject $H_0$'.
           </div>
           <div class="exp-section">
             <h4>Distractor Breakdown</h4>
-            • A is incorrect: Rejecting $H_0$ requires $p \le \alpha$.<br>
+            • A is incorrect: Rejecting $H_0$ requires $p \\le \\alpha$.<br>
             • B is incorrect: Hypothesis testing decisions are formulated regarding $H_0$, not 'rejecting $H_1$'.<br>
-            • D is incorrect: When $p > \alpha$, the outcome is classified as non-statistically significant.
+            • D is incorrect: When $p > \\alpha$, the outcome is classified as non-statistically significant.
           </div>`
       }
     ];
 
-    /* =========================================================================
-       2. STATE MANAGEMENT & STORAGE
-       ========================================================================= */
     let activeQuestions = [];
     let currentIndex = 0;
-    let userAnswers = {};       // { qId: selectedOptionIndex }
+    let userAnswers = {};
     let flaggedItems = new Set();
-    let strikethroughs = {};    // { qId: Set of option indices }
-    let notes = {};             // { qId: string }
-    let currentMode = 'practice'; // 'practice' | 'exam' | 'flashcard'
+    let strikethroughs = {};
+    let notes = {};
+    let currentMode = 'practice';
     let timerInterval = null;
     let secondsElapsed = 0;
     let timerDuration = 0;
     let matrixFilter = 'all';
 
-    // LocalStorage keys
-    const LS_KEY_PROGRESS = 'biostat_quiz_state_v1';
+    const LS_KEY_PROGRESS = 'biostat_quiz_state_v2';
 
     function saveState() {
       const state = {
@@ -1728,7 +1731,11 @@
         notes,
         secondsElapsed
       };
-      localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify(state));
+      try {
+        localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify(state));
+      } catch (err) {
+        console.warn("Storage error", err);
+      }
     }
 
     function loadState() {
@@ -1746,11 +1753,19 @@
       }
     }
 
-    /* =========================================================================
-       3. SESSION INITIALIZATION & FILTERING
-       ========================================================================= */
+    function clearAllProgress() {
+      if (confirm("Reset all saved answers, notes, and flags? This cannot be undone.")) {
+        localStorage.removeItem(LS_KEY_PROGRESS);
+        userAnswers = {};
+        flaggedItems.clear();
+        strikethroughs = {};
+        notes = {};
+        secondsElapsed = 0;
+        alert("Progress cleared. You can start fresh now!");
+      }
+    }
+
     function initSession() {
-      loadState();
       currentMode = document.getElementById('cfgMode').value;
       const countCfg = document.getElementById('cfgCount').value;
       const filterCfg = document.getElementById('cfgFilter').value;
@@ -1760,19 +1775,19 @@
       if (filterCfg === 'flagged') {
         pool = pool.filter(q => flaggedItems.has(q.id));
         if (pool.length === 0) {
-          alert("No items currently flagged! Defaulting to entire question bank.");
+          alert("No items currently flagged! Launching all questions instead.");
           pool = [...quizData];
         }
       } else if (filterCfg === 'unattempted') {
         pool = pool.filter(q => userAnswers[q.id] === undefined);
         if (pool.length === 0) {
-          alert("All questions have been attempted! Resetting to all items.");
+          alert("All questions have been attempted! Resetting to entire question bank.");
           pool = [...quizData];
         }
       }
 
       if (countCfg !== 'all') {
-        const limit = parseInt(countCfg);
+        const limit = parseInt(countCfg, 10);
         pool = pool.slice(0, limit);
       }
 
@@ -1786,6 +1801,7 @@
       // UI Switch
       document.getElementById('launchView').style.display = 'none';
       document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
 
       if (currentMode === 'flashcard') {
         document.getElementById('quizView').style.display = 'none';
@@ -1802,26 +1818,36 @@
     }
 
     function resetToConfig() {
-      clearInterval(timerInterval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
+      // Reset active session locks
+      userAnswers = {};
+      strikethroughs = {};
+      saveState();
+
       document.getElementById('timerBadge').style.display = 'none';
       document.getElementById('scorecardView').style.display = 'none';
       document.getElementById('quizView').style.display = 'none';
       document.getElementById('flashcardView').style.display = 'none';
-      document.getElementById('launchView').style.display = 'block';
+      document.getElementById('matrixDrawer').classList.remove('open');
+      
+      const launch = document.getElementById('launchView');
+      launch.style.display = 'block';
       document.getElementById('modeBadge').textContent = "PRACTICE";
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* =========================================================================
-       4. TIMER ENGINE
-       ========================================================================= */
     function initTimer() {
-      clearInterval(timerInterval);
+      if (timerInterval) clearInterval(timerInterval);
       const timerEl = document.getElementById('timerBadge');
       timerEl.style.display = 'inline-block';
       timerEl.classList.remove('urgent');
 
       if (currentMode === 'exam') {
-        // 1.5 minutes per question for Timed Exam
         timerDuration = activeQuestions.length * 90;
         let remaining = timerDuration;
         updateTimerDisplay(remaining);
@@ -1857,9 +1883,6 @@
         `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
-    /* =========================================================================
-       5. QUIZ WORKSPACE ENGINE
-       ========================================================================= */
     function initQuizMode() {
       renderCurrentQuestion();
     }
@@ -1868,13 +1891,11 @@
       const q = activeQuestions[currentIndex];
       if (!q) return;
 
-      // Meta Header
       document.getElementById('qNumberPill').textContent = `Q ${currentIndex + 1} of ${activeQuestions.length}`;
       document.getElementById('qTopicPill').textContent = q.topic;
       document.getElementById('qDiffPill').textContent = q.difficulty;
       document.getElementById('qCounterDisplay').textContent = `${currentIndex + 1} / ${activeQuestions.length}`;
 
-      // Flag UI
       const flagBtn = document.getElementById('flagBtn');
       if (flaggedItems.has(q.id)) {
         flagBtn.style.color = 'var(--flag-color)';
@@ -1884,10 +1905,8 @@
         flagBtn.textContent = '☆ Flag';
       }
 
-      // Stem
       document.getElementById('qStem').innerHTML = q.q;
 
-      // Options Rendering
       const container = document.getElementById('optionsContainer');
       container.innerHTML = '';
 
@@ -1899,11 +1918,10 @@
       q.options.forEach((optText, idx) => {
         const card = document.createElement('div');
         card.className = 'opt-card';
-        if (hasAnswered) card.classList.add('locked');
+        if (hasAnswered && currentMode === 'practice') card.classList.add('locked');
         if (selected === idx) card.classList.add('selected');
         if (struckSet.has(idx)) card.classList.add('struck');
 
-        // Mode coloring logic
         if (hasAnswered && currentMode === 'practice') {
           if (idx === q.correct) {
             card.classList.add('correct-ans');
@@ -1912,14 +1930,12 @@
           }
         }
 
-        // Click to select
         card.onclick = (e) => {
           if (e.target.classList.contains('strike-btn')) return;
-          if (hasAnswered && currentMode === 'practice') return; // locked in practice
+          if (hasAnswered && currentMode === 'practice') return;
           selectOption(idx);
         };
 
-        // Right-click to strike
         card.oncontextmenu = (e) => {
           e.preventDefault();
           toggleStrike(idx);
@@ -1933,7 +1949,6 @@
         container.appendChild(card);
       });
 
-      // Explanation box (Practice mode shows immediately if answered)
       const expBox = document.getElementById('explanationBox');
       if (currentMode === 'practice' && hasAnswered) {
         document.getElementById('explanationContent').innerHTML = q.explanation;
@@ -1942,11 +1957,9 @@
         expBox.style.display = 'none';
       }
 
-      // Scratchpad
       const notesInput = document.getElementById('scratchpadInput');
       notesInput.value = notes[q.id] || '';
 
-      // Nav Buttons
       document.getElementById('prevBtn').disabled = currentIndex === 0;
       const nextBtn = document.getElementById('nextBtn');
       if (currentIndex === activeQuestions.length - 1) {
@@ -2005,7 +2018,6 @@
       }
     }
 
-    /* Scratchpad Handling */
     function toggleScratchpad() {
       const area = document.getElementById('scratchpadInput');
       area.style.display = (area.style.display === 'block') ? 'none' : 'block';
@@ -2019,7 +2031,6 @@
       }
     });
 
-    /* Text-to-Speech */
     function readStemAloud() {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -2032,9 +2043,6 @@
       }
     }
 
-    /* =========================================================================
-       6. FLASHCARD ENGINE
-       ========================================================================= */
     let fcFlipped = false;
 
     function initFlashcards() {
@@ -2098,9 +2106,6 @@
       }
     }
 
-    /* =========================================================================
-       7. DRAWER & QUESTION MATRIX
-       ========================================================================= */
     function toggleDrawer() {
       document.getElementById('matrixDrawer').classList.toggle('open');
     }
@@ -2149,16 +2154,13 @@
       });
     }
 
-    /* =========================================================================
-       8. EXAM FINALIZATION & SCORECARD ANALYTICS
-       ========================================================================= */
     function finalizeExam() {
-      clearInterval(timerInterval);
+      if (timerInterval) clearInterval(timerInterval);
       document.getElementById('quizView').style.display = 'none';
       document.getElementById('flashcardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
       document.getElementById('scorecardView').style.display = 'block';
 
-      // Compute statistics
       let correctCount = 0;
       let topicBreakdown = {};
 
@@ -2175,9 +2177,8 @@
       });
 
       const totalQ = activeQuestions.length;
-      const pct = Math.round((correctCount / totalQ) * 100);
+      const pct = totalQ > 0 ? Math.round((correctCount / totalQ) * 100) : 0;
 
-      // Scorecard values
       document.getElementById('scoreRaw').textContent = `${correctCount}/${totalQ}`;
       document.getElementById('timeSpent').textContent = formatSeconds(secondsElapsed);
       document.getElementById('flagCount').textContent = flaggedItems.size;
@@ -2191,16 +2192,14 @@
         statusEl.style.color = '#ef4444';
       }
 
-      // Donut Ring Animation
       const donutFill = document.getElementById('donutFill');
       const donutText = document.getElementById('donutText');
       donutText.textContent = `${pct}%`;
-      const circumference = 2 * Math.PI * 70; // 440
+      const circumference = 2 * Math.PI * 70;
       const offset = circumference - (pct / 100) * circumference;
       donutFill.style.strokeDashoffset = offset;
       donutFill.style.stroke = (pct >= 70) ? '#10b981' : '#ef4444';
 
-      // Render Topic Breakdown
       const topicContainer = document.getElementById('topicProgressContainer');
       topicContainer.innerHTML = '';
       for (const [topName, stats] of Object.entries(topicBreakdown)) {
@@ -2259,9 +2258,6 @@
       return `${m}m ${s}s`;
     }
 
-    /* =========================================================================
-       9. ACCESSIBILITY, HOTKEYS & THEMES
-       ========================================================================= */
     let currentFontSize = 16;
     function adjustFont(delta) {
       currentFontSize = Math.max(12, Math.min(22, currentFontSize + delta));
@@ -2279,9 +2275,7 @@
       }
     }
 
-    // Keyboard Hotkeys
     window.addEventListener('keydown', (e) => {
-      // Don't trigger hotkeys if user is typing in search or scratchpad
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
 
       const key = e.key.toUpperCase();
@@ -2300,7 +2294,6 @@
       }
     });
 
-    // Run on startup
     loadState();
   </script>
 </body>
