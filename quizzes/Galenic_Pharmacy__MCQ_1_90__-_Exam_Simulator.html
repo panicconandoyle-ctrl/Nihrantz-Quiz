@@ -1,0 +1,3203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galenic Pharmacy (MCQ 1–90) - Exam Simulator</title>
+  <style>
+    :root {
+      --font-scale: 16px;
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --text: #2e3856;
+      --text-muted: #64748b;
+      --accent: #4255ff;
+      --accent-hover: #3142e0;
+      --border: #e6e9f2;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --correct-bg: #ecfdf5;
+      --correct-border: #10b981;
+      --correct-text: #065f46;
+      --wrong-bg: #fef2f2;
+      --wrong-border: #ef4444;
+      --wrong-text: #991b1b;
+      --flag-color: #f59e0b;
+      --strikethrough: #94a3b8;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b0f19;
+      --surface: #151c2e;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --border: #28334e;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --correct-bg: rgba(16, 185, 129, 0.15);
+      --correct-border: #10b981;
+      --correct-text: #6ee7b7;
+      --wrong-bg: rgba(239, 68, 68, 0.15);
+      --wrong-border: #ef4444;
+      --wrong-text: #fca5a5;
+      --flag-color: #fbbf24;
+      --strikethrough: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-size: var(--font-scale);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.75rem 1.25rem;
+    }
+
+    .nav-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+    }
+
+    .badge-mode {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .controls-cluster {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button.icon-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    button.icon-btn:hover {
+      background: var(--border);
+    }
+
+    .timer-badge {
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      display: none;
+    }
+
+    .timer-badge.urgent {
+      color: #ef4444;
+      border-color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 5rem 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .config-hero {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .config-hero h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .config-hero p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(66, 85, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .launch-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .q-tags {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pill-difficulty {
+      background: rgba(66, 85, 255, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .action-icons {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .stem-box {
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      cursor: text;
+    }
+
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .opt-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.9rem 1.1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--surface);
+      position: relative;
+      user-select: none;
+    }
+
+    .opt-card:hover:not(.locked) {
+      border-color: var(--accent);
+      background: rgba(66, 85, 255, 0.03);
+    }
+
+    .opt-card.selected {
+      border-color: var(--accent);
+      background: rgba(66, 85, 255, 0.08);
+      font-weight: 600;
+    }
+
+    .opt-card.struck {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+
+    .opt-card.correct-ans {
+      background: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+      color: var(--correct-text) !important;
+      font-weight: 600;
+    }
+
+    .opt-card.wrong-ans {
+      background: var(--wrong-bg) !important;
+      border-color: var(--wrong-border) !important;
+      color: var(--wrong-text) !important;
+    }
+
+    .opt-key {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .opt-card.selected .opt-key {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .opt-text {
+      flex: 1;
+      padding-top: 2px;
+    }
+
+    .strike-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      opacity: 0.5;
+    }
+
+    .strike-btn:hover {
+      opacity: 1;
+      background: var(--border);
+    }
+
+    .explanation-box {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .exp-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+
+    .exp-section {
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .exp-section h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .scratchpad-wrap {
+      margin-top: 1rem;
+    }
+
+    .scratchpad-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-weight: 600;
+      padding: 0.25rem 0;
+    }
+
+    .scratchpad-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
+      resize: vertical;
+    }
+
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -360px;
+      width: 340px;
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+      z-index: 200;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+    }
+
+    .drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-search {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .drawer-filter {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      flex: 1;
+      padding: 0.3rem 0;
+      font-size: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 0.25rem;
+    }
+
+    .matrix-node {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .matrix-node.current {
+      border: 2px solid var(--accent);
+    }
+
+    .matrix-node.answered {
+      background: rgba(66, 85, 255, 0.15);
+      border-color: var(--accent);
+    }
+
+    .matrix-node.flagged::after {
+      content: "★";
+      position: absolute;
+      top: 2px;
+      right: 3px;
+      font-size: 0.65rem;
+      color: var(--flag-color);
+    }
+
+    .flashcard-wrap {
+      perspective: 1000px;
+      margin: 1.5rem 0;
+      min-height: 280px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 280px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--card-shadow);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .flashcard.flipped {
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
+    }
+
+    .flashcard-hint {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .scorecard {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .donut-wrap {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    .donut-wrap svg {
+      transform: rotate(-90deg);
+    }
+
+    .donut-circle-bg {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 12;
+    }
+
+    .donut-circle-fill {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 12;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1s ease;
+      stroke-linecap: round;
+    }
+
+    .donut-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .score-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-pill {
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .topic-breakdown {
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+
+    .topic-item {
+      margin-bottom: 1rem;
+    }
+
+    .topic-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .topic-bar-bg {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .topic-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    .analytics-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 90;
+      padding: 0.65rem 1.25rem;
+    }
+
+    .footer-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .attribution-text {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .social-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .social-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .social-pill:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+      header, footer, .controls-cluster, .bottom-bar, .action-icons, .scratchpad-wrap { display: none !important; }
+      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 2rem !important; page-break-inside: avoid; }
+      .explanation-box { display: block !important; border: 1px solid #ccc !important; background: #fafafa !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <div class="brand-title">
+        <span>Galenic Pharmacy</span>
+        <span class="badge-mode" id="modeBadge">Practice</span>
+      </div>
+      <div class="controls-cluster">
+        <span class="timer-badge" id="timerBadge">00:00</span>
+        <button class="icon-btn" onclick="adjustFont(-1)" title="Decrease font size">A-</button>
+        <button class="icon-btn" onclick="adjustFont(1)" title="Increase font size">A+</button>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle dark/light">🌙</button>
+        <button class="icon-btn" onclick="toggleDrawer()" id="matrixBtn" title="Question matrix">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="card config-hero" id="launchView">
+      <h1>Galenic Pharmacy MCQ 1–90 Simulation</h1>
+      <p>Dosage Form Design, Excipients, Water Treatment, Packaging, Quality Control & Pharmacokinetics</p>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Simulation Mode</label>
+          <select id="cfgMode">
+            <option value="practice">Practice Mode (Instant Feedback & Rationales)</option>
+            <option value="exam">Timed Exam Mode (Silent Answers & Final Scorecard)</option>
+            <option value="flashcard">Flashcard Review (Active Recall 3D Flip)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Topic Scope</label>
+          <select id="cfgTopic">
+            <option value="all">All Topics (90 Questions)</option>
+            <option value="Fundamentals & API Origins">Fundamentals & API Origins (Q1-8)</option>
+            <option value="Excipients & Water Treatment">Excipients & Water Treatment (Q9-31)</option>
+            <option value="Packaging & GMP">Packaging & GMP (Q32-37)</option>
+            <option value="In-Process Quality Control (IPQC)">In-Process Quality Control (IPQC) (Q38-56)</option>
+            <option value="Disintegration & Dissolution Testing">Disintegration & Dissolution Testing (Q57-70)</option>
+            <option value="Routes of Administration & Dosage Forms">Routes of Administration & Dosage Forms (Q71-90)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Question Count</label>
+          <select id="cfgCount">
+            <option value="all">All In Selected Scope</option>
+            <option value="15">Quick 15 Questions</option>
+            <option value="30">30 Questions</option>
+            <option value="45">45 Questions</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter Scope</label>
+          <select id="cfgFilter">
+            <option value="all">Entire Question Pool</option>
+            <option value="flagged">Flagged Items Only</option>
+            <option value="unattempted">Unattempted Items Only</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="launch-actions">
+        <button class="btn-primary" onclick="initSession()">Launch Study Session</button>
+        <button class="icon-btn" onclick="clearAllProgress()" style="padding: 0.85rem 1.25rem;">Clear All Saved Progress</button>
+      </div>
+    </div>
+
+    <div class="card" id="quizView" style="display: none;">
+      <div class="q-meta">
+        <div class="q-tags">
+          <span class="pill" id="qNumberPill">Q 1 of 90</span>
+          <span class="pill" id="qTopicPill">Fundamentals</span>
+          <span class="pill pill-difficulty" id="qDiffPill">High-Yield</span>
+        </div>
+        <div class="action-icons">
+          <button class="icon-btn" id="ttsBtn" onclick="readStemAloud()" title="Read stem aloud">🔊 TTS</button>
+          <button class="icon-btn" id="flagBtn" onclick="toggleFlag()" title="Flag for review">★ Flag</button>
+        </div>
+      </div>
+
+      <div class="stem-box" id="qStem">Question text goes here...</div>
+
+      <div class="options-stack" id="optionsContainer"></div>
+
+      <div class="explanation-box" id="explanationBox">
+        <div class="exp-title">Comprehensive Rationale</div>
+        <div id="explanationContent"></div>
+      </div>
+
+      <div class="scratchpad-wrap">
+        <button class="scratchpad-toggle" onclick="toggleScratchpad()">
+          <span>📝 Notes & Scratchpad</span>
+        </button>
+        <textarea class="scratchpad-textarea" id="scratchpadInput" placeholder="Jot down memory hooks or notes..."></textarea>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="icon-btn" onclick="prevQuestion()" id="prevBtn">← Previous</button>
+        <span style="font-size: 0.85rem; color: var(--text-muted);" id="qCounterDisplay">1 / 90</span>
+        <button class="icon-btn" onclick="nextQuestion()" id="nextBtn">Next →</button>
+      </div>
+    </div>
+
+    <div class="card" id="flashcardView" style="display: none; text-align: center;">
+      <div class="q-meta">
+        <span class="pill" id="fcTopicPill">Topic</span>
+        <span class="pill" id="fcCounter">1 / 90</span>
+      </div>
+
+      <div class="flashcard-wrap" onclick="flipFlashcard()">
+        <div class="flashcard" id="flashcardEl">
+          <div id="fcFront" style="font-size: 1.25rem; font-weight: 700;">Question Prompt</div>
+          <div id="fcBack" style="display: none; font-size: 1.15rem; color: var(--correct-text);">Correct Answer</div>
+          <div class="flashcard-hint">Click card or press Space to flip</div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="icon-btn" onclick="prevFlashcard()">← Previous</button>
+        <button class="icon-btn" onclick="nextFlashcard()">Next →</button>
+      </div>
+    </div>
+
+    <div class="card scorecard" id="scorecardView" style="display: none;">
+      <h2 style="margin-bottom: 0.5rem;">Performance Assessment Report</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;" id="scorecardSubtitle">Galenic Pharmacy MCQ 1–90</p>
+
+      <div class="donut-wrap">
+        <svg width="160" height="160">
+          <circle class="donut-circle-bg" cx="80" cy="80" r="70"></circle>
+          <circle class="donut-circle-fill" id="donutFill" cx="80" cy="80" r="70"></circle>
+        </svg>
+        <div class="donut-center-text" id="donutText">0%</div>
+      </div>
+
+      <div class="score-stats">
+        <div class="stat-pill">
+          <div class="stat-val" id="scoreRaw">0/90</div>
+          <div class="stat-lbl">Total Score</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-val" id="timeSpent">0m 0s</div>
+          <div class="stat-lbl">Time Spent</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-val" id="flagCount">0</div>
+          <div class="stat-lbl">Flagged Items</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-val" id="examStatus">PASS</div>
+          <div class="stat-lbl">Result (≥70%)</div>
+        </div>
+      </div>
+
+      <div class="topic-breakdown">
+        <h3 style="font-size: 1rem; margin-bottom: 1rem;">Subject Competency Breakdown</h3>
+        <div id="topicProgressContainer"></div>
+      </div>
+
+      <div class="analytics-btns">
+        <button class="btn-primary" onclick="drillMissed()">Drill Missed Questions</button>
+        <button class="icon-btn" onclick="exportToAnki()">Export to Anki (CSV)</button>
+        <button class="icon-btn" onclick="window.print()">Print / PDF Summary</button>
+        <button class="icon-btn" onclick="resetToConfig()">New Session</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer" id="matrixDrawer">
+    <div class="drawer-header">
+      <h3 style="font-size: 1.05rem;">Question Navigator</h3>
+      <button class="icon-btn" onclick="toggleDrawer()">✕</button>
+    </div>
+    <input type="text" class="drawer-search" id="drawerSearch" placeholder="Search questions..." oninput="renderMatrixGrid()">
+    <div class="drawer-filter">
+      <button class="filter-btn active" onclick="setMatrixFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setMatrixFilter('answered', this)">Answered</button>
+      <button class="filter-btn" onclick="setMatrixFilter('unanswered', this)">Unanswered</button>
+      <button class="filter-btn" onclick="setMatrixFilter('flagged', this)">Flagged</button>
+    </div>
+    <div class="matrix-grid" id="matrixGrid"></div>
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <span class="attribution-text">Prepared by Bunreth Nihrantz</span>
+      <div class="social-pills">
+        <a href="https://www.facebook.com/nihrantz/" target="_blank" rel="noopener" class="social-pill" title="Facebook">F</a>
+        <a href="https://www.instagram.com/nihrantz?igsh=ODB2NzhocHgxc2Fw" target="_blank" rel="noopener" class="social-pill" title="Instagram">I</a>
+        <a href="https://t.me/Nihrantz" target="_blank" rel="noopener" class="social-pill" title="Telegram">T</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const quizData = [
+      {
+        id: 1,
+        topic: "Fundamentals & API Origins",
+        difficulty: "High-Yield",
+        q: "What is the definition of Galenic Pharmacy?",
+        options: [
+          "It is the study of dosage form design, including associated manufacturing techniques",
+          "It is the study of the effect that drugs have on the body",
+          "It is the study of the effect that the body has on drugs",
+          "It is the study of preparation of medicines by infusion, decoction, etc."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Galenic Pharmacy (pharmaceutics) is the science and art of dosage form design and manufacturing techniques to convert APIs into administrable, stable medicines.
+          </div>
+          <div class="exp-section">
+            <h4>Distractor Breakdown</h4>
+            • (b) refers to Pharmacodynamics.<br>
+            • (c) refers to Pharmacokinetics.<br>
+            • (d) refers to traditional extemporaneous compounding or pharmacognosy preparation.
+          </div>`
+      },
+      {
+        id: 2,
+        topic: "Fundamentals & API Origins",
+        difficulty: "High-Yield",
+        q: "What is the definition of API (Active Pharmaceutical Ingredient)?",
+        options: [
+          "Any substance or combination of substances exerts a physiological effect and they are responsible for the therapeutic activity.",
+          "Any substance or combinations of substances are indispensible for the active ingredients becoming medicines",
+          "All of above",
+          "None of all"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            An Active Pharmaceutical Ingredient (API) is the chemically or biologically active component in a pharmaceutical drug that produces the intended pharmacological and therapeutic effect.
+          </div>
+          <div class="exp-section">
+            <h4>Distractor Breakdown</h4>
+            • (b) is the definition of an Excipient, not an API.
+          </div>`
+      },
+      {
+        id: 3,
+        topic: "Fundamentals & API Origins",
+        difficulty: "High-Yield",
+        q: "What is the definition of Excipient?",
+        options: [
+          "Any substance or combination of substances exerts a physiological effect and they are responsible for the therapeutic activity.",
+          "Any substance or combinations of substances are indispensible for the active ingredients becoming medicines.",
+          "All of above.",
+          "None of all."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Excipients are inactive substances formulated alongside the active pharmaceutical ingredient, indispensable for processing, stability, bulking, and drug release.
+          </div>`
+      },
+      {
+        id: 4,
+        topic: "Fundamentals & API Origins",
+        difficulty: "High-Yield",
+        q: "The component of the medicine contains:",
+        options: [
+          "It contains the API.",
+          "It contains the Excipient.",
+          "It contains the API and excipient including the packaging.",
+          "None of all."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A complete finished medicinal product consists of the API, functional excipients, and the container/packaging system that protects and identifies it.
+          </div>`
+      },
+      {
+        id: 5,
+        topic: "Fundamentals & API Origins",
+        difficulty: "High-Yield",
+        q: "The origins of Active ingredient are from:",
+        options: [
+          "Natural.",
+          "Synthesis.",
+          "Biotechnology.",
+          "All of above."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pharmaceutical APIs can originate from natural sources (plants, minerals, animals, microbes), synthetic chemical manufacturing, or biotechnology (recombinant DNA, cell culture).
+          </div>`
+      },
+      {
+        id: 6,
+        topic: "Fundamentals & API Origins",
+        difficulty: "Moderate",
+        q: "The natural origin of Active Pharmaceutical Ingredient, which one of the following sentence is not true?",
+        options: [
+          "It is from the Microorganism.",
+          "It is from plants.",
+          "It is from mineral.",
+          "It is from inorganic compound."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pure synthetic inorganic compounds represent synthetic/chemical origins rather than natural biological/mineral extracts.
+          </div>`
+      },
+      {
+        id: 7,
+        topic: "Fundamentals & API Origins",
+        difficulty: "Moderate",
+        q: "The synthetic origin of Active Pharmaceutical Ingredient, which one of the following sentence is true?",
+        options: [
+          "It is from the Microorganism.",
+          "It is from plants.",
+          "It is from mineral.",
+          "It is from inorganic compound."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Synthetic active substances are created via chemical reaction/synthesis (organic or inorganic compounds) rather than isolated directly from living biological materials.
+          </div>`
+      },
+      {
+        id: 8,
+        topic: "Fundamentals & API Origins",
+        difficulty: "Moderate",
+        q: "The Biotechnology origin of Active Pharmaceutical Ingredient, which one of the following sentence is true?",
+        options: [
+          "It is from the Microorganism.",
+          "It is from the living organ such as Interferon.",
+          "It is from mineral.",
+          "It is from inorganic compound."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Biotechnological APIs include therapeutic proteins produced by living systems or biological cell lines, such as interferons, monoclonal antibodies, and cytokines.
+          </div>`
+      },
+      {
+        id: 9,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "The following are role of excipient except one:",
+        options: [
+          "Facilitate administration of active ingredients.",
+          "Improve the efficacy of active ingredients.",
+          "Provide the therapeutic effect similar to API.",
+          "Assure the stability and preservation of medicine until its expiry date."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Excipients must be pharmacologically inert in the intended therapeutic dose; they do NOT provide therapeutic effects.
+          </div>`
+      },
+      {
+        id: 10,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "The following are the usage of water except one?",
+        options: [
+          "Use as Starting material",
+          "Use as Raw material in the production process and formulation.",
+          "Use as Cleaning process.",
+          "Use as API."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Water is an essential vehicle, solvent, raw material, and cleaning medium in pharmaceutical production, but is not used as a pharmacological API.
+          </div>`
+      },
+      {
+        id: 11,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "The following are different grade of qualified water except one?",
+        options: [
+          "Drinking water.",
+          "Purified water.",
+          "Water for injection.",
+          "Muddy water."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Standard pharmacopeial grades of water include Potable/Drinking water, Purified Water (PW), and Water for Injection (WFI). Muddy water is untreated surface water.
+          </div>`
+      },
+      {
+        id: 12,
+        topic: "Excipients & Water Treatment",
+        difficulty: "Moderate",
+        q: "The following are materials used in water treatment except one?",
+        options: [
+          "Chlorine.",
+          "Electro deionization cell.",
+          "Ultra-filter",
+          "Reverse osmosis."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            EDI cells, ultra-filters, and reverse osmosis membranes are core technological purification equipment/materials, whereas chlorine is a chemical sanitizing agent that must be removed prior to RO/EDI.
+          </div>`
+      },
+      {
+        id: 13,
+        topic: "Excipients & Water Treatment",
+        difficulty: "Moderate",
+        q: "The following are the general consideration for selection of water treatment method except one:",
+        options: [
+          "the water quality specification.",
+          "the yield or efficiency of the purification system.",
+          "the temperature of the water.",
+          "the operation costs."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            System design is dictated by required quality specifications (compendial grade), operational efficiency, and capital/operational costs.
+          </div>`
+      },
+      {
+        id: 14,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Diluent?",
+        options: [
+          "making medicine practical to produce and convenient for the consumer to use.",
+          "add sufficient cohesion to the powders.",
+          "facilitate dispersion or breakup of tablets and contents of capsules into smaller particles.",
+          "applied to the surface of a dosage form, to protection, masking the core."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Diluents (bulking agents/fillers) provide volume and weight to low-dose potent APIs, making tablet compression and patient handling feasible.
+          </div>`
+      },
+      {
+        id: 15,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Binder?",
+        options: [
+          "making medicine practical to produce and convenient for the consumer to use.",
+          "add sufficient cohesion to the powders.",
+          "facilitate dispersion or breakup of tablets and contents of capsules into smaller particles.",
+          "applied to the surface of a dosage form, to protection, masking the core."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Binders impart cohesive qualities to powder formulations to form durable granules and tablets under compression.
+          </div>`
+      },
+      {
+        id: 16,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Disintegrant?",
+        options: [
+          "making medicine practical to produce and convenient for the consumer to use.",
+          "add sufficient cohesion to the powders.",
+          "facilitate dispersion or breakup of tablets and contents of capsules into smaller particles.",
+          "applied to the surface of a dosage form, to protection, masking the core."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Disintegrants overcome the cohesive strength of binders when in contact with aqueous media, breaking the tablet into granules/particles for dissolution.
+          </div>`
+      },
+      {
+        id: 17,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Coating agent?",
+        options: [
+          "making medicine practical to produce and convenient for the consumer to use.",
+          "add sufficient cohesion to the powders.",
+          "facilitate dispersion or breakup of tablets and contents of capsules into smaller particles.",
+          "applied to the surface of a dosage form, to protection, masking the core."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Coating agents protect the tablet core from atmospheric moisture/oxygen, mask unpleasant taste/odor, and facilitate swallowing.
+          </div>`
+      },
+      {
+        id: 18,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Anti adherent?",
+        options: [
+          "Prevent adhesion of the tablet surface to the die walls and the punches.",
+          "Prevent from sticking to the tablet punches or capsule filling machine and make smooth to tablet surface.",
+          "Enhance product flow by reducing inters particulate friction.",
+          "Protects the product against microbial proliferation."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Anti-adherents prevent tablet formulation powders from sticking/picking to punch faces and equipment surfaces.
+          </div>`
+      },
+      {
+        id: 19,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Lubricant?",
+        options: [
+          "Prevent adhesion of the tablet surface to the die walls and the punches.",
+          "Prevent from sticking to the tablet punches or capsule filling machine and make smooth to tablet surface.",
+          "Enhance product flow by reducing inters particulate friction.",
+          "Protects the product against microbial proliferation."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Lubricants reduce friction between the tablet compact and the die wall during compression and ejection.
+          </div>`
+      },
+      {
+        id: 20,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Glidant?",
+        options: [
+          "Prevent adhesion of the tablet surface to the die walls and the punches.",
+          "Prevent from sticking to the tablet punches or capsule filling machine and make smooth to tablet surface.",
+          "Enhance product flow by reducing inters particulate friction.",
+          "Protects the product against microbial proliferation."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Glidants (e.g., colloidal silicon dioxide) improve powder flow characteristics by reducing inter-particulate friction.
+          </div>`
+      },
+      {
+        id: 21,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Preservative?",
+        options: [
+          "Prevent adhesion of the tablet surface to the die walls and the punches.",
+          "Prevent from sticking to the tablet punches or capsule filling machine and make smooth to tablet surface.",
+          "Enhance product flow by reducing inters particulate friction.",
+          "Protects the product against microbial proliferation."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Preservatives inhibit or prevent microbial growth in aqueous formulations.
+          </div>`
+      },
+      {
+        id: 22,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Antioxidant?",
+        options: [
+          "is a molecule that inhibits the oxidation of other molecules.",
+          "increase the palatability of the therapeutic agent.",
+          "are added to increase patient acceptance.",
+          "impart the preferred color to the formulation."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Antioxidants prevent oxidation and oxidative degradation of active drugs and excipients.
+          </div>`
+      },
+      {
+        id: 23,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Sweetening agent?",
+        options: [
+          "is a molecule that inhibits the oxidation of other molecules.",
+          "increase the palatability of the therapeutic agent.",
+          "are added to increase patient acceptance.",
+          "impart the preferred color to the formulation."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Sweeteners enhance the palatability of oral liquids and chewables by masking unpalatable or bitter tastes.
+          </div>`
+      },
+      {
+        id: 24,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Flavoring agent?",
+        options: [
+          "is a molecule that inhibits the oxidation of other molecules.",
+          "increase the palatability of the therapeutic agent.",
+          "are added to increase patient acceptance.",
+          "impart the preferred color to the formulation."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Flavoring agents provide distinct appealing scents/tastes to increase patient compliance, especially in pediatrics.
+          </div>`
+      },
+      {
+        id: 25,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Coloring agent?",
+        options: [
+          "is a molecule that inhibits the oxidation of other molecules.",
+          "increase the palatability of the therapeutic agent.",
+          "are added to increase patient acceptance.",
+          "impart the preferred color to the formulation."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Coloring agents give the product an aesthetic appearance and enable visual differentiation of dosages.
+          </div>`
+      },
+      {
+        id: 26,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Solvent?",
+        options: [
+          "is a substance that can dissolve a solute resulting in solution.",
+          "increase the solubility of poorly water soluble substances or to enhance the chemical stability of a drug.",
+          "make solution to resist any change in pH should an acid or an alkali be added.",
+          "these agents are used when it is desirable to increase or decrease the viscosity of a liquid."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A solvent dissolves another substance (solute) to yield a homogeneous single-phase solution.
+          </div>`
+      },
+      {
+        id: 27,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Co-solvent?",
+        options: [
+          "is a substance that can dissolve a solute resulting in solution.",
+          "increase the solubility of poorly water soluble substances or to enhance the chemical stability of a drug.",
+          "make solution to resist any change in pH should an acid or an alkali be added.",
+          "these agents are used when it is desirable to increase or decrease the viscosity of a liquid."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Co-solvents (such as alcohol, propylene glycol, glycerol) increase the solubility of poorly water-soluble drugs in water.
+          </div>`
+      },
+      {
+        id: 28,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Buffering agent?",
+        options: [
+          "is a substance that can dissolve a solute resulting in solution.",
+          "increase the solubility of poorly water soluble substances or to enhance the chemical stability of a drug.",
+          "make solution to resist any change in pH should an acid or an alkali be added.",
+          "these agents are used when it is desirable to increase or decrease the viscosity of a liquid."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Buffers stabilize formulation pH against changes that might occur from chemical reactions or container interactions.
+          </div>`
+      },
+      {
+        id: 29,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Viscosity imparting agent?",
+        options: [
+          "is a substance that can dissolve a solute resulting in solution.",
+          "increase the solubility of poorly water soluble substances or to enhance the chemical stability of a drug.",
+          "make solution to resist any change in pH should an acid or an alkali be added.",
+          "agent is used when it is desirable to increase or decrease the viscosity of a liquid."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Viscosity modifiers adjust flow rheology, slowing down particle sedimentation in suspensions and improving mouthfeel.
+          </div>`
+      },
+      {
+        id: 30,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Surfactant?",
+        options: [
+          "is a substance that can dissolve a solute resulting in solution.",
+          "increase the solubility of poorly water soluble substances or to enhance the chemical stability of a drug.",
+          "make solution to resist any change in pH should an acid or an alkali be added.",
+          "lower the surface tension between two liquids or between a liquid and a solid and increase the solubility."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Surfactants are amphiphilic molecules that lower interfacial and surface tension, facilitating wetting, emulsification, and micellar solubilization.
+          </div>`
+      },
+      {
+        id: 31,
+        topic: "Excipients & Water Treatment",
+        difficulty: "High-Yield",
+        q: "What is the character of Humectant?",
+        options: [
+          "is a substance that can dissolve a solute resulting in solution.",
+          "attracts and retains the moisture in the nearby air via absorption.",
+          "make solution to resist any change in pH should an acid or an alkali be added.",
+          "lower the surface tension between two liquids or between a liquid and a solid and increase the solubility."
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Humectants (e.g., glycerin, sorbitol) attract and retain moisture, preventing topicals and semi-solids from drying out.
+          </div>`
+      },
+      {
+        id: 32,
+        topic: "Packaging & GMP",
+        difficulty: "High-Yield",
+        q: "The uses of packaging in pharmaceutical product?",
+        options: [
+          "Presentation.",
+          "Identification.",
+          "Protection.",
+          "Containment during storage.",
+          "All of above"
+        ],
+        correct: 4,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pharmaceutical packaging provides containment, physical/environmental protection, product identification, and marketing presentation.
+          </div>`
+      },
+      {
+        id: 33,
+        topic: "Packaging & GMP",
+        difficulty: "High-Yield",
+        q: "The following are the component of packaging except one?",
+        options: [
+          "Glass.",
+          "Metal.",
+          "Plastic.",
+          "Fibrous material.",
+          "Propylene glycol."
+        ],
+        correct: 4,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Propylene glycol is a liquid formulation excipient (co-solvent/humectant), not a packaging material.
+          </div>`
+      },
+      {
+        id: 34,
+        topic: "Packaging & GMP",
+        difficulty: "Moderate",
+        q: "The following are the different type of glass for packaging except one?",
+        options: [
+          "Coloured glass or amber glass.",
+          "Sulphured glass.",
+          "Borosilicate glass.",
+          "Aluminum glass."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Official pharmaceutical glasses include Type I (Borosilicate), Type II (Sulphured / Treated Soda-lime), Type III (Soda-lime), and Amber glass. 'Aluminum glass' is not a pharmaceutical glass category.
+          </div>`
+      },
+      {
+        id: 35,
+        topic: "Packaging & GMP",
+        difficulty: "Moderate",
+        q: "The following are the different types of plastic for packaging except one?",
+        options: [
+          "Polyethylene.",
+          "Polyvinyl chloride.",
+          "Polystyrene.",
+          "Alu-Alu blister."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Alu-Alu blister consists of aluminum foil laminates, which is metallic packaging rather than a plastic polymer.
+          </div>`
+      },
+      {
+        id: 36,
+        topic: "Packaging & GMP",
+        difficulty: "Moderate",
+        q: "The following are the different types of metal for packaging, which one is true?",
+        options: [
+          "The thickest aluminum is used for rigid containers",
+          "Intermediate thickness is steel important but the pack should be capable of being deformed under a reasonable force.",
+          "Thinnest aluminum is used in flexible foils.",
+          "All of above."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Aluminum applications in pharma range from thick rigid cans/aerosols, collapsible intermediate tubes, to ultra-thin flexible blister lidding foils.
+          </div>`
+      },
+      {
+        id: 37,
+        topic: "Packaging & GMP",
+        difficulty: "High-Yield",
+        q: "The following are the essential elements of GMP except one:",
+        options: [
+          "People",
+          "Equipment.",
+          "Environment.",
+          "Technology.",
+          "Material."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The classic 5 P's / essential elements of GMP are People, Premises (Environment), Processes, Products (Materials), and Procedures (Equipment/Docs). 'Technology' is not an isolated primary GMP element.
+          </div>`
+      },
+      {
+        id: 38,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "What is the full meaning of IPQC?",
+        options: [
+          "In process Quality Control.",
+          "In process Control.",
+          "In Process Quality Compound.",
+          "In Production Quality Control."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            IPQC stands for In-Process Quality Control, representing checks performed during manufacturing to monitor and adjust processes.
+          </div>`
+      },
+      {
+        id: 39,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "The following are the various instrument used in IPQC at Production Department except one:",
+        options: [
+          "Disintegration apparatus.",
+          "Friability testing apparatus.",
+          "Tablet hardness tester.",
+          "Dissolution apparatus"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Dissolution testing requires complex analytical sampling and HPLC/UV detection in the QC analytical laboratory rather than rapid on-line IPQC line testing.
+          </div>`
+      },
+      {
+        id: 40,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Testing Parameters: Which one represents the official (compendial) tests?",
+        options: [
+          "Weight variation.",
+          "Disintegration.",
+          "Dissolution.",
+          "All of above"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Weight variation (uniformity of dosage units), disintegration, dissolution, and assay (drug content) are official tests standardized in pharmacopeias (USP, BP, Ph. Eur.).
+          </div>`
+      },
+      {
+        id: 41,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Testing Parameters: Which one represents the non-official (non-compendial) tests?",
+        options: [
+          "Weight variation.",
+          "Hardness.",
+          "Friability.",
+          "Answers b and c."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Hardness (crushing strength) and friability are non-official manufacturing in-process controls that do not have rigid universal compendial limits for finished release across all products.
+          </div>`
+      },
+      {
+        id: 42,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "What is the definition of hardness?",
+        options: [
+          "It is the strength of tablet and resistance to friability to withstand mechanical shocks of handling in manufacture.",
+          "It determines the average weight.",
+          "It determines the drug contain.",
+          "Answers a and c."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Tablet hardness (breaking force) measures the mechanical strength required to crush a tablet across its diameter, ensuring it withstands shipping and packaging.
+          </div>`
+      },
+      {
+        id: 43,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Why do we measure the hardness?",
+        options: [
+          "To determine the need for pressure adjustments on the tableting machine.",
+          "Hardness can affect the disintegration",
+          "In general, if the tablet hardness is too high, we first check its disintegration before rejecting the batch.",
+          "All of above."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Hardness testing guides machine compression settings; excessive hardness can prolong disintegration time and retard dissolution.
+          </div>`
+      },
+      {
+        id: 44,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "What is the definition of Friability?",
+        options: [
+          "It is the ability of the medicine can reduce to powder during packaging or friction.",
+          "It determines the average weight.",
+          "It determines the drug contain.",
+          "Answers b and c."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Friability is the tendency of a compressed tablet to chip, crumble, or break into powder under mechanical tumbling stress.
+          </div>`
+      },
+      {
+        id: 45,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "What is the formula to calculate Friability?",
+        options: [
+          "Friability (% loss) = [(W1 − W2) / W1] × 100",
+          "Friability (% loss) = [(W2 − W1) / W1] × 100",
+          "Friability (% loss) = [(W2 − W1) / W2] × 100",
+          "Friability (% loss) = [(W1 − W2) / W2] × 100"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Friability is calculated as percentage weight loss: % Loss = [(Initial weight W1 − Final weight W2) / Initial weight W1] × 100.
+          </div>`
+      },
+      {
+        id: 46,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Moderate",
+        q: "Thickness test, which of the following is true?",
+        options: [
+          "Thickness is an official test",
+          "It determines the average weight.",
+          "It determines the drug contain.",
+          "It determines the thickness of medicine."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Thickness testing using micrometers or vernier calipers measures dimensional height to ensure uniform packaging fill and consistent compression tooling.
+          </div>`
+      },
+      {
+        id: 47,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Formula for determination of weight variation (average weight):",
+        options: [
+          "Average weight: X = (X1 + X2 + X3 + ... + X20) / 20",
+          "Average weight: [(W1 − W2) / W1] × 100",
+          "Average weight: [(W2 − W1) / W1] × 100",
+          "Average weight: [(W1 − W2) / W2] × 100"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The average tablet weight is the arithmetic mean of 20 randomly sampled tablets weighed individually: X = ΣX / 20.
+          </div>`
+      },
+      {
+        id: 48,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Moderate",
+        q: "What is the upper limit of weight variation?",
+        options: [
+          "Upper limit = average weight + (average weight × % error)",
+          "Upper limit = average weight − (average weight × % error)",
+          "Upper limit = average weight − (average weight × 10% of error)",
+          "Upper limit = average weight + (average weight × 10% of error)"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Upper limit = Mean Weight + (Mean Weight × Allowed Percentage Deviation).
+          </div>`
+      },
+      {
+        id: 49,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Moderate",
+        q: "What is the lower limit of weight variation?",
+        options: [
+          "Lower limit = average weight + (average weight × % error)",
+          "Lower limit = average weight − (average weight × % error)",
+          "Lower limit = average weight − (average weight × 10% of error)",
+          "Lower limit = average weight + (average weight × 10% of error)"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Lower limit = Mean Weight − (Mean Weight × Allowed Percentage Deviation).
+          </div>`
+      },
+      {
+        id: 50,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Based on USP, what is the acceptable percentage deviation of weight variation if the average weight is less than 130 mg?",
+        options: [
+          "the acceptant value is ±10%",
+          "the acceptant value is ±7.5%",
+          "the acceptant value is ±5%",
+          "the acceptant value is ±3%"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            USP weight variation criteria:<br>
+            • ≤ 130 mg: ±10%<br>
+            • 130 mg to 324 mg: ±7.5%<br>
+            • > 324 mg: ±5%
+          </div>`
+      },
+      {
+        id: 51,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Based on USP, what is the acceptable percentage deviation of weight variation if the average weight is 130 to 324 mg?",
+        options: [
+          "the acceptant value is ±10%",
+          "the acceptant value is ±7.5%",
+          "the acceptant value is ±5%",
+          "the acceptant value is ±3%"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            For tablets weighing 130 mg to 324 mg, the USP permitted percentage deviation is ±7.5%.
+          </div>`
+      },
+      {
+        id: 52,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "High-Yield",
+        q: "Based on USP, what is the acceptable percentage deviation of weight variation if the average weight is more than 325 mg?",
+        options: [
+          "the acceptant value is ±10%",
+          "the acceptant value is ±7.5%",
+          "the acceptant value is ±5%",
+          "the acceptant value is ±3%"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            For large tablets (> 324 mg or ≥ 325 mg), the USP allowed deviation is ±5%.
+          </div>`
+      },
+      {
+        id: 53,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Moderate",
+        q: "Based on USP, what is the acceptable range of weight variation if the average weight of your tablet is 500 mg?",
+        options: [
+          "the acceptant value is 500-600mg",
+          "the acceptant value is 550-600mg",
+          "the acceptant value is 450-600mg",
+          "the acceptant value is 475-525 mg"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            500 mg falls into the > 324 mg category (±5% limit).<br>
+            500 × 5% = 25 mg.<br>
+            Acceptable range: 500 − 25 mg to 500 + 25 mg = 475 to 525 mg.
+          </div>`
+      },
+      {
+        id: 54,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Moderate",
+        q: "Based on USP, what is the acceptable range of weight variation if the average weight of your tablet is 300 mg?",
+        options: [
+          "the acceptant value is 300-310mg",
+          "the acceptant value is 277.5-322.5mg",
+          "the acceptant value is 300-325mg",
+          "the acceptant value is 275-325 mg"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            300 mg falls into the 130 to 324 mg category (±7.5% limit).<br>
+            300 × 7.5% = 22.5 mg.<br>
+            Range: 300 − 22.5 = 277.5 mg to 300 + 22.5 = 322.5 mg.
+          </div>`
+      },
+      {
+        id: 55,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Moderate",
+        q: "Based on USP, what is the acceptable range of weight variation if the average weight of your tablet is 100 mg?",
+        options: [
+          "the acceptant value is 90-110mg",
+          "the acceptant value is 80-110mg",
+          "the acceptant value is 85-115mg",
+          "the acceptant value is 95-110 mg"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            100 mg is < 130 mg (±10% limit).<br>
+            100 × 10% = 10 mg.<br>
+            Range: 100 − 10 = 90 mg to 100 + 10 = 110 mg.
+          </div>`
+      },
+      {
+        id: 56,
+        topic: "In-Process Quality Control (IPQC)",
+        difficulty: "Advanced",
+        q: "Content Uniformity test of tablet, which of the following is not true?",
+        options: [
+          "Randomly select 30 tablets",
+          "10 of these assayed individually",
+          "Tablet passes the test if 9 of the 10 tablets must contain not less than 85% and not more than 115% the labeled drug content.",
+          "It can be 2tablets may not contain less than 75% and more than125%"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Under USP criteria for the first 10 tablets: No single unit can fall outside the 75% to 125% limit (zero tablets allowed outside 75%–125%). Allowing '2 tablets' outside 75%–125% is incorrect.
+          </div>`
+      },
+      {
+        id: 57,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test, which of the following is not true?",
+        options: [
+          "It is the time required for the tablet to break into particles",
+          "The temperature of the medium should be 37±2°C",
+          "the medium of simulated gastric is 0.1 N of HCl",
+          "the medium of simulated intestinal is 0.1 N of HCl"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Simulated intestinal fluid is a phosphate buffer at pH 6.8, NOT 0.1 N HCl (which represents simulated gastric fluid).
+          </div>`
+      },
+      {
+        id: 58,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The standard medium for Compressed uncoated tablets is:",
+        options: [
+          "the medium is water",
+          "the medium is simulated intestinal: 0.1 N of HCl",
+          "the medium is Phosphate buffer pH 6.8",
+          "All of above"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            The official disintegration medium for compressed uncoated immediate-release tablets is purified water at 37 ± 2°C.
+          </div>`
+      },
+      {
+        id: 59,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The standard initial medium for Sugar coated tablet is:",
+        options: [
+          "the medium is water",
+          "the medium is simulated intestinal is 0.1 N of HCl at the first time",
+          "the medium is Phosphate buffer pH 6.8",
+          "All of above"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Purified water is the primary medium for sugar-coated tablets. If 1 or 2 tablets fail to disintegrate, 0.1 N HCl can be used if permitted by the monograph.
+          </div>`
+      },
+      {
+        id: 60,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The standard medium for Film coated tablet is:",
+        options: [
+          "the medium is water",
+          "the medium is simulated intestinal: 0.1 N of HCl",
+          "the medium is Phosphate buffer pH 6.8 at the first time",
+          "All of above"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Standard disintegration testing for plain film-coated tablets is performed in purified water at 37 ± 2°C.
+          </div>`
+      },
+      {
+        id: 61,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The media for Enteric coated tablet are:",
+        options: [
+          "the medium is water",
+          "the medium is simulated intestinal is 0.1 N of HCl",
+          "the medium is Phosphate buffer pH 6.8",
+          "Both b and c"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Enteric-coated tablets undergo a sequential two-step test: first in 0.1 N HCl for 1–2 hours (no disintegration allowed), then transferred to phosphate buffer pH 6.8.
+          </div>`
+      },
+      {
+        id: 62,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The medium for Effervescent tablets is:",
+        options: [
+          "the medium is water",
+          "the medium is simulated intestinal is 0.1 N of HCl",
+          "the medium is Phosphate buffer pH 6.8",
+          "Both b and c"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Effervescent tablets are tested in water (15–25°C) to observe gas evolution and rapid dissolution.
+          </div>`
+      },
+      {
+        id: 63,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The standard medium for Buccal tablets is:",
+        options: [
+          "the medium is water",
+          "the medium is simulated intestinal: 0.1 N of HCl",
+          "the medium of Phosphate buffer pH 6.8",
+          "Both b and c"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Water is the standard disintegration medium specified for sublingual and buccal tablets.
+          </div>`
+      },
+      {
+        id: 64,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The limit of Compressed uncoated tablets is:",
+        options: [
+          "15 minutes or as per individual monograph",
+          "30 minutes or as per individual monograph",
+          "45 minutes or as per individual monograph",
+          "60 minutes or as per individual monograph"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Immediate-release compressed uncoated tablets must disintegrate within 15 minutes.
+          </div>`
+      },
+      {
+        id: 65,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The limit of Film coated tablets is:",
+        options: [
+          "15 minutes or as per individual monograph",
+          "30 minutes or as per individual monograph",
+          "45 minutes or as per individual monograph",
+          "60 minutes or as per individual monograph"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Film-coated tablets generally have a pharmacopeial disintegration limit of 30 minutes.
+          </div>`
+      },
+      {
+        id: 66,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The limit of Sugar coated tablets is:",
+        options: [
+          "15 minutes or as per individual monograph",
+          "30 minutes or as per individual monograph",
+          "45 minutes or as per individual monograph",
+          "60 minutes or as per individual monograph"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Due to the thick sucrose coating layers, sugar-coated tablets have a disintegration limit of 60 minutes.
+          </div>`
+      },
+      {
+        id: 67,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The limit of Enteric coated tablets in phosphate buffer is:",
+        options: [
+          "15 minutes or as per individual monograph",
+          "30 minutes or as per individual monograph",
+          "45 minutes or as per individual monograph",
+          "60 minutes or as per individual monograph"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Enteric-coated tablets must show no sign of disintegration in 0.1 N HCl (usually 1–2 hrs) and then disintegrate within 60 minutes in phosphate buffer pH 6.8.
+          </div>`
+      },
+      {
+        id: 68,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The limit of Effervescent tablets in water is:",
+        options: [
+          "15 minutes or as per individual monograph",
+          "30 minutes or as per individual monograph",
+          "45 minutes or as per individual monograph",
+          "< 3 minutes or as per individual monograph"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Effervescent tablets must disintegrate and dissolve in water within less than 3 minutes.
+          </div>`
+      },
+      {
+        id: 69,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Disintegration test: The limit of Buccal tablets is typically:",
+        options: [
+          "15 minutes or as per individual monograph",
+          "30 minutes or as per individual monograph",
+          "4hr or as per individual monograph",
+          "< 3 minutes or as per individual monograph"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Buccal tablets are designed to release medication slowly across the buccal mucosa without disintegrating rapidly (often up to 4 hours).
+          </div>`
+      },
+      {
+        id: 70,
+        topic: "Disintegration & Dissolution Testing",
+        difficulty: "High-Yield",
+        q: "Dissolution test, which of the following is true?",
+        options: [
+          "tablet can pass the test if dissolved active ingredient is in range of 3 stage level of S1, S2 and S3",
+          "it measures the amount of dissolved active ingredient in the medium.",
+          "the mediums can be used based on the monograph in the pharmacopeia",
+          "all of above"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Dissolution testing measures the rate and extent of API dissolution in specified media according to 3-stage acceptance tables (S1, S2, S3).
+          </div>`
+      },
+      {
+        id: 71,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following avoids the hepatic first-pass effect?",
+        options: [
+          "Tablets",
+          "Capsules",
+          "Oral solution",
+          "Sublingual"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Sublingual administration drains directly into the superior vena cava via the lingual veins, bypassing the portal vein and hepatic first-pass metabolism.
+          </div>`
+      },
+      {
+        id: 72,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following encounters the first-pass effect of the liver?",
+        options: [
+          "Tablets",
+          "Transdermal patch",
+          "Buccal",
+          "Sublingual"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Conventional swallowed oral dosage forms (tablets, capsules, syrups) are absorbed from the GI tract into the mesenteric/portal circulation directly to the liver.
+          </div>`
+      },
+      {
+        id: 73,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following is NOT an advantage of Oral tablets?",
+        options: [
+          "First pass effect avoided",
+          "Convenient",
+          "Cheap",
+          "Safer if compare with solution for injection"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Swallowed tablets do NOT avoid the first-pass effect; oral absorption passes through the liver, which is a disadvantage for drugs with high hepatic clearance.
+          </div>`
+      },
+      {
+        id: 74,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following is NOT a disadvantage of Oral tablets?",
+        options: [
+          "Only part of the drug may be absorbed",
+          "First-pass effect",
+          "Cheap",
+          "Irritation to gastric mucosa"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Being low-cost (cheap) and economically manufactured is a major ADVANTAGE of oral tablets, not a disadvantage.
+          </div>`
+      },
+      {
+        id: 75,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following is an advantage of Sublingual administration?",
+        options: [
+          "Large quantities can be given",
+          "First-pass effect avoided",
+          "Few drugs are absorbed",
+          "Irritation to oral mucosa"
+        ],
+        correct: 1,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Avoiding hepatic first-pass metabolism and providing rapid systemic absorption are the primary benefits of the sublingual route.
+          </div>`
+      },
+      {
+        id: 76,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following is a disadvantage of Sublingual administration?",
+        options: [
+          "First-pass avoided",
+          "Drug absorption is quick if compare to oral tablet",
+          "Irritation of oral mucosa",
+          "All of above"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Potential irritation of the delicate oral mucosa and limitation to small doses/potent drugs are recognized disadvantages of sublingual administration.
+          </div>`
+      },
+      {
+        id: 77,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following is an advantage of suppositories?",
+        options: [
+          "Used in vomiting/unconscious patients",
+          "Drug absorption is quick if compare to oral tablet",
+          "Convenient",
+          "All of above"
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Rectal suppositories are particularly valuable when the patient is vomiting, unconscious, or cannot take oral medications.
+          </div>`
+      },
+      {
+        id: 78,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which one of the following is a disadvantage of the Intravenous route?",
+        options: [
+          "Bioavailability is 100%",
+          "Can use large quantities",
+          "Requires strict asepsis and risk of adverse reaction is immediate (less convenient / invasive)",
+          "First pass effect avoided"
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            IV administration is invasive, cannot be self-administered easily, requires strict sterile technique, and errors cannot be reversed (making it less convenient/riskier).
+          </div>`
+      },
+      {
+        id: 79,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Classification of dosage form according to route of administration: Which one of the following is true?",
+        options: [
+          "Solid",
+          "Semisolid",
+          "Liquid",
+          "Parenteral"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Parenteral is a route of administration. In contrast, Solid, Semisolid, and Liquid are classifications based on physical state.
+          </div>`
+      },
+      {
+        id: 80,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Classification of dosage form according to Physical form: Which one of the following is NOT true?",
+        options: [
+          "Solid",
+          "Semisolid",
+          "Liquid",
+          "Parenteral"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Parenteral represents a route of administration, not a physical state (which consists of solids, semisolids, liquids, and gases).
+          </div>`
+      },
+      {
+        id: 81,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is NOT an excipient used in oral tablets?",
+        options: [
+          "Binder",
+          "Glidants",
+          "Lubricant",
+          "Propellant"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Propellants (e.g., HFAs) are pressurized gas excipients used in aerosols and inhalers, not oral compressed tablets.
+          </div>`
+      },
+      {
+        id: 82,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is the excipient used in Metered Dose Inhalations (MDIs)?",
+        options: [
+          "Binder",
+          "Glidants",
+          "Lubricant",
+          "Propellant"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pressurized MDIs require propellants to aerosolize the liquid drug formulation into fine respirable droplets.
+          </div>`
+      },
+      {
+        id: 83,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is an advantage of tablet coating?",
+        options: [
+          "Hide the taste of the tablet's components.",
+          "Make the tablet smoother and easier to swallow.",
+          "Make it more resistant to the environment and extend shelf life.",
+          "All of above"
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Coating masks bitter taste, improves swallowability, enhances aesthetics, and shields the core from environmental moisture and light.
+          </div>`
+      },
+      {
+        id: 84,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "Moderate",
+        q: "Which of the following is NOT true regarding Buccal tablets?",
+        options: [
+          "Administered by placing them between the cheek and gum.",
+          "Medications dissolve and are absorbed through oral mucosa.",
+          "Avoids the acid and enzymatic environment of the stomach.",
+          "It is routinely formulated as a sugar-coated tablet."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Buccal tablets are small, flat, compressed tablets designed for mucosal adhesion/dissolution; they are not sugar-coated tablets.
+          </div>`
+      },
+      {
+        id: 85,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is NOT true regarding Effervescent tablets?",
+        options: [
+          "Uncoated tablets.",
+          "Contain acid substances (citric and tartaric acids) and carbonates.",
+          "Dissolved or dispersed in water before use.",
+          "Avoids the hepatic first-pass effect."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Effervescent solutions are swallowed and absorbed gastrointestinally; they enter the portal circulation and undergo hepatic first-pass metabolism.
+          </div>`
+      },
+      {
+        id: 86,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is NOT true regarding Chewable tablets?",
+        options: [
+          "Tablets that are chewed prior to swallowing.",
+          "It is not good dispersion in water.",
+          "Must be dissolved or dispersed in water before administration.",
+          "Subject to hepatic first-pass metabolism."
+        ],
+        correct: 2,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Chewable tablets are intended to be chewed mechanically in the mouth before swallowing, NOT dissolved in water beforehand (unlike effervescent tablets).
+          </div>`
+      },
+      {
+        id: 87,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "Moderate",
+        q: "Which of the following is NOT considered a standard oral liquid preparation?",
+        options: [
+          "Oral solution.",
+          "Oral suspension.",
+          "Syrup.",
+          "Oral paste."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Pastes are thick, highly loaded semi-solid formulations (often > 20% to 50% solids), not liquid dosage forms.
+          </div>`
+      },
+      {
+        id: 88,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is a topical dosage form that delivers a specific dose of medication across skin into the bloodstream with controlled release?",
+        options: [
+          "Gel.",
+          "Poultice.",
+          "Paste.",
+          "Transdermal patch."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            Transdermal patches deliver systemic drug therapy across the stratum corneum with zero-order or sustained controlled release into cutaneous capillaries.
+          </div>`
+      },
+      {
+        id: 89,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is NOT true regarding suppositories and pessaries?",
+        options: [
+          "Suppository is inserted into the rectum.",
+          "It melts at body temperature or dissolves in colon secretions.",
+          "Usually is cone-shaped.",
+          "Pessary is inserted into the urethra."
+        ],
+        correct: 3,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A pessary is formulated for vaginal insertion. Urethral inserts are termed bougies.
+          </div>`
+      },
+      {
+        id: 90,
+        topic: "Routes of Administration & Dosage Forms",
+        difficulty: "High-Yield",
+        q: "Which of the following is used for the rinsing/irrigation of the vagina?",
+        options: [
+          "Vaginal douche.",
+          "Retention enema.",
+          "Evacuant enema.",
+          "NuvaRing."
+        ],
+        correct: 0,
+        explanation: `
+          <div class="exp-section">
+            <h4>Key Takeaway / High-Yield Summary</h4>
+            A vaginal douche is an aqueous solution used to rinse and cleanse the vaginal cavity.
+          </div>`
+      }
+    ];
+
+    let activeQuestions = [];
+    let currentIndex = 0;
+    let userAnswers = {};
+    let flaggedItems = new Set();
+    let strikethroughs = {};
+    let notes = {};
+    let currentMode = 'practice';
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let timerDuration = 0;
+    let matrixFilter = 'all';
+
+    const LS_KEY_PROGRESS = 'galenic_pharm_mcq_state_v1';
+
+    function saveState() {
+      const state = {
+        userAnswers,
+        flaggedItems: Array.from(flaggedItems),
+        notes,
+        secondsElapsed
+      };
+      try {
+        localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify(state));
+      } catch (err) {
+        console.warn("Storage error", err);
+      }
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem(LS_KEY_PROGRESS);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          userAnswers = parsed.userAnswers || {};
+          flaggedItems = new Set(parsed.flaggedItems || []);
+          notes = parsed.notes || {};
+          secondsElapsed = parsed.secondsElapsed || 0;
+        } catch(e) {
+          console.error("Could not parse saved progress", e);
+        }
+      }
+    }
+
+    function clearAllProgress() {
+      if (confirm("Reset all saved answers, notes, and flags for Galenic Pharmacy?")) {
+        localStorage.removeItem(LS_KEY_PROGRESS);
+        userAnswers = {};
+        flaggedItems.clear();
+        strikethroughs = {};
+        notes = {};
+        secondsElapsed = 0;
+        alert("Progress cleared. You can start a fresh session!");
+      }
+    }
+
+    function initSession() {
+      currentMode = document.getElementById('cfgMode').value;
+      const topicCfg = document.getElementById('cfgTopic').value;
+      const countCfg = document.getElementById('cfgCount').value;
+      const filterCfg = document.getElementById('cfgFilter').value;
+
+      let pool = [...quizData];
+      if (topicCfg !== 'all') {
+        if (topicCfg.includes("Q1-8")) {
+          pool = pool.slice(0, 8);
+        } else if (topicCfg.includes("Q9-31")) {
+          pool = pool.slice(8, 31);
+        } else if (topicCfg.includes("Q32-37")) {
+          pool = pool.slice(31, 37);
+        } else if (topicCfg.includes("Q38-56")) {
+          pool = pool.slice(37, 56);
+        } else if (topicCfg.includes("Q57-70")) {
+          pool = pool.slice(56, 70);
+        } else if (topicCfg.includes("Q71-90")) {
+          pool = pool.slice(70, 90);
+        }
+      }
+
+      if (filterCfg === 'flagged') {
+        pool = pool.filter(q => flaggedItems.has(q.id));
+        if (pool.length === 0) {
+          alert("No items currently flagged in this selection! Defaulting to all questions.");
+          pool = [...quizData];
+        }
+      } else if (filterCfg === 'unattempted') {
+        pool = pool.filter(q => userAnswers[q.id] === undefined);
+        if (pool.length === 0) {
+          alert("All questions in this selection have been attempted! Resetting to all questions.");
+          pool = [...quizData];
+        }
+      }
+
+      if (countCfg !== 'all') {
+        const limit = parseInt(countCfg, 10);
+        pool = pool.slice(0, limit);
+      }
+
+      activeQuestions = pool;
+      currentIndex = 0;
+
+      const badge = document.getElementById('modeBadge');
+      badge.textContent = currentMode.toUpperCase();
+
+      document.getElementById('launchView').style.display = 'none';
+      document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
+
+      if (currentMode === 'flashcard') {
+        document.getElementById('quizView').style.display = 'none';
+        document.getElementById('flashcardView').style.display = 'block';
+        initFlashcards();
+      } else {
+        document.getElementById('flashcardView').style.display = 'none';
+        document.getElementById('quizView').style.display = 'block';
+        initQuizMode();
+      }
+
+      initTimer();
+      renderMatrixGrid();
+    }
+
+    function resetToConfig() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      userAnswers = {};
+      strikethroughs = {};
+      saveState();
+
+      document.getElementById('timerBadge').style.display = 'none';
+      document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('flashcardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
+
+      const launch = document.getElementById('launchView');
+      launch.style.display = 'block';
+      document.getElementById('modeBadge').textContent = "PRACTICE";
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function initTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      const timerEl = document.getElementById('timerBadge');
+      timerEl.style.display = 'inline-block';
+      timerEl.classList.remove('urgent');
+
+      if (currentMode === 'exam') {
+        timerDuration = activeQuestions.length * 60; // 1 minute per question
+        let remaining = timerDuration;
+        updateTimerDisplay(remaining);
+
+        timerInterval = setInterval(() => {
+          remaining--;
+          secondsElapsed++;
+          updateTimerDisplay(remaining);
+
+          if (remaining <= 300) {
+            timerEl.classList.add('urgent');
+          }
+          if (remaining <= 0) {
+            clearInterval(timerInterval);
+            alert("Time has expired! Submitting your exam.");
+            finalizeExam();
+          }
+        }, 1000);
+      } else {
+        secondsElapsed = 0;
+        updateTimerDisplay(secondsElapsed);
+        timerInterval = setInterval(() => {
+          secondsElapsed++;
+          updateTimerDisplay(secondsElapsed);
+        }, 1000);
+      }
+    }
+
+    function updateTimerDisplay(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      document.getElementById('timerBadge').textContent = 
+        `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function initQuizMode() {
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      const q = activeQuestions[currentIndex];
+      if (!q) return;
+
+      document.getElementById('qNumberPill').textContent = `Q ${currentIndex + 1} of ${activeQuestions.length}`;
+      document.getElementById('qTopicPill').textContent = q.topic;
+      document.getElementById('qDiffPill').textContent = q.difficulty;
+      document.getElementById('qCounterDisplay').textContent = `${currentIndex + 1} / ${activeQuestions.length}`;
+
+      const flagBtn = document.getElementById('flagBtn');
+      if (flaggedItems.has(q.id)) {
+        flagBtn.style.color = 'var(--flag-color)';
+        flagBtn.textContent = '★ Flagged';
+      } else {
+        flagBtn.style.color = 'var(--text)';
+        flagBtn.textContent = '☆ Flag';
+      }
+
+      document.getElementById('qStem').innerHTML = q.q;
+
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+      const selected = userAnswers[q.id];
+      const hasAnswered = selected !== undefined;
+      const struckSet = strikethroughs[q.id] || new Set();
+
+      q.options.forEach((optText, idx) => {
+        const card = document.createElement('div');
+        card.className = 'opt-card';
+        if (hasAnswered && currentMode === 'practice') card.classList.add('locked');
+        if (selected === idx) card.classList.add('selected');
+        if (struckSet.has(idx)) card.classList.add('struck');
+
+        if (hasAnswered && currentMode === 'practice') {
+          if (idx === q.correct) {
+            card.classList.add('correct-ans');
+          } else if (selected === idx && selected !== q.correct) {
+            card.classList.add('wrong-ans');
+          }
+        }
+
+        card.onclick = (e) => {
+          if (e.target.classList.contains('strike-btn')) return;
+          if (hasAnswered && currentMode === 'practice') return;
+          selectOption(idx);
+        };
+
+        card.oncontextmenu = (e) => {
+          e.preventDefault();
+          toggleStrike(idx);
+        };
+
+        card.innerHTML = `
+          <div class="opt-key">${letters[idx] || (idx + 1)}</div>
+          <div class="opt-text">${optText}</div>
+          <button class="strike-btn" title="Cross out" onclick="toggleStrike(${idx})">✕</button>
+        `;
+        container.appendChild(card);
+      });
+
+      const expBox = document.getElementById('explanationBox');
+      if (currentMode === 'practice' && hasAnswered) {
+        document.getElementById('explanationContent').innerHTML = q.explanation;
+        expBox.style.display = 'block';
+      } else {
+        expBox.style.display = 'none';
+      }
+
+      const notesInput = document.getElementById('scratchpadInput');
+      notesInput.value = notes[q.id] || '';
+
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+      const nextBtn = document.getElementById('nextBtn');
+      if (currentIndex === activeQuestions.length - 1) {
+        nextBtn.textContent = (currentMode === 'exam') ? 'Submit Exam' : 'Finish Session';
+      } else {
+        nextBtn.textContent = 'Next →';
+      }
+
+      renderMatrixGrid();
+    }
+
+    function selectOption(optIndex) {
+      const q = activeQuestions[currentIndex];
+      userAnswers[q.id] = optIndex;
+      saveState();
+      renderCurrentQuestion();
+    }
+
+    function toggleStrike(optIndex) {
+      const q = activeQuestions[currentIndex];
+      if (!strikethroughs[q.id]) {
+        strikethroughs[q.id] = new Set();
+      }
+      if (strikethroughs[q.id].has(optIndex)) {
+        strikethroughs[q.id].delete(optIndex);
+      } else {
+        strikethroughs[q.id].add(optIndex);
+      }
+      renderCurrentQuestion();
+    }
+
+    function toggleFlag() {
+      const q = activeQuestions[currentIndex];
+      if (flaggedItems.has(q.id)) {
+        flaggedItems.delete(q.id);
+      } else {
+        flaggedItems.add(q.id);
+      }
+      saveState();
+      renderCurrentQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrentQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        finalizeExam();
+      }
+    }
+
+    function toggleScratchpad() {
+      const area = document.getElementById('scratchpadInput');
+      area.style.display = (area.style.display === 'block') ? 'none' : 'block';
+    }
+
+    document.getElementById('scratchpadInput').addEventListener('input', (e) => {
+      const q = activeQuestions[currentIndex];
+      if (q) {
+        notes[q.id] = e.target.value;
+        saveState();
+      }
+    });
+
+    function readStemAloud() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const text = activeQuestions[currentIndex].q;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 1.0;
+        window.speechSynthesis.speak(utter);
+      } else {
+        alert("Text-to-speech is not supported on this browser.");
+      }
+    }
+
+    let fcFlipped = false;
+
+    function initFlashcards() {
+      fcFlipped = false;
+      renderFlashcard();
+    }
+
+    function renderFlashcard() {
+      const q = activeQuestions[currentIndex];
+      if (!q) return;
+
+      document.getElementById('fcTopicPill').textContent = q.topic;
+      document.getElementById('fcCounter').textContent = `${currentIndex + 1} / ${activeQuestions.length}`;
+
+      const card = document.getElementById('flashcardEl');
+      const front = document.getElementById('fcFront');
+      const back = document.getElementById('fcBack');
+
+      card.classList.remove('flipped');
+      fcFlipped = false;
+
+      front.style.display = 'block';
+      back.style.display = 'none';
+
+      front.innerHTML = `<strong>${q.q}</strong>`;
+      back.innerHTML = `
+        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">CORRECT ANSWER</div>
+        <div style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">${q.options[q.correct]}</div>
+        <div style="font-size: 0.95rem; text-align: left; color: var(--text);">${q.explanation}</div>
+      `;
+    }
+
+    function flipFlashcard() {
+      const card = document.getElementById('flashcardEl');
+      const front = document.getElementById('fcFront');
+      const back = document.getElementById('fcBack');
+
+      fcFlipped = !fcFlipped;
+      if (fcFlipped) {
+        card.classList.add('flipped');
+        front.style.display = 'none';
+        back.style.display = 'block';
+      } else {
+        card.classList.remove('flipped');
+        front.style.display = 'block';
+        back.style.display = 'none';
+      }
+    }
+
+    function nextFlashcard() {
+      if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderFlashcard();
+      }
+    }
+
+    function prevFlashcard() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderFlashcard();
+      }
+    }
+
+    function toggleDrawer() {
+      document.getElementById('matrixDrawer').classList.toggle('open');
+    }
+
+    function setMatrixFilter(filter, btn) {
+      matrixFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMatrixGrid();
+    }
+
+    function renderMatrixGrid() {
+      const grid = document.getElementById('matrixGrid');
+      grid.innerHTML = '';
+      const query = (document.getElementById('drawerSearch').value || '').toLowerCase();
+
+      activeQuestions.forEach((q, idx) => {
+        const isAnswered = userAnswers[q.id] !== undefined;
+        const isFlagged = flaggedItems.has(q.id);
+        const matchesSearch = q.q.toLowerCase().includes(query) || q.topic.toLowerCase().includes(query);
+
+        if (!matchesSearch) return;
+
+        if (matrixFilter === 'answered' && !isAnswered) return;
+        if (matrixFilter === 'unanswered' && isAnswered) return;
+        if (matrixFilter === 'flagged' && !isFlagged) return;
+
+        const node = document.createElement('div');
+        node.className = 'matrix-node';
+        if (idx === currentIndex) node.classList.add('current');
+        if (isAnswered) node.classList.add('answered');
+        if (isFlagged) node.classList.add('flagged');
+
+        node.textContent = idx + 1;
+        node.onclick = () => {
+          currentIndex = idx;
+          if (currentMode === 'flashcard') {
+            renderFlashcard();
+          } else {
+            renderCurrentQuestion();
+          }
+          toggleDrawer();
+        };
+
+        grid.appendChild(node);
+      });
+    }
+
+    function finalizeExam() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('flashcardView').style.display = 'none';
+      document.getElementById('matrixDrawer').classList.remove('open');
+      document.getElementById('scorecardView').style.display = 'block';
+
+      let correctCount = 0;
+      let topicBreakdown = {};
+
+      activeQuestions.forEach(q => {
+        const chosen = userAnswers[q.id];
+        const isCorrect = chosen === q.correct;
+        if (isCorrect) correctCount++;
+
+        if (!topicBreakdown[q.topic]) {
+          topicBreakdown[q.topic] = { total: 0, correct: 0 };
+        }
+        topicBreakdown[q.topic].total++;
+        if (isCorrect) topicBreakdown[q.topic].correct++;
+      });
+
+      const totalQ = activeQuestions.length;
+      const pct = totalQ > 0 ? Math.round((correctCount / totalQ) * 100) : 0;
+
+      document.getElementById('scoreRaw').textContent = `${correctCount}/${totalQ}`;
+      document.getElementById('timeSpent').textContent = formatSeconds(secondsElapsed);
+      document.getElementById('flagCount').textContent = flaggedItems.size;
+
+      const statusEl = document.getElementById('examStatus');
+      if (pct >= 70) {
+        statusEl.textContent = 'PASS';
+        statusEl.style.color = '#10b981';
+      } else {
+        statusEl.textContent = 'RETRY';
+        statusEl.style.color = '#ef4444';
+      }
+
+      const donutFill = document.getElementById('donutFill');
+      const donutText = document.getElementById('donutText');
+      donutText.textContent = `${pct}%`;
+      const circumference = 2 * Math.PI * 70;
+      const offset = circumference - (pct / 100) * circumference;
+      donutFill.style.strokeDashoffset = offset;
+      donutFill.style.stroke = (pct >= 70) ? '#10b981' : '#ef4444';
+
+      const topicContainer = document.getElementById('topicProgressContainer');
+      topicContainer.innerHTML = '';
+      for (const [topName, stats] of Object.entries(topicBreakdown)) {
+        const topPct = Math.round((stats.correct / stats.total) * 100);
+        const item = document.createElement('div');
+        item.className = 'topic-item';
+        item.innerHTML = `
+          <div class="topic-info">
+            <span>${topName}</span>
+            <span>${stats.correct}/${stats.total} (${topPct}%)</span>
+          </div>
+          <div class="topic-bar-bg">
+            <div class="topic-bar-fill" style="width: ${topPct}%;"></div>
+          </div>
+        `;
+        topicContainer.appendChild(item);
+      }
+    }
+
+    function drillMissed() {
+      const missed = activeQuestions.filter(q => userAnswers[q.id] !== q.correct);
+      if (missed.length === 0) {
+        alert("Outstanding work! You have 0 missed questions in this session.");
+        return;
+      }
+      activeQuestions = missed;
+      currentIndex = 0;
+      currentMode = 'practice';
+      document.getElementById('modeBadge').textContent = 'PRACTICE (REMEDIATION)';
+      document.getElementById('scorecardView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'block';
+      initTimer();
+      renderCurrentQuestion();
+    }
+
+    function exportToAnki() {
+      let csvContent = "data:text/csv;charset=utf-8,Front,Back\n";
+      activeQuestions.forEach(q => {
+        const cleanFront = `"${q.q.replace(/"/g, '""')}"`;
+        const answerText = `Correct Answer: ${q.options[q.correct]}<br><br>${q.explanation.replace(/[\n\r]/g, ' ').replace(/"/g, '""')}`;
+        const cleanBack = `"${answerText}"`;
+        csvContent += `${cleanFront},${cleanBack}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Galenic_Pharmacy_MCQ1-90_Anki.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function formatSeconds(totalSec) {
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${m}m ${s}s`;
+    }
+
+    let currentFontSize = 16;
+    function adjustFont(delta) {
+      currentFontSize = Math.max(12, Math.min(22, currentFontSize + delta));
+      document.documentElement.style.setProperty('--font-scale', `${currentFontSize}px`);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.body.removeAttribute('data-theme');
+        document.getElementById('themeBtn').textContent = '🌙';
+      } else {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('themeBtn').textContent = '☀️';
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+      const key = e.key.toUpperCase();
+      if (['1', 'A'].includes(key)) selectOption(0);
+      if (['2', 'B'].includes(key)) selectOption(1);
+      if (['3', 'C'].includes(key)) selectOption(2);
+      if (['4', 'D'].includes(key)) selectOption(3);
+      if (['5', 'E'].includes(key)) selectOption(4);
+      if (key === 'ARROWLEFT') prevQuestion();
+      if (key === 'ARROWRIGHT') nextQuestion();
+      if (key === 'F') toggleFlag();
+      if (key === ' ') {
+        if (currentMode === 'flashcard') {
+          e.preventDefault();
+          flipFlashcard();
+        }
+      }
+    });
+
+    loadState();
+  </script>
+</body>
+</html>
