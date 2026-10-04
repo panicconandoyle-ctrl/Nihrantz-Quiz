@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physiology MCQs Examination (Questions 1–129)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 24px 16px; display: flex; justify-content: center; }
+    .quiz-container { max-width: 850px; width: 100%; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 8px; }
+    .stats-bar { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 12px 20px; border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--border); }
+    .progress-bar-container { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+    .progress-bar { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+    .card { background: var(--card-bg); border-radius: 12px; padding: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .q-number { font-size: 0.9rem; color: var(--accent); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+    .q-text { font-size: 1.15rem; font-weight: 500; margin-bottom: 20px; line-height: 1.5; }
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .option-btn { background: #0f172a; border: 1px solid var(--border); color: var(--text); padding: 14px 18px; border-radius: 8px; text-align: left; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; line-height: 1.4; }
+    .option-btn:hover:not(:disabled) { border-color: var(--accent); background: #1e293b; }
+    .option-btn.correct { background: rgba(34, 197, 94, 0.2); border-color: var(--correct); color: #86efac; }
+    .option-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--wrong); color: #fca5a5; }
+    .option-btn:disabled { cursor: default; }
+    .feedback-box { margin-top: 20px; padding: 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; display: none; }
+    .feedback-box.show { display: block; }
+    .feedback-box.correct { background: rgba(34, 197, 94, 0.15); border: 1px solid var(--correct); }
+    .feedback-box.wrong { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--wrong); }
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 24px; gap: 12px; }
+    .jump-box { display: flex; align-items: center; gap: 8px; }
+    .jump-select { background: #0f172a; color: var(--text); border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; }
+    .btn { background: var(--accent); color: #0f172a; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .results-view { text-align: center; padding: 32px 16px; }
+    .results-score { font-size: 3rem; font-weight: 700; color: var(--accent); margin: 16px 0; }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <div class="header">
+    <h1>Medical Physiology Examination</h1>
+    <p style="color: var(--text-muted);">129 Review Questions — Interactive Examination Mode</p>
+  </div>
+
+  <div class="stats-bar">
+    <span id="q-counter">Question 1 / 129</span>
+    <div class="jump-box">
+      <label for="jump-dropdown" style="font-size: 0.9rem; color: var(--text-muted);">Jump to:</label>
+      <select id="jump-dropdown" class="jump-select" onchange="jumpToQuestion(this.value)"></select>
+    </div>
+    <span id="score-counter">Score: 0 / 0</span>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+
+  <div id="quiz-body">
+    <div class="card">
+      <div class="q-number" id="q-meta">Question 1</div>
+      <div class="q-text" id="q-text">Loading question...</div>
+      <div class="options" id="options-container"></div>
+      <div class="feedback-box" id="feedback"></div>
+      <div class="nav-buttons">
+        <button class="btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="btn" id="next-btn" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="results-body" class="card results-view" style="display: none;">
+    <h2>Quiz Completed!</h2>
+    <div class="results-score" id="final-score">0%</div>
+    <p id="score-details" style="color: var(--text-muted); margin-bottom: 24px;"></p>
+    <button class="btn" onclick="restartQuiz()">Restart Examination</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { id: 1, stem: "Red blood cells will swell the most when placed in a solution containing:", options: ["100 mmol CaCl2", "150 mmol NaCl", "250 mmol KCl", "250 mmol urea"], correct: 3, exp: "Urea easily permeates the cell membrane (ineffective osmole), making the solution functionally hypotonic (effectively 0 mOsm/L), leading to water influx, maximal swelling, and lysis." },
+  { id: 2, stem: "If the extracellular K+ concentration increases from 4 meq/L to 10 meq/L:", options: ["The membrane potential will become significantly more negative", "Sodium conductance will increase", "Potassium conductance will increase", "The cell membrane will become more excitable"], correct: 3, exp: "Elevated extracellular K+ reduces the potassium chemical gradient, shifting the resting membrane potential closer to threshold and initially increasing cell membrane excitability." },
+  { id: 3, stem: "Inhibiting the activity of the Na-K pump will cause:", options: ["An increase in intracellular fluid volume", "An increase in intracellular K+ concentration", "Hyperpolarization of the cell membrane potential", "An increase in nerve cell excitability"], correct: 0, exp: "Inhibiting the Na-K pump leads to intracellular sodium accumulation. Water follows sodium osmotically into the cell, increasing intracellular fluid volume." },
+  { id: 4, stem: "Cell membrane excitability increases most markedly by:", options: ["An increase in extracellular Na+", "An increase in extracellular K+", "A decrease in extracellular Cl-", "A decrease in extracellular Ca2+"], correct: 3, exp: "Hypocalcemia reduces surface charge shielding on voltage-gated sodium channels, lowering the threshold for action potential firing and markedly increasing excitability." },
+  { id: 5, stem: "The resting membrane potential of a nerve cell primarily depends on the concentration gradient of:", options: ["Potassium", "Sodium", "Calcium", "Chloride"], correct: 0, exp: "Because resting cell membranes have high permeability to potassium (via leak channels) compared to other ions, resting potential is largely determined by the K+ gradient." },
+  { id: 6, stem: "Which muscle protein plays a crucial role in the contraction of both smooth muscle and skeletal muscle?", options: ["Calmodulin", "Troponin", "Tropomyosin", "Actin"], correct: 3, exp: "Actin is the core thin-filament component required for cross-bridge interaction with myosin in both smooth and striated muscle (troponin is absent in smooth muscle)." },
+  { id: 7, stem: "Which term or phrase is most closely related to the endplate potential of the neuromuscular junction?", options: ["All-or-none response", "Depolarization", "Hyperpolarization", "Action potential"], correct: 1, exp: "The endplate potential (EPP) is a graded, non-propagated depolarization produced by acetylcholine opening post-synaptic nicotinic receptor cation channels." },
+  { id: 8, stem: "In a nerve fiber, the magnitude of the action potential depends on:", options: ["The magnitude of the stimulus", "Intracellular potassium concentration", "Extracellular sodium concentration", "Resting membrane potential"], correct: 2, exp: "The peak (overshoot) of the action potential approaches the equilibrium potential for sodium (ENa), which directly depends on extracellular Na+ concentration." },
+  { id: 9, stem: "The amount of force generated by skeletal muscle can be increased by:", options: ["An increase in extracellular Mg2+ concentration", "A decrease in extracellular Ca2+ concentration", "An increase in acetylcholine esterase activity", "A decrease in the interval between muscle contractions"], correct: 3, exp: "Decreasing the stimulus interval causes temporal wave summation and tetany due to persistent elevation of intracellular Ca2+." },
+  { id: 10, stem: "The diffusion rate of particles across a cell membrane will increase if:", options: ["The surface area of the cell membrane is small", "The thickness of the cell membrane increases", "The size of the particles increases", "The lipid solubility of the particles decreases"], correct: 3, exp: "Under standard Fick's principles, diffusion is directly related to concentration difference, surface area, and partition coefficient (lipid solubility), and inversely related to membrane thickness." },
+  { id: 11, stem: "Periodic hyperkalemic paralysis is characterized by elevated potassium levels and muscle weakness. Which of the following is the cause of muscle weakness resulting from increased extracellular potassium?", options: ["Hyperpolarization of muscle cells", "Inactivation of sodium channels across the muscle cell membrane", "Increased release of neurotransmitters from alpha motor neurons", "Decreased potassium conductance in muscle cells"], correct: 1, exp: "Prolonged depolarization caused by sustained hyperkalemia keeps voltage-gated Na+ channel inactivation gates closed, preventing further action potentials." },
+  { id: 12, stem: "The influx of calcium into the cell is an essential part of the upstroke phase of the action potential in:", options: ["Ventricular cardiac muscle", "Smooth muscle of the small intestine", "Skeletal muscle fibers", "Nerve cell body (soma)"], correct: 1, exp: "Gastrointestinal smooth muscle action potential upstrokes are mediated by voltage-gated L-type Ca2+ channels rather than fast Na+ channels." },
+  { id: 13, stem: "The cell membrane potential will depolarize the most if membrane permeability increases for:", options: ["Potassium", "Sodium and Potassium", "Chloride", "Sodium"], correct: 3, exp: "An isolated increase in sodium permeability pulls the membrane potential strongly toward the sodium equilibrium potential (+60 mV), causing maximal depolarization." },
+  { id: 14, stem: "Synaptic transmission between pain fibers from the skin to spinal cord neurons utilizes:", options: ["Acetylcholine", "Substance P", "Endorphins", "Somatostatin"], correct: 1, exp: "Primary nociceptive C-fibers release Substance P (alongside glutamate) at dorsal horn synapses in the spinal cord." },
+  { id: 15, stem: "In which of the following transport processes does a substance move down its electrochemical gradient?", options: ["Sodium moving out of a nerve cell", "Calcium entering the sarcoplasmic reticulum", "Hydrogen ions entering the lumen of the distal tubule of the nephron", "Glucose entering adipose tissue"], correct: 3, exp: "Glucose enters adipocytes through GLUT4 transporters via facilitated diffusion, which is passive transport down a concentration gradient." },
+  { id: 16, stem: "The NMDA (N-methyl-D-Aspartate) receptor is activated by:", options: ["Glycine", "Acetylcholine", "Substance P", "Histamine"], correct: 0, exp: "The NMDA receptor requires binding of both glutamate and its obligate co-agonist glycine (or D-serine) for activation." },
+  { id: 17, stem: "Blood pressure increases and heart rate decreases in response to:", options: ["Exercise", "An increase in body temperature", "High altitude", "Increased intracranial pressure"], correct: 3, exp: "Cushing's triad: elevated intracranial pressure leads to cerebral ischemia, sympathetic-driven hypertension, and reflex baroreceptor-mediated bradycardia." },
+  { id: 18, stem: "During exercise, cardiac output increases due to:", options: ["Increased vascular resistance via sympathetic stimulation", "Venodilation", "Decreased end-diastolic volume", "Increased ventricular contractility"], correct: 3, exp: "Sympathetic stimulation (via beta-1 adrenergic receptors) increases myocardial contractility (inotropy) and heart rate, boosting cardiac output." },
+  { id: 19, stem: "An electrocardiogram (ECG) is most effective in detecting a decrease in:", options: ["Ventricular contractility", "Mean arterial pressure", "Total peripheral resistance", "Blood flow in coronary blood vessels"], correct: 3, exp: "ECG sensitively records ischemic electrical abnormalities (ST elevation/depression, T-wave inversion) reflecting decreased coronary perfusion." },
+  { id: 20, stem: "During aerobic exercise, blood flow remains relatively constant in the:", options: ["Skin", "Heart", "Brain", "Skeletal muscle"], correct: 2, exp: "Cerebral blood flow is protected by precise autoregulation and remains stable (~750 mL/min) despite marked changes in cardiac output." },
+  { id: 21, stem: "The enzyme responsible for forming fibrin monomers is:", options: ["Heparin", "Plasminogen", "Thrombin", "Kininogen"], correct: 2, exp: "Thrombin (Factor IIa) proteolytically cleaves fibrinopeptides A and B from soluble fibrinogen to yield insoluble fibrin monomers." },
+  { id: 22, stem: "Central venous pressure increases due to:", options: ["A decrease in blood volume", "An increase in venomotor tone", "An increase in total peripheral resistance", "A decrease in heart rate"], correct: 1, exp: "Increased venomotor tone constricts capacitance veins, shifting blood toward the central circulation and raising central venous pressure (CVP)." },
+  { id: 23, stem: "Capillary permeability is lowest in the:", options: ["Kidneys", "Spleen", "Liver", "Brain"], correct: 3, exp: "The blood-brain barrier features continuous non-fenestrated capillaries joined by tight junctions, rendering permeability the lowest in the body." },
+  { id: 24, stem: "Blood flow through an organ can increase due to a decrease in:", options: ["Artery diameter", "Number of open arterioles", "Arterial pressure", "Hematocrit"], correct: 3, exp: "A decrease in hematocrit lowers blood viscosity, decreasing vascular resistance and thereby increasing organ blood flow per Poiseuille's law." },
+  { id: 25, stem: "A decrease in carotid sinus pressure will cause a decrease in:", options: ["Heart rate", "Myocardial contractility", "Total peripheral resistance", "Venous compliance"], correct: 3, exp: "Decreased carotid sinus baroreceptor firing triggers sympathetic activation, causing venoconstriction, which decreases venous compliance." },
+  { id: 26, stem: "The percentage of total cardiac output distributed to a single organ is most closely related to:", options: ["The contractile state of the heart", "The magnitude of blood pressure", "The magnitude of diastolic blood pressure", "The ratio of the organ's vascular resistance to total peripheral resistance"], correct: 3, exp: "Organ flow fraction is inversely proportional to that organ's resistance relative to total peripheral resistance (TPR)." },
+  { id: 27, stem: "Warfarin (Coumarin) is an anticoagulant frequently used in heart attack patients. Overdose can cause bleeding, which can be treated with:", options: ["Aspirin", "Heparin", "t-PA (tissue plasminogen activator)", "Vitamin K"], correct: 3, exp: "Warfarin acts as a competitive inhibitor of vitamin K epoxide reductase; administering vitamin K reverses its anticoagulant effect." },
+  { id: 28, stem: "Citrate is a useful anticoagulant because its mechanism of action:", options: ["Buffers basic groups of coagulation factors", "Binds factor XII", "Binds vitamin K", "Chelates calcium"], correct: 3, exp: "Citrate binds and chelates ionized calcium (Factor IV), an essential cofactor across multiple enzymatic steps in the clotting cascade." },
+  { id: 29, stem: "Lymphatic vessels differ from capillaries in that they:", options: ["Have lower permeability", "Are not lined with endothelium", "Lack valves", "Are absent in the central nervous system"], correct: 3, exp: "The central nervous system lacks traditional lymphatic vessels (relying instead on the glymphatic drainage pathway)." },
+  { id: 30, stem: "Which of the following increases during exercise?", options: ["Diastolic blood pressure", "Central vascular resistance", "Venous oxygen pressure (PvO2)", "Renal blood flow"], correct: 0, exp: "In most physiologic contexts, systolic BP rises markedly; in static/isometric exercises or intense dynamic exercise, mean arterial pressure or peripheral resistance adjustments can sustain/elevate diastolic pressure, while renal flow and PvO2 drop." },
+  { id: 31, stem: "The distribution of blood flow among various organs is regulated by altering the resistance of:", options: ["Arteries", "Arterioles", "Precapillary sphincters", "Postcapillary venules"], correct: 1, exp: "Arterioles possess rich vascular smooth muscle and serve as the primary site of systemic vascular resistance and selective flow regulation." },
+  { id: 32, stem: "A patient is diagnosed with anaphylactic shock rather than hypovolemic shock because:", options: ["Cardiac output is higher than normal", "Ventricular contractility is stronger than normal", "Total peripheral resistance is higher than normal", "Blood creatinine is higher than normal"], correct: 0, exp: "Anaphylactic shock is distributive shock: histamine release causes profound vasodilation, often maintaining high or hyperdynamic cardiac output initially." },
+  { id: 33, stem: "Vitamin B12 is primarily absorbed in the:", options: ["Stomach", "Duodenum", "Jejunum", "Ileum"], correct: 3, exp: "The vitamin B12-intrinsic factor complex is absorbed via receptor-mediated endocytosis (cubilin receptors) specifically in the terminal ileum." },
+  { id: 34, stem: "The major paracrine hormone involved in the inhibitory feedback regulation of gastric acid secretion is:", options: ["Gastrin", "Somatostatin", "Histamine", "Enterogastrone"], correct: 1, exp: "Somatostatin, secreted by gastric D cells in response to low antral luminal pH, acts via paracrine signaling to inhibit G cells and parietal cells." },
+  { id: 35, stem: "Which of the following is a putative inhibitory neurotransmitter responsible for relaxing gastrointestinal smooth muscle?", options: ["Dopamine", "Vasoactive intestinal peptide (VIP)", "Somatostatin", "Substance P"], correct: 1, exp: "VIP and nitric oxide (NO) are the primary inhibitory non-adrenergic, non-cholinergic (NANC) neurotransmitters that relax GI sphincters and smooth muscle." },
+  { id: 36, stem: "The hormone associated with initiating migrating motor complexes (MMC) is:", options: ["Gastrin", "Motilin", "Secretin", "Cholecystokinin"], correct: 1, exp: "Motilin, secreted by M cells of the duodenum and jejunum during fasting, coordinates cyclic Phase III contractions of the MMC." },
+  { id: 37, stem: "Basal acid output increases due to:", options: ["Acidification of the antrum", "Use of H2 receptor antagonists", "Vagotomy", "Alkalinization of the antrum"], correct: 3, exp: "Alkalinization of the gastric antrum removes somatostatin-mediated negative feedback on G cells, stimulating gastrin secretion and acid output." },
+  { id: 38, stem: "Following the secretion of trypsinogen into the duodenum, it is converted into active trypsin by:", options: ["Enteropeptidase", "Procarboxypeptidase", "Pancreatic lipase", "Previously secreted trypsin"], correct: 0, exp: "Enteropeptidase (enterokinase), an enzyme localized on the duodenal brush border membrane, cleaves trypsinogen to initiate pancreatic zymogen activation." },
+  { id: 39, stem: "The primary mechanism for sodium absorption in the small intestine is:", options: ["Na+-H+ exchange", "Cotransport with potassium", "Electrogenic transport", "Neutral NaCl absorption"], correct: 0, exp: "Postprandially and in the interdigestive state, apical Na+-H+ exchangers (NHE3) and nutrient-coupled cotransporters drive sodium uptake in the jejunum." },
+  { id: 40, stem: "Resection of the proximal small intestine leads to a decrease in:", options: ["Basal acid output", "Maximal acid output", "Gastric fluid secretion", "Pancreatic enzyme secretion"], correct: 3, exp: "The duodenum and proximal jejunum produce secretin and CCK; resection of this area markedly reduces CCK-stimulated pancreatic enzyme secretion." },
+  { id: 41, stem: "Which statement correctly describes gallbladder contraction?", options: ["Gallbladder contraction is inhibited by a fatty meal", "Gallbladder contraction is inhibited by amino acids in the duodenum", "Gallbladder contraction is stimulated by atropine", "Gallbladder contraction occurs in response to cholecystokinin (CCK)"], correct: 3, exp: "CCK, released by I cells in response to luminal amino acids and fatty acids, binds CCK-1 receptors on the gallbladder, causing contraction and bile release." },
+  { id: 42, stem: "Acidification of the duodenum will:", options: ["Decrease pancreatic bicarbonate secretion", "Increase gastric acid secretion", "Decrease gastric emptying", "Increase gallbladder contraction"], correct: 2, exp: "Duodenal acidification triggers secretin release and neural enterogastric reflexes that inhibit gastric motility, slowing gastric emptying." },
+  { id: 43, stem: "Which statement regarding small intestine crypt cells is correct?", options: ["They have well-developed microvilli", "They are responsible for absorbing NaCl and water", "They possess large amounts of brush border hydrolases", "They are responsible for secreting NaCl and water"], correct: 3, exp: "Intestinal crypts of Lieberkühn primarily secrete fluid and electrolytes (via CFTR Cl- channels followed by Na+ and water), while villi absorb them." },
+  { id: 44, stem: "Which of the following sugars is absorbed in the small intestine via facilitated diffusion?", options: ["Glucose", "Galactose", "Fructose", "Sucrose"], correct: 2, exp: "Fructose is absorbed across the apical enterocyte membrane via facilitated diffusion mediated by the GLUT5 transporter." },
+  { id: 45, stem: "At dietary concentrations, which vitamin is primarily absorbed via passive diffusion?", options: ["Vitamin C", "Folate", "Vitamin D", "Niacin"], correct: 2, exp: "Fat-soluble vitamins (A, D, E, K) incorporate into mixed lipid micelles and cross enterocyte membranes via simple passive diffusion." },
+  { id: 46, stem: "Compared to long-chain fatty acids, medium-chain fatty acids:", options: ["Are also packaged into chylomicrons", "Can be used as a caloric source for patients with malabsorption", "Are more abundant in the typical diet", "Are less water-soluble"], correct: 1, exp: "Medium-chain fatty acids (MCFAs) are water-soluble, enter portal blood directly without bile micelle incorporation, and serve as an ideal caloric source in malabsorption." },
+  { id: 47, stem: "Which statement regarding vitamin B12 absorption is correct?", options: ["In humans, intrinsic factor is secreted by chief cells of gastric glands", "Vitamin B12 binds to intrinsic factor in the stomach", "In adults, vitamin B12 absorption occurs throughout the entire length of the small intestine", "Its absorption is decreased in patients with pancreatic insufficiency"], correct: 3, exp: "Pancreatic proteases are required to degrade R-proteins in the duodenum so vitamin B12 can bind Intrinsic Factor; pancreatic insufficiency impairs this step." },
+  { id: 48, stem: "The release of chyme into the proximal small intestine will:", options: ["Increase gastric acid secretion", "Decrease pancreatic bicarbonate secretion", "Increase gastric emptying of solids", "Increase small intestinal segmentation"], correct: 3, exp: "Entry of chyme distends the duodenal lumen, initiating local intrinsic nerve reflexes that enhance rhythmic segmentation to mix chyme with digestive enzymes." },
+  { id: 49, stem: "The transport protein responsible for the entry of glucose into small intestinal enterocytes is:", options: ["GLUT2", "GLUT5", "SGLT1", "SGLT2"], correct: 2, exp: "Apical glucose uptake into enterocytes occurs via the sodium-glucose cotransporter 1 (SGLT1), driven by secondary active transport." },
+  { id: 50, stem: "Blood absorption of short-chain fatty acids occurs almost entirely in the:", options: ["Stomach", "Duodenum", "Jejunum", "Colon"], correct: 3, exp: "Short-chain fatty acids (acetate, propionate, butyrate) are produced by bacterial carbohydrate fermentation in the large intestine and absorbed in the colon." },
+  { id: 51, stem: "ADH (Vasopressin) is secreted by the posterior pituitary in response to:", options: ["Decreased plasma Na+ concentration", "Decreased plasma volume", "Decreased plasma K+ concentration", "Decreased plasma pH"], correct: 1, exp: "Hypovolemia (sensed by low-pressure cardiopulmonary baroreceptors) stimulates ADH secretion to conserve water and restore circulating volume." },
+  { id: 52, stem: "The approximate amount of glucose reabsorbed by a normal patient's kidneys is:", options: ["0 mg/min", "120 mg/min", "165 mg/min", "200 mg/min"], correct: 1, exp: "Filtered glucose load = GFR (125 mL/min) × plasma glucose (1.0 mg/mL) = ~125 mg/min. Under normal conditions, virtually 100% (~120–125 mg/min) is reabsorbed." },
+  { id: 53, stem: "If a substance appears in the renal artery but is absent from the renal vein:", options: ["Its clearance equals the glomerular filtration rate (GFR)", "It must be completely reabsorbed by the kidneys", "Its urinary concentration must be higher than in plasma", "Its clearance equals renal plasma flow (RPF)"], correct: 3, exp: "Complete extraction in a single transit through the kidney (e.g., Para-aminohippurate / PAH) means clearance equals effective renal plasma flow (RPF)." },
+  { id: 54, stem: "Destruction of the supraoptic nuclei of the hypothalamus will cause which changes in urine volume and concentration? (Assuming fluid intake equals fluid loss)", options: ["Increased urine volume and highly dilute urine", "Increased urine volume and highly concentrated urine", "Normal urine volume and concentration", "Decreased urine volume and highly dilute urine"], correct: 0, exp: "Loss of supraoptic ADH synthesis leads to central diabetes insipidus, preventing water reabsorption in collecting ducts and producing profuse, dilute polyuria." },
+  { id: 55, stem: "Which of the following returns to near normal during chronic respiratory acidosis?", options: ["Alveolar ventilation", "Arterial PCO2", "Arterial PO2", "Arterial hydrogen ion concentration ([H+])"], correct: 3, exp: "Renal compensation (generating and reabsorbing HCO3-) buffers excess carbonic acid over days, restoring arterial pH and [H+] close to normal." },
+  { id: 56, stem: "Fluid pH in the distal nephron can be significantly lower than in the proximal tubule because:", options: ["The sodium gradient across the distal nephron wall is greater than across the proximal tubule", "There is more buffer in the distal nephron fluid than in the proximal tubule", "More hydrogen ions are secreted in the distal nephron than in the proximal tubule", "The tight junctions of the distal nephron are much tighter and less permeable to solutes than in the proximal tubule"], correct: 3, exp: "The collecting duct possesses tight, impermeable junctions that sustain large electrochemical gradients, enabling H+-ATPase pumps to lower luminal pH down to ~4.5." },
+  { id: 57, stem: "Which statement regarding Renin is correct?", options: ["It is secreted by the proximal tubule", "Renin secretion occurs during loss of sodium and water from blood", "Renin secretion is stimulated by increased mean renal arterial pressure", "Renin converts angiotensinogen into angiotensin I"], correct: 3, exp: "Renin is an aspartyl protease secreted by juxtaglomerular granular cells that enzymatically cleaves circulating hepatic angiotensinogen to form angiotensin I." },
+  { id: 58, stem: "Renal compensation for hyperkalemia will lead to:", options: ["Alkalosis", "Acidosis", "Increased HCO3- excretion", "Increased H+ excretion"], correct: 1, exp: "High extracellular K+ drives K+ into cells in exchange for H+ moving out, and reduces renal ammoniagenesis and H+ excretion, predisposing to metabolic acidosis." },
+  { id: 59, stem: "A man drinks 2 liters of pure water to replenish fluid lost through sweating during exercise. Compared to pre-exercise conditions:", options: ["His intracellular fluid will become hypertonic", "His extracellular fluid will become hypertonic", "His intracellular fluid volume will increase", "His extracellular fluid volume will increase"], correct: 2, exp: "Replacing sweat (hypotonic fluid) with pure water dilutes extracellular osmolality; water shifts osmotically into cells, increasing intracellular fluid (ICF) volume." },
+  { id: 60, stem: "The amount of potassium excreted by the kidneys will decrease if:", options: ["Distal tubular flow rate increases", "Circulating aldosterone increases", "Dietary potassium intake increases", "Distal tubular Na+ reabsorption decreases"], correct: 3, exp: "Sodium reabsorption via ENaC in principal cells generates the lumen-negative transepithelial potential that pulls K+ into the lumen; reducing Na+ reabsorption blunts K+ excretion." },
+  { id: 61, stem: "Decreased resistance of the afferent arteriole of the renal glomerulus will reduce:", options: ["Renal plasma flow", "Filtration fraction", "Peritubular capillary oncotic pressure", "None of the above"], correct: 3, exp: "Afferent arteriolar dilation increases renal blood flow and glomerular capillary hydrostatic pressure, which increases GFR and RPF rather than reducing them." },
+  { id: 62, stem: "Metabolic alkalosis is commonly observed in patients with:", options: ["Hyperaldosteronism", "Hyperventilation", "Persistent diarrhea", "Renal failure"], correct: 0, exp: "Aldosterone stimulates apical H+-ATPase pumps in alpha-intercalated cells and drives HCO3- generation, causing metabolic alkalosis in Conn's syndrome." },
+  { id: 63, stem: "An increase in NaCl concentration in the fluid of the thick ascending limb of Henle's loop causes the macula densa to release:", options: ["ADH", "Aldosterone", "Adenosine", "Renin"], correct: 2, exp: "High tubular NaCl uptake via NKCC2 stimulates macula densa release of adenosine/ATP, which constricts the afferent arteriole via tubuloglomerular feedback." },
+  { id: 64, stem: "Metabolic acidosis can result from:", options: ["Hypoaldosteronism", "Hyperventilation", "Hypokalemia", "Decreased blood volume"], correct: 0, exp: "Hypoaldosteronism (Addison's disease or Type 4 RTA) impairs H+ and K+ excretion in the cortical collecting duct, causing hyperkalemic normal anion gap metabolic acidosis." },
+  { id: 65, stem: "In addition to increasing the water permeability of the collecting duct, ADH increases its permeability to:", options: ["Hydrogen ions", "Ammonium", "Potassium", "Urea"], correct: 3, exp: "ADH upregulates UT-A1 and UT-A3 urea transporters in the inner medullary collecting duct, promoting urea recycling into the medullary interstitium." },
+  { id: 66, stem: "Extracellular potassium in a patient with elevated blood potassium can be decreased by administering:", options: ["Atropine", "Epinephrine", "Glucagon", "Lactic acid"], correct: 1, exp: "Beta-2 adrenergic stimulation by epinephrine activates the Na+-K+ ATPase, driving potassium from extracellular fluid into intracellular compartments." },
+  { id: 67, stem: "The extracellular fluid volume in a normal individual is approximately:", options: ["5% of body weight", "10% of body weight", "20% of body weight", "40% of body weight"], correct: 2, exp: "Total body water is ~60% of body weight: ICF accounts for two-thirds (~40%), and ECF accounts for one-third (~20% of body weight)." },
+  { id: 68, stem: "Which of the following renal failure symptoms is caused by the deficiency of a hormone produced by the kidneys?", options: ["Edema", "Hypertension", "Anemia", "Uremia"], correct: 2, exp: "Chronic renal failure leads to normocytic normochromic anemia due to deficient synthesis of erythropoietin (EPO) by renal peritubular interstitial fibroblasts." },
+  { id: 69, stem: "The effect of insulin on glucose transport is:", options: ["Capable of transporting against a concentration gradient", "Promotes transport into adipocytes", "Promotes transport across the epithelium of renal tubules", "Promotes transport into the brain"], correct: 1, exp: "Insulin stimulates the translocation of GLUT4 vesicle transporters to the plasma membrane in skeletal muscle and adipose tissue." },
+  { id: 70, stem: "Which of the following statements about glucagon action is correct?", options: ["It promotes glycogen breakdown in skeletal muscle", "It inhibits insulin secretion", "It stimulates gluconeogenesis in the liver", "It inhibits adenylyl cyclase"], correct: 2, exp: "Glucagon acts on hepatic GPCRs linked to Gs/cAMP to stimulate gluconeogenesis and glycogenolysis (muscle cells lack glucagon receptors)." },
+  { id: 71, stem: "Administration of thyroid hormone to a human will:", options: ["Decrease the rate of oxygen consumption", "Increase muscle protein synthesis", "Decrease vitamin requirements", "Increase plasma cholesterol concentration"], correct: 1, exp: "Physiologic levels of thyroid hormone promote transcription and translation across multiple tissues, increasing protein synthesis and basal metabolic rate." },
+  { id: 72, stem: "The manifestations of primary hyperaldosteronism (Conn's syndrome) include:", options: ["Hypertension", "Increased blood potassium levels", "Decreased extracellular fluid volume", "Increased renal urine-concentrating ability"], correct: 0, exp: "Autonomous aldosterone secretion drives renal sodium retention and expansion of ECF volume, resulting in secondary hypertension alongside hypokalemia." },
+  { id: 73, stem: "Adrenalectomy causes:", options: ["Elevated blood glucose due to decreased insulin effectiveness", "Increased mobilization and utilization of adipose tissue", "Increased urinary water excretion and loss of sodium in urine", "Improved resistance to infection and shock"], correct: 2, exp: "Loss of mineralocorticoids (aldosterone) leads to uncontrolled renal wasting of sodium and water, hemoconcentration, and circulatory collapse." },
+  { id: 74, stem: "The actions of angiotensin II include:", options: ["Dilating peripheral arterioles", "Stimulating salt excretion via renal tubules", "Decreasing aldosterone secretion", "Inducing thirst"], correct: 3, exp: "Angiotensin II acts on the hypothalamic subfornical organ to stimulate dipsogenesis (thirst), alongside vasoconstriction and aldosterone release." },
+  { id: 75, stem: "The Islets of Langerhans of the pancreas:", options: ["Are found primarily in the head of the pancreas", "Make up 30% of total pancreatic weight", "Consist of 6 distinct endocrine cell types", "Secrete insulin and glucagon"], correct: 3, exp: "The endocrine pancreas consists of islets populated by beta cells (insulin), alpha cells (glucagon), delta cells (somatostatin), and PP cells." },
+  { id: 76, stem: "Progesterone:", options: ["Is secreted by the corpus luteum", "Placental secretion begins to increase at week 6 of pregnancy", "Plasma levels increase during menstruation", "Plasma levels remain constant following implantation"], correct: 0, exp: "During the post-ovulatory luteal phase, the corpus luteum synthesizes and secretes high concentrations of progesterone to prepare the endometrium." },
+  { id: 77, stem: "The therapeutic effectiveness of anti-inflammatory drugs is thought to be mediated by:", options: ["Increased capillary permeability", "Increased leukotriene production", "Increased pyrogen release from granulocytes", "Stabilization of cellular lysosomal membranes"], correct: 3, exp: "Glucocorticoids and anti-inflammatory agents stabilize lysosomal membranes, preventing the extracellular release of destructive proteolytic enzymes." },
+  { id: 78, stem: "The hormone with the closest structural similarity to gastrin is:", options: ["Secretin", "Cholecystokinin (CCK)", "Motilin", "Vasoactive intestinal polypeptide (VIP)"], correct: 1, exp: "Gastrin and CCK share an identical C-terminal five-amino-acid sequence (-Gly-Trp-Met-Asp-Phe-NH2), explaining their overlapping receptor affinities." },
+  { id: 79, stem: "Which of the following hormones produces its biological effect by activating cell surface membrane receptors?", options: ["Progesterone", "Estrogen", "Cortisol", "Epinephrine"], correct: 3, exp: "Epinephrine is a water-soluble catecholamine that binds plasma membrane-bound adrenergic G-protein coupled receptors (alpha and beta)." },
+  { id: 80, stem: "The hormone responsible for stimulating milk ejection is:", options: ["Oxytocin", "Progesterone", "Estradiol", "Insulin"], correct: 0, exp: "Oxytocin stimulates contraction of myoepithelial cells surrounding mammary alveoli to cause milk ejection (the let-down reflex)." },
+  { id: 81, stem: "The primary function of capillaries is:", options: ["Returning blood to the heart", "Producing immunity", "Transporting oxygen-rich blood", "Gas and nutrient exchange"], correct: 3, exp: "Microvascular thin-walled capillary endothelium allows the diffusion of oxygen, carbon dioxide, nutrients, and waste products between blood and interstitial fluid." },
+  { id: 82, stem: "Substances that can be exchanged across capillary walls include:", options: ["Lymph", "Carbon dioxide", "Water / fluid", "Hormones"], correct: 1, exp: "Respiratory gases (O2 and CO2) freely and rapidly diffuse across capillary endothelial membranes down their partial pressure gradients." },
+  { id: 83, stem: "The capillary wall is composed of:", options: ["Nerve cells", "Muscle cells", "Endothelial cells", "Epithelial cells"], correct: 2, exp: "Capillaries consist of a single continuous unicellular layer of endothelial cells resting upon a basal lamina." },
+  { id: 84, stem: "The typical diameter of capillaries is:", options: ["15–20 μm", "8–10 μm", "25–30 μm", "5–10 μm"], correct: 3, exp: "True human capillaries average 5 to 10 μm in lumen diameter, just wide enough for erythrocytes (diameter ~7.5 μm) to pass in single file." },
+  { id: 85, stem: "All systemic veins, with the exception of the pulmonary veins, carry:", options: ["Oxyhemoglobin", "Deoxygenated blood", "Red blood cells", "Oxygenated blood"], correct: 1, exp: "Systemic veins collect oxygen-depleted blood from tissues to return to the right atrium; pulmonary veins are the exception carrying oxygenated blood." },
+  { id: 86, stem: "Which vein carries oxygen-rich blood?", options: ["Superior Vena Cava", "Portal Vein", "Pulmonary vein", "Inferior Vena Cava"], correct: 2, exp: "Pulmonary veins carry freshly oxygenated blood from the alveolar capillary beds of the lungs to the left atrium of the heart." },
+  { id: 87, stem: "The nervous system is the center of all mental activities, EXCEPT:", options: ["Thinking", "Learning", "Digestion", "Memory"], correct: 2, exp: "Digestion is primarily a vegetative physiological/metabolic process carried out by the gastrointestinal tract and digestive organs." },
+  { id: 88, stem: "Like other organ systems in the body, the nervous system is composed of major structures: brain, spinal cord, nerves, and:", options: ["Ganglia", "Axons", "Neurons", "Bones"], correct: 0, exp: "Anatomically, the major macroscopic structures of the nervous system are the brain, spinal cord, peripheral nerves, and ganglia." },
+  { id: 89, stem: "The brain and spinal cord are organs of the:", options: ["Autonomic nervous system", "Central nervous system", "Cerebrospinal fluid", "Peripheral nervous system"], correct: 1, exp: "The Central Nervous System (CNS) is defined strictly as the brain contained within the cranium and the spinal cord within the vertebral canal." },
+  { id: 90, stem: "The meninges covering the brain and spinal cord consist of:", options: ["1 layer", "2 layers", "3 layers", "4 layers"], correct: 2, exp: "The meninges comprise three concentric protective connective tissue membranes: dura mater, arachnoid mater, and pia mater." },
+  { id: 91, stem: "Which of the following is one of the three basic primary parts of a neuron?", options: ["Axon", "Myelin", "Pons", "Bone"], correct: 0, exp: "The three core morphological components of a neuron are the cell body (soma), dendrites, and axon." },
+  { id: 92, stem: "A primary function of the lymphatic system is to return excess fluid to the bloodstream, which is:", options: ["Clear", "Interstitial", "Red-colored", "Thoracic"], correct: 1, exp: "The lymphatic system recovers extravasated interstitial fluid from the extracellular space and returns it to venous circulation as lymph." },
+  { id: 93, stem: "The thymus gland is largest during:", options: ["Adolescence (teen)", "Infancy / childhood", "Adulthood", "Puberty"], correct: 3, exp: "The thymus reaches its maximum absolute anatomical size and weight at puberty, after which it undergoes progressive age-related involution." },
+  { id: 94, stem: "The thymus gland decreases in size (atrophies) after:", options: ["Adolescence (teen)", "Infancy / childhood", "Adulthood", "Puberty"], correct: 3, exp: "Following puberty, the functional thymic lymphoid tissue is progressively replaced by adipose tissue in a process termed thymic involution." },
+  { id: 95, stem: "Which of the following is absorbed and utilized by body cells from digested food?", options: ["Fat", "Enzymes", "Molecules / Nutrients", "Fluids"], correct: 2, exp: "The end products of digestion are hydrolyzed into basic absorbable molecules and nutrients (monosaccharides, amino acids, fatty acids)." },
+  { id: 96, stem: "The digestive tract includes: mouth, esophagus, stomach, small intestine, large intestine, and:", options: ["Pharynx", "Larynx", "Pancreas", "Liver"], correct: 0, exp: "The alimentary canal forms a continuous tube consisting of mouth, pharynx, esophagus, stomach, small intestine, and large intestine." },
+  { id: 97, stem: "The wave-like movement that propels food forward along the digestive tract is called:", options: ["Peristalsis", "Rhythm", "Mastication", "Hydrolysis"], correct: 0, exp: "Peristalsis is a coordinated neuromuscular reflex consisting of an upstream contraction and downstream relaxation that propels the bolus." },
+  { id: 98, stem: "The wall of the digestive tract has 4 layers: mucosa, submucosa, muscular layer, and:", options: ["Lumen", "Lamina propria", "Serous layer or serosa", "Muscularis mucosa"], correct: 2, exp: "From inside out, the four canonical layers of the gut tube are mucosa, submucosa, muscularis externa, and serosa (or adventitia)." },
+  { id: 99, stem: "Functions of bones include support, protection, movement, mineral storage, and:", options: ["Water absorption", "Blood cell production (hematopoiesis)", "Toxin elimination", "Immune system antibody generation"], correct: 1, exp: "Red bone marrow located within trabecular cavities of bones is the primary site of hematopoiesis (production of RBCs, WBCs, and platelets)." },
+  { id: 100, stem: "Bone tissue comes in two major types: Compact bone and:", options: ["Yellow marrow", "Spongy (Cancellous) bone", "Periosteum", "Osseous tissue"], correct: 1, exp: "Bone tissue is histologically classified into dense/compact (cortical) bone and spongy/trabecular (cancellous) bone." },
+  { id: 101, stem: "Bone growth begins to decline and ceases around the age of approximately:", options: ["15 years", "9 years", "20 years", "18 years"], correct: 2, exp: "Longitudinal bone growth ends with epiphyseal plate closure, typically completed between 18 and 21 years of age." },
+  { id: 102, stem: "A long bone has a central tubular shaft called the diaphysis and enlarged rounded ends called:", options: ["Lunate", "Carpals", "Epiphysis", "Spongy bone"], correct: 2, exp: "Anatomy of long bones: diaphysis (shaft), metaphysis (growth zone), and epiphysis (expanded articular ends)." },
+  { id: 103, stem: "The typical adult human skeleton consists of:", options: ["80 bones", "220 bones", "300 bones", "206 bones"], correct: 3, exp: "The adult human skeleton comprises 206 individual named bones (80 axial and 126 appendicular)." },
+  { id: 104, stem: "Joint types are classified into:", options: ["5 types", "3 types", "2 types", "4 types"], correct: 1, exp: "Structural joint classification divides joints into 3 categories: fibrous (synarthroses), cartilaginous (amphiarthroses), and synovial (diarthroses)." },
+  { id: 105, stem: "Venous return of blood to the heart is aided by pocket valves, smooth muscle in vein walls, the respiratory pump, gravity from the upper body, and:", options: ["Cardiac contraction force", "Skeletal muscle pump / contractions", "Rest and stillness", "Digestion"], correct: 1, exp: "The skeletal muscle pump mechanically compresses deep veins during locomotion, propelling venous blood toward the heart against gravity." },
+  { id: 106, stem: "Functions of blood include transport of substances, maintaining homeostasis, blood clotting, and:", options: ["Keeping the heart rhythm steady", "Defense against infection / disease", "Fat emulsification", "Sugar breakdown"], correct: 1, exp: "White blood cells, immunoglobulins, and complement proteins circulating in blood provide vital immune defense against pathogens." },
+  { id: 107, stem: "Plasma accounts for approximately what percentage of total blood volume?", options: ["30.00%", "40.00%", "55.00%", "80.00%"], correct: 2, exp: "Whole blood is composed of approximately 55% liquid plasma and 45% formed cellular elements (erythrocytes, leukocytes, platelets)." },
+  { id: 108, stem: "Hemoglobin allows blood to become:", options: ["Deoxygenated", "Oxygenated", "Acidotic", "Leukophilic"], correct: 1, exp: "Hemoglobin's four heme iron groups cooperatively bind molecular oxygen in the pulmonary capillaries, oxygenating systemic arterial blood." },
+  { id: 109, stem: "Human lungs are divided into lobes; the right lung generally has:", options: ["2 lobes", "3 lobes", "4 lobes", "5 lobes"], correct: 1, exp: "The right lung has 3 lobes (superior, middle, inferior) separated by horizontal and oblique fissures (the left lung has 2 lobes)." },
+  { id: 110, stem: "Under normal resting conditions, the respiratory rate in a healthy adult is:", options: ["4 to 10 breaths/min", "12 to 15 breaths/min", "20 to 25 breaths/min", "30 to 35 breaths/min"], correct: 1, exp: "Normal adult eupneic resting respiratory rate ranges between 12 and 16 (or 12 to 20) breaths per minute." },
+  { id: 111, stem: "Parts of the lower respiratory tract include the trachea, bronchi, bronchioles, alveoli, and:", options: ["Larynx", "Diaphragm", "Pharynx", "Epiglottis"], correct: 0, exp: "The larynx marks the transition to the lower respiratory tract, which includes larynx, trachea, bronchi, bronchioles, and lungs." },
+  { id: 112, stem: "Parts of the upper respiratory tract include the mouth, pharynx, larynx, nose & nasal cavity, and:", options: ["Sinuses", "Esophagus", "Epiglottis", "Trachea"], correct: 0, exp: "The paranasal sinuses are air-filled extensions of the respiratory part of the nasal cavity, making them upper respiratory structures." },
+  { id: 113, stem: "The two kidneys are located between the levels of:", options: ["T7 and L1 vertebrae", "T9 and L2 vertebrae", "T10 and L2 vertebrae", "T12 and L3 vertebrae"], correct: 3, exp: "The retroperitoneal kidneys extend vertically from the level of the twelfth thoracic vertebra (T12) to the third lumbar vertebra (L3)." },
+  { id: 114, stem: "In a normal adult without urinary retention, the urinary bladder can hold a volume of:", options: ["300 to 500 mL", "400 to 600 mL", "500 to 700 mL", "600 to 800 mL"], correct: 1, exp: "Normal physiological capacity of the adult urinary bladder is approximately 400 to 600 mL (with the urge to void initiating around 150–250 mL)." },
+  { id: 115, stem: "Under normal conditions, substances excreted in urine include:", options: ["Glucose", "Bile pigments / urochrome from liver & bile metabolism", "Dietary protein / meat extract", "Red blood cells"], correct: 1, exp: "Urochrome (urobilin), a breakdown end product of bilirubin and hemoglobin degradation, is regularly excreted in urine and imparts its yellow color." },
+  { id: 116, stem: "The function of the testes is to:", options: ["Produce semen", "Produce white blood cells", "Produce sperm and male sex hormones (testosterone)", "Generate metabolic energy"], correct: 2, exp: "The dual functions of the testes are spermatogenesis within the seminiferous tubules and androgen (testosterone) synthesis by Leydig cells." },
+  { id: 117, stem: "Under normal conditions, one milliliter of human semen contains approximately:", options: ["1 million to 3 million sperm", "15 million to 50 million sperm", "20 million to 60 million sperm", "50 million to 150 million sperm"], correct: 2, exp: "Normal reference human sperm concentration typically ranges from 20 to 100+ million spermatozoa per milliliter of ejaculate." },
+  { id: 118, stem: "The ovaries function to secrete female sex hormones (Estrogen, Progesterone) and:", options: ["Produce lubricating mucus", "Develop gonads", "Release ova / female gametes", "Support fetal gestation"], correct: 2, exp: "The ovaries carry out oogenesis, maturing and releasing an oocyte (ovum) during each monthly ovulatory cycle." },
+  { id: 119, stem: "Ovulation typically occurs around:", options: ["Day 13 of the menstrual cycle", "Day 10 of the menstrual cycle", "Day 14 of the menstrual cycle", "Day 28 of the menstrual cycle"], correct: 2, exp: "In an idealized 28-day menstrual cycle, the mid-cycle LH surge triggers rupture of the mature dominant follicle and ovulation on day 14." },
+  { id: 120, stem: "Normally, an ovum remains viable in the outer third of the fallopian tube awaiting fertilization for approximately:", options: ["8 to 12 hours", "24 to 48 hours", "3 to 5 days", "4 to 5 days"], correct: 1, exp: "Following ovulation, the secondary oocyte remains viable and capable of fertilization for approximately 12 to 24 (up to 48) hours." },
+  { id: 121, stem: "The uterine lining layer involved in shedding as menstrual blood is the:", options: ["Endocardium", "Myometrium", "Endometrium", "Perimetrium"], correct: 2, exp: "The functional layer of the endometrium (stratum functionale) proliferates, differentiates, and sheds during menstruation in response to progesterone withdrawal." },
+  { id: 122, stem: "The vagina functions as a passage for menstrual flow, sexual intercourse, child delivery, and:", options: ["Fetal gestation", "Excretion of metabolic wastes", "Urinary excretion", "Producing female gametes or eggs"], correct: 0, exp: "The vagina serves as the female copulatory organ, birth canal during parturition, and conduit for menstrual discharge." },
+  { id: 123, stem: "Functions of muscular tissue include contractility, producing movement, maintaining body stability, and:", options: ["Producing immunity", "Generating body heat", "Producing lymph", "Producing blood cells"], correct: 1, exp: "Muscle contractions generate substantial heat through cellular respiration and ATP hydrolysis (thermogenesis / shivering)." },
+  { id: 124, stem: "Skeletal muscle is characterized as:", options: ["Voluntary muscle", "Located in the inner walls of visceral organs", "Involuntary muscle", "Smooth muscle"], correct: 0, exp: "Skeletal muscle is somatic striated muscle under voluntary, conscious motor control (unlike involuntary cardiac and smooth muscle)." },
+  { id: 125, stem: "Which of the following tissue types does NOT contribute to the composition of skeletal muscle?", options: ["Connective tissue", "Nerve tissue", "Blood / vascular tissue", "Epithelial tissue"], correct: 3, exp: "Skeletal muscle organs consist of skeletal muscle fibers, dense connective tissue sheaths (epimysium/perimysium), nerves, and blood vessels, but lack an epithelial lining." },
+  { id: 126, stem: "Smooth muscle is found in the walls of all of the following visceral organs EXCEPT:", options: ["Stomach", "Esophagus", "Bronchi", "Pleura"], correct: 3, exp: "The pleura is a serous membrane composed of a simple squamous mesothelium and thin connective tissue, devoid of smooth muscle." },
+  { id: 127, stem: "Cardiac muscle has a high resistance to fatigue due to all of the following factors EXCEPT:", options: ["High density of mitochondria rich in enzymes and proteins for energy metabolism", "High levels of hemoglobin for oxygen transport", "Direct continuous command from the central nervous system", "Rich and abundant coronary blood supply"], correct: 2, exp: "Cardiac muscle relies on intrinsic autorhythmicity from pacemaker cells (SA node), functioning autonomously without requiring continuous central nervous system commands." },
+  { id: 128, stem: "Skeletal muscles are named based on size, shape, fiber direction, anatomical location, number of origins/divisions, points of attachment, and:", options: ["Function / action", "Muscle color", "Contraction type", "Total muscle length"], correct: 0, exp: "Anatomical naming conventions for skeletal muscles include location, shape, relative size, fiber orientation, number of origins, attachments, and primary action (e.g., flexor carpi radialis)." },
+  { id: 129, stem: "Muscle contraction occurs through the involvement of all of the following EXCEPT:", options: ["Stimulus from sensory nerves", "Action of motor neurons", "Tendons", "ATP (Adenosine triphosphate)"], correct: 0, exp: "Skeletal muscle voluntary excitation-contraction coupling is initiated by alpha motor neurons, not sensory nerves." }
+];
+
+let currentIndex = 0;
+let userAnswers = {};
+
+function initDropdown() {
+  const select = document.getElementById("jump-dropdown");
+  select.innerHTML = "";
+  questions.forEach((q, idx) => {
+    const opt = document.createElement("option");
+    opt.value = idx;
+    opt.text = `Q ${q.id}`;
+    select.appendChild(opt);
+  });
+}
+
+function renderQuestion() {
+  const q = questions[currentIndex];
+  document.getElementById("q-meta").innerText = `Question ${q.id} of ${questions.length}`;
+  document.getElementById("q-counter").innerText = `Question ${currentIndex + 1} / ${questions.length}`;
+  document.getElementById("q-text").innerText = q.stem;
+  document.getElementById("jump-dropdown").value = currentIndex;
+  document.getElementById("progress").style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+
+  const container = document.getElementById("options-container");
+  container.innerHTML = "";
+  const feedback = document.getElementById("feedback");
+  feedback.className = "feedback-box";
+  feedback.style.display = "none";
+
+  const answered = userAnswers[currentIndex] !== undefined;
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+    
+    if (answered) {
+      btn.disabled = true;
+      if (idx === q.correct) btn.classList.add("correct");
+      if (userAnswers[currentIndex] === idx && idx !== q.correct) btn.classList.add("wrong");
+    } else {
+      btn.onclick = () => selectOption(idx);
+    }
+    container.appendChild(btn);
+  });
+
+  if (answered) {
+    feedback.style.display = "block";
+    const isCorrect = userAnswers[currentIndex] === q.correct;
+    feedback.className = `feedback-box show ${isCorrect ? "correct" : "wrong"}`;
+    feedback.innerHTML = `<strong>${isCorrect ? "✓ Correct!" : "✗ Incorrect"}</strong> — ${q.exp}`;
+  }
+
+  document.getElementById("prev-btn").disabled = currentIndex === 0;
+  document.getElementById("next-btn").innerText = currentIndex === questions.length - 1 ? "Finish" : "Next";
+  updateScore();
+}
+
+function selectOption(idx) {
+  userAnswers[currentIndex] = idx;
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion();
+  }
+}
+
+function jumpToQuestion(idx) {
+  currentIndex = parseInt(idx, 10);
+  renderQuestion();
+}
+
+function updateScore() {
+  const answeredKeys = Object.keys(userAnswers);
+  const correctCount = answeredKeys.filter(k => userAnswers[k] === questions[k].correct).length;
+  document.getElementById("score-counter").innerText = `Score: ${correctCount} / ${answeredKeys.length}`;
+}
+
+function showResults() {
+  document.getElementById("quiz-body").style.display = "none";
+  document.getElementById("results-body").style.display = "block";
+  const total = questions.length;
+  const correctCount = Object.keys(userAnswers).filter(k => userAnswers[k] === questions[k].correct).length;
+  const pct = Math.round((correctCount / total) * 100);
+  document.getElementById("final-score").innerText = `${pct}%`;
+  document.getElementById("score-details").innerText = `You scored ${correctCount} out of ${total} points.`;
+}
+
+function restartQuiz() {
+  userAnswers = {};
+  currentIndex = 0;
+  document.getElementById("quiz-body").style.display = "block";
+  document.getElementById("results-body").style.display = "none";
+  renderQuestion();
+}
+
+initDropdown();
+renderQuestion();
+</script>
+</body>
+</html>
