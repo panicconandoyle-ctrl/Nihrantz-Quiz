@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linguistic Foundations: Comprehensive Editorial Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #fbfaf7;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f4f2eb;
+      --bg-card-hover: #fcfcfb;
+      
+      --text-main: #18191c;
+      --text-muted: #565a64;
+      --text-light: #7e838f;
+      
+      --border-color: #e5e0d5;
+      --border-subtle: #eeeae1;
+      
+      --accent-terracotta: #c85a17;
+      --accent-terracotta-light: rgba(200, 90, 23, 0.08);
+      --accent-indigo: #2c42b5;
+      --accent-indigo-light: rgba(44, 66, 181, 0.08);
+      --accent-sage: #216d4c;
+      --accent-sage-light: rgba(33, 109, 76, 0.08);
+      --accent-amber: #b26800;
+      --accent-amber-light: rgba(178, 104, 0, 0.08);
+      --accent-crimson: #a62a22;
+      --accent-crimson-light: rgba(166, 42, 34, 0.08);
+      --accent-purple: #6c3da8;
+      --accent-purple-light: rgba(108, 61, 168, 0.08);
+      
+      --shadow-sm: 0 2px 4px rgba(24, 25, 28, 0.03), 0 1px 2px rgba(24, 25, 28, 0.04);
+      --shadow-md: 0 10px 25px -4px rgba(24, 25, 28, 0.05), 0 4px 10px -2px rgba(24, 25, 28, 0.03);
+      --shadow-lg: 0 20px 30px -10px rgba(24, 25, 28, 0.07);
+      
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 16.5px;
+      line-height: 1.78;
+      letter-spacing: -0.01em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(200, 90, 23, 0.03) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(44, 66, 181, 0.03) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Top Sticky Reading Progress & Nav */
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      z-index: 100;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-terracotta), var(--accent-indigo));
+      transition: width 0.1s ease-out;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      background: rgba(251, 250, 247, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 90;
+      padding: 12px 24px;
+    }
+    .nav-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-brand span {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-terracotta);
+    }
+    .nav-links {
+      display: flex;
+      gap: 14px;
+      list-style: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover {
+      color: var(--accent-terracotta);
+    }
+
+    /* Container & Layout */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 24px 100px 24px;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 40px 0 54px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 60px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      background-color: var(--accent-terracotta-light);
+      color: var(--accent-terracotta);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 22px;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-terracotta);
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.3rem, 4.8vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.16;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      margin-bottom: 20px;
+    }
+    .hero .lead {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 30px auto;
+      line-height: 1.7;
+    }
+    .author-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 6px 18px 6px 8px;
+      box-shadow: var(--shadow-sm);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .author-avatar {
+      width: 28px;
+      height: 28px;
+      background: var(--accent-terracotta);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .author-name {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .hero-insight-card {
+      background: linear-gradient(135deg, #ffffff 0%, #faf8f3 100%);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-terracotta);
+      border-radius: 12px;
+      padding: 24px 28px;
+      text-align: left;
+      margin-top: 40px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-insight-card p {
+      margin: 0;
+      font-size: 0.98rem;
+      color: var(--text-muted);
+    }
+    .hero-insight-card strong {
+      color: var(--text-main);
+    }
+
+    /* Chapter Headers */
+    .chapter-section {
+      margin-bottom: 74px;
+    }
+    .chapter-header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border-subtle);
+      padding-bottom: 14px;
+    }
+    .chapter-num {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--text-main);
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+    .chapter-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.05rem);
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+    .section-lead {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      line-height: 1.74;
+    }
+
+    /* Subsection Headers */
+    .subsection-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 36px 0 16px 0;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .subsection-title span.tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-card-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Cards & Grids */
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 24px 0;
+    }
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin: 24px 0;
+    }
+    .card-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .editorial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .editorial-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .editorial-card.highlight {
+      border-top: 3px solid var(--accent-terracotta);
+    }
+    .editorial-card.highlight-indigo {
+      border-top: 3px solid var(--accent-indigo);
+    }
+    .editorial-card.highlight-sage {
+      border-top: 3px solid var(--accent-sage);
+    }
+    .editorial-card.highlight-amber {
+      border-top: 3px solid var(--accent-amber);
+    }
+    .editorial-card.highlight-purple {
+      border-top: 3px solid var(--accent-purple);
+    }
+
+    .card-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    .card-heading {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .card-text {
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      line-height: 1.68;
+    }
+    .card-text strong {
+      color: var(--text-main);
+    }
+
+    /* Phonetic & Monospace Tags */
+    code, .phonetic-badge {
+      font-family: var(--font-mono);
+      background-color: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.88em;
+      color: var(--accent-indigo);
+      font-weight: 500;
+    }
+    .phonetic-badge.illegal {
+      background-color: var(--accent-crimson-light);
+      color: var(--accent-crimson);
+      border-color: rgba(166, 42, 34, 0.2);
+    }
+    .phonetic-badge.legal {
+      background-color: var(--accent-sage-light);
+      color: var(--accent-sage);
+      border-color: rgba(33, 109, 76, 0.2);
+    }
+
+    /* Comparison Table / Multilingual Grid */
+    .lingual-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .lingual-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .lingual-item .lang {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+    .lingual-item .word {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-indigo);
+    }
+
+    /* Sensory Cards */
+    .sensory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 22px 0;
+    }
+    .sensory-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .sensory-card .word-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-terracotta);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .try-it-pill {
+      font-size: 0.8rem;
+      font-style: italic;
+      background: var(--bg-card-subtle);
+      border-left: 3px solid var(--accent-terracotta);
+      padding: 6px 12px;
+      border-radius: 0 6px 6px 0;
+      margin-top: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Grammaticality Grid */
+    .judgment-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .judgment-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+    }
+    .judgment-item.valid {
+      border-left: 4px solid var(--accent-sage);
+    }
+    .judgment-item.invalid {
+      border-left: 4px solid var(--accent-crimson);
+    }
+    .judgment-status {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .judgment-item.valid .judgment-status {
+      background: var(--accent-sage-light);
+      color: var(--accent-sage);
+    }
+    .judgment-item.invalid .judgment-status {
+      background: var(--accent-crimson-light);
+      color: var(--accent-crimson);
+    }
+
+    /* Parameter Switch Cards */
+    .param-switch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px;
+      margin: 14px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .param-title {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--accent-indigo);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .param-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .param-opt {
+      background: var(--bg-card-subtle);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.86rem;
+    }
+    .param-opt strong {
+      display: block;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    /* Hierarchy Ladder */
+    .hierarchy-ladder {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 24px 0;
+    }
+    .ladder-step {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 18px;
+      gap: 16px;
+    }
+    .ladder-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-indigo);
+    }
+    .ladder-info {
+      flex: 1;
+    }
+    .ladder-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+    .ladder-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Stacking recursion container */
+    .stack-container {
+      background: var(--bg-card-subtle);
+      border: 1px dashed var(--border-color);
+      border-radius: 10px;
+      padding: 18px;
+      margin: 16px 0;
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 2;
+    }
+    .stack-highlight {
+      background: #ffecdb;
+      color: var(--accent-terracotta);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Case Studies & Reflection Boxes */
+    .case-study {
+      background: linear-gradient(to right, #ffffff, #faf9f6);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 28px;
+      margin: 36px 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .case-study-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-terracotta);
+      background: var(--accent-terracotta-light);
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+    .case-study-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .case-study-question {
+      font-size: 1.02rem;
+      font-style: italic;
+      color: var(--text-main);
+      padding: 14px 18px;
+      background: var(--bg-card-subtle);
+      border-left: 3px solid var(--accent-terracotta);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .step-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+    .step-num {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-terracotta);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+    .step-content strong {
+      color: var(--text-main);
+    }
+
+    .verdict-box {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .verdict-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--accent-indigo-light);
+      color: var(--accent-indigo);
+    }
+    .verdict-text {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .verdict-text strong {
+      color: var(--text-main);
+    }
+
+    /* Checklist Section */
+    .checklist-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 28px;
+      margin-top: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .checklist-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .custom-checklist li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .custom-checklist li:hover {
+      background: var(--bg-card-subtle);
+    }
+    .checkbox-icon {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .checkbox-icon svg {
+      width: 12px;
+      height: 12px;
+      stroke: #ffffff;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-dasharray: 16;
+      stroke-dashoffset: 16;
+      transition: stroke-dashoffset 0.2s ease;
+    }
+    .custom-checklist li.checked .checkbox-icon {
+      background: var(--accent-sage);
+      border-color: var(--accent-sage);
+    }
+    .custom-checklist li.checked .checkbox-icon svg {
+      stroke-dashoffset: 0;
+    }
+    .custom-checklist li.checked span.text {
+      text-decoration: line-through;
+      color: var(--text-light);
+    }
+
+    /* Pedagogical Banners */
+    .pedagogy-banner {
+      background: linear-gradient(135deg, rgba(44, 66, 181, 0.04) 0%, rgba(200, 90, 23, 0.04) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin-top: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .pedagogy-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .pedagogy-text {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.66;
+    }
+    .pedagogy-text strong {
+      color: var(--text-main);
+    }
+
+    /* Grand Finale Manifesto */
+    .grand-manifesto {
+      background: #18191c;
+      color: #f4f2eb;
+      border-radius: 16px;
+      padding: 48px 40px;
+      margin: 80px 0 40px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .grand-manifesto::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      height: 100px;
+      background: radial-gradient(ellipse, rgba(200, 90, 23, 0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .manifesto-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #df9768;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .grand-manifesto h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+    .grand-manifesto p {
+      font-size: 1.05rem;
+      color: #b7b9c2;
+      max-width: 640px;
+      margin: 0 auto 32px auto;
+      line-height: 1.76;
+    }
+    .creator-signature {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .creator-signature .credit-line {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+    }
+    .creator-signature .credit-sub {
+      font-size: 0.8rem;
+      color: #8c8f9b;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 32px 18px 60px 18px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .hero-insight-card {
+        padding: 18px 20px;
+      }
+      .case-study {
+        padding: 20px;
+      }
+      .grand-manifesto {
+        padding: 36px 20px;
+      }
+      .param-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Editorial Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <span></span> Linguistic Foundations
+      </div>
+      <ul class="nav-links">
+        <li><a href="#module-1">1. Functions</a></li>
+        <li><a href="#module-2">2. Sounds</a></li>
+        <li><a href="#module-3">3. Words</a></li>
+        <li><a href="#module-4">4. Sentences</a></li>
+        <li><a href="#module-5">5. Frameworks</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="badge">
+        <span class="badge-dot"></span> Complete Editorial Curriculum
+      </div>
+      <h1>Linguistic Knowledge &amp; Human Identity</h1>
+      <p class="lead">
+        A master exploration of what it truly means to "know" a language—from acoustic inventories and arbitrary symbols to generative syntax, Chomskyan competence, and Universal Grammar.
+      </p>
+      
+      <div class="author-pill">
+        <div class="author-avatar">BN</div>
+        <span>Created by <strong class="author-name">Bunreth Nihrantz</strong></span>
+      </div>
+
+      <div class="hero-insight-card">
+        <p>
+          <strong>Foundational Premise:</strong> Language is not merely a rote catalog of memorized vocabulary or mechanical habits. It is a <strong>generative cognitive faculty</strong> operating through finite sound inventories, social conventions, recursive syntactic algorithms, and an innate biological substrate.
+        </p>
+      </div>
+    </header>
+
+    <!-- MODULE 1 -->
+    <section class="chapter-section" id="module-1">
+      <div class="chapter-header">
+        <span class="chapter-num">01</span>
+        <h2 class="chapter-title">Language: Communication &amp; Human Identity</h2>
+      </div>
+      <p class="section-lead">
+        What makes human language unique? We examine language as an instrument of social coordination and a species-defining cognitive architecture.
+      </p>
+
+      <h3 class="subsection-title">
+        The Core Functions of Language
+        <span class="tag">Section 1.1</span>
+      </h3>
+
+      <div class="card-grid-2">
+        <div class="editorial-card highlight">
+          <span class="card-label">Primary Purpose</span>
+          <h4 class="card-heading">Instrument of Communication</h4>
+          <p class="card-text">
+            Language is fundamentally a system for <strong>transferring meaning</strong> from one mind to another. It serves as social glue, allowing humans to coordinate actions, form institutions, share culture, and maintain complex cooperative societies.
+          </p>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Species Marker</span>
+          <h4 class="card-heading">Distinguishes Humans</h4>
+          <p class="card-text">
+            While animals communicate (bees dance, whales sing, canines bark), human language is qualitatively distinct. It forms the core of human identity, defining <em>Homo sapiens</em> as creatures possessing genuine linguistic competence.
+          </p>
+        </div>
+      </div>
+
+      <div class="card-grid-3">
+        <div class="editorial-card">
+          <span class="card-label">Cognitive Pillar I</span>
+          <h4 class="card-heading">Complexity</h4>
+          <p class="card-text">
+            The capability to convey multi-tiered, nuance-laden information regarding internal emotional landscapes, hypotheticals, and logical syllogisms.
+          </p>
+        </div>
+        <div class="editorial-card">
+          <span class="card-label">Cognitive Pillar II</span>
+          <h4 class="card-heading">Productivity</h4>
+          <p class="card-text">
+            The creative ability to produce and decode an infinite spectrum of original sentences from a finite lexicon and grammar.
+          </p>
+        </div>
+        <div class="editorial-card">
+          <span class="card-label">Cognitive Pillar III</span>
+          <h4 class="card-heading">Displacement</h4>
+          <p class="card-text">
+            The capacity to discuss objects, events, and abstract ideas that are distant in time, geography, or strictly hypothetical (e.g., justice, metaphysics).
+          </p>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">
+        What Does It Mean to "Know" a Language?
+        <span class="tag">The Triad</span>
+      </h3>
+
+      <div class="card-grid-3">
+        <div class="editorial-card highlight">
+          <span class="card-label">Pillar A</span>
+          <h4 class="card-heading">Production</h4>
+          <p class="card-text">
+            Generating recognizable acoustic or manual symbols. To communicate, production requires a <strong>shared code</strong>: speaking fluent Japanese in an exclusively Spanish-speaking room produces sound, but fails to communicate.
+          </p>
+        </div>
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Pillar B</span>
+          <h4 class="card-heading">Construction</h4>
+          <p class="card-text">
+            Assembling sound units into structured sequences. Because meaning is arbitrary, swapping sounds entirely modifies the concept: <span class="phonetic-badge">/dɒɡ/</span> represents a canine, whereas <span class="phonetic-badge">/ɡɒd/</span> evokes a deity.
+          </p>
+        </div>
+        <div class="editorial-card highlight-sage">
+          <span class="card-label">Pillar C</span>
+          <h4 class="card-heading">Reception</h4>
+          <p class="card-text">
+            Real-time acoustic decoding and semantic retrieval. Listeners parse acoustic signals, match them against their internal mental dictionary, and interpret speaker intent, tone, and contextual pragmatic nuance.
+          </p>
+        </div>
+      </div>
+
+      <!-- Case Study 1: The Parrot Paradox -->
+      <div class="case-study">
+        <span class="case-study-badge">Analytical Case Study</span>
+        <h4 class="case-study-title">The Parrot Paradox: Mimicry vs. Competence</h4>
+        <div class="case-study-question">
+          "A parrot can mimic the phrase 'Hello, how are you?' perfectly. Does the parrot 'know' the language based on the definition of linguistic competence?"
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Criterion A (Production): Passed.</strong> The avian vocal tract reproduces recognizable acoustic waveforms that humans successfully decode.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Criterion B (Construction &amp; Arbitrariness): Failed.</strong> The parrot cannot deconstruct "Hello" into constituent phonemes, nor can it spontaneously recombine words to formulate "How is the weather?" It merely replicates a single, frozen acoustic string.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Criterion C (Reception &amp; Intentionality): Failed.</strong> If a speaker replies, "I am feeling sorrowful," the bird does not decode semantic distress or adapt its response.
+            </div>
+          </li>
+        </ul>
+
+        <div class="verdict-box">
+          <span class="verdict-tag">Theoretical Verdict</span>
+          <div class="verdict-text">
+            The parrot displays acoustic <strong>Performance</strong> (surface mimicry) while totally lacking <strong>Linguistic Competence</strong> (an internalized rule-governed grammar and semantic lexicon). It does not "know" the language.
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist 1 -->
+      <div class="checklist-card">
+        <div class="checklist-title">Summary Checklist: Linguistic Competence</div>
+        <ul class="custom-checklist">
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Socially Shared:</strong> Grounded within an agreed-upon community code.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Structural:</strong> Rules for combining phonological strings into meaningful units.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Bidirectional:</strong> Simultaneous transmission (speaking) and pragmatic reception.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Human &amp; Generative:</strong> Transcends simple repetition to enable creative thought.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODULE 2 -->
+    <section class="chapter-section" id="module-2">
+      <div class="chapter-header">
+        <span class="chapter-num">02</span>
+        <h2 class="chapter-title">Components of Linguistic Knowledge: The Sound System</h2>
+      </div>
+      <p class="section-lead">
+        To know a language, the brain organizes linguistic information across dedicated modules: <strong>Phonology</strong> (sounds), <strong>Morphology &amp; Lexicon</strong> (words), and <strong>Syntax</strong> (sentences). Here we decode Component #1.
+      </p>
+
+      <h3 class="subsection-title">
+        Sound Inventories &amp; Phonotactic Architecture
+        <span class="tag">Phonology</span>
+      </h3>
+
+      <div class="card-grid-2">
+        <div class="editorial-card highlight">
+          <span class="card-label">Dimension A</span>
+          <h4 class="card-heading">Phonemic Inventory</h4>
+          <p class="card-text">
+            Every human language selects a distinct subset of possible vocal sounds. If a phoneme is absent from a speaker's native inventory, their perceptual filter often replaces it with the closest available native equivalent.
+          </p>
+          <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem;">
+            <div>• <strong>English:</strong> Uses the dental fricative <span class="phonetic-badge">/θ/</span> (<em>think</em>).</div>
+            <div>• <strong>Spanish:</strong> Lacks <span class="phonetic-badge">/θ/</span> in most dialects; substituted with <span class="phonetic-badge">/s/</span> or <span class="phonetic-badge">/t/</span>.</div>
+            <div>• <strong>Japanese:</strong> Does not phonemically separate <span class="phonetic-badge">/l/</span> and <span class="phonetic-badge">/r/</span>, grouping both under an alveolar flap <span class="phonetic-badge">/ɾ/</span>.</div>
+            <div>• <strong>Xhosa:</strong> Employs diverse click consonants (<span class="phonetic-badge">/!/</span>, <span class="phonetic-badge">/ǀ/</span>) absent from Indo-European systems.</div>
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Dimension B</span>
+          <h4 class="card-heading">Phonotactic Constraints</h4>
+          <p class="card-text">
+            Possessing sounds is insufficient; speakers must also internalize the structural rules governing sound placement and acceptable clustering across syllables.
+          </p>
+          <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
+            <div><strong>1. Onset (Start):</strong> English allows <span class="phonetic-badge">/sp/</span> (<em>spin</em>), whereas Spanish inserts an epenthetic vowel (<em>deporte</em> / <em>esporte</em>). English forbids word-initial <span class="phonetic-badge illegal">/ŋ/</span> (no English word starts with "ng").</div>
+            <div><strong>2. Sequence (Follow):</strong> English accommodates three-consonant clusters (<em>strengths</em> = <span class="phonetic-badge">/str-/</span>). Turkish and Finnish apply strict vowel harmony across syllables.</div>
+            <div><strong>3. Coda (End):</strong> English permits rich codas (<em>texts</em>, <em>asks</em>). Hawaiian mandates open syllables ending strictly in vowels (adapting <em>bus</em> into <em>kalepa</em>).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case Study 2: Japanese L1 Interference -->
+      <div class="case-study">
+        <span class="case-study-badge">Analytical Case Study</span>
+        <h4 class="case-study-title">Cross-Linguistic Phonological Transfer</h4>
+        <div class="case-study-question">
+          "A Japanese learner of English pronounces 'Rice' as 'Lais' and 'Club' as 'Kurabu'. Utilizing sound inventory and phonotactic principles, explain this linguistic phenomenon."
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Inventory Filter ('Rice' ➔ 'Lais'):</strong> Japanese lacks distinct phonemic categories for English liquid consonants <span class="phonetic-badge">/r/</span> and <span class="phonetic-badge">/l/</span>, possessing instead a single alveolar flap <span class="phonetic-badge">/ɾ/</span>. The learner's perceptual processor maps both English inputs to their native sound category.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Phonotactic Repair ('Club' ➔ 'Kurabu'):</strong> Japanese syllable structure prefers alternating consonants and vowels (CV), disallowing word-initial clusters like <span class="phonetic-badge illegal">/kl-/</span> and closed final codas like <span class="phonetic-badge illegal">/-b/</span>. To resolve this structural conflict, the speaker introduces epenthetic vowels <span class="phonetic-badge">/u/</span>, reshaping the word into compliant units: <em>Ku-ra-bu</em>.
+            </div>
+          </li>
+        </ul>
+
+        <div class="verdict-box">
+          <span class="verdict-tag">Pedagogical Implication</span>
+          <div class="verdict-text">
+            Learner pronunciation errors are rarely mechanical failures of the vocal articulators. They represent systematic filters applied by the speaker's native <strong>Linguistic Competence</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist 2 -->
+      <div class="checklist-card">
+        <div class="checklist-title">Summary Checklist: The Sound System</div>
+        <ul class="custom-checklist">
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Phonemic Inventory:</strong> Knowledge of permissible sounds in the language.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Onset Legality:</strong> Knowing which sounds can begin words (e.g., No /ŋ/ in English).</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Sequencing Constraints:</strong> Rules governing legal consonant combinations (e.g., /str-/ is legal; /zb-/ is illegal).</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Coda Rules:</strong> Regulations on allowable syllable endings (consonant-rich vs. vowel-only).</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODULE 3 -->
+    <section class="chapter-section" id="module-3">
+      <div class="chapter-header">
+        <span class="chapter-num">03</span>
+        <h2 class="chapter-title">Knowledge of Words &amp; The Arbitrary Relation</h2>
+      </div>
+      <p class="section-lead">
+        A word is not an isolated sound, but a structured sequence coupled with conceptual meaning. We examine Ferdinand de Saussure's principle of arbitrariness and its notable exceptions.
+      </p>
+
+      <h3 class="subsection-title">
+        The Nature of the Word
+        <span class="tag">Lexicon</span>
+      </h3>
+
+      <div class="editorial-card highlight" style="margin-bottom: 24px;">
+        <span class="card-label">Theoretical Formula</span>
+        <h4 class="card-heading" style="font-family: var(--font-mono); font-size: 1.15rem; color: var(--accent-terracotta);">
+          Sound Sequence (Form) + Mental Concept (Meaning) = Word
+        </h4>
+        <p class="card-text">
+          Mastering a language requires internalizing a mental dictionary (the <strong>Lexicon</strong>). Merely reciting acoustic shapes without mapping them to semantic concepts does not constitute lexical command.
+        </p>
+      </div>
+
+      <div class="card-grid-2">
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Saussurean Semiotics</span>
+          <h4 class="card-heading">The Arbitrary Relationship</h4>
+          <p class="card-text">
+            There is no natural, physical, or logical necessity connecting a sequence of speech sounds to the entity it represents. The connection is maintained solely through <strong>tacit social convention</strong>.
+          </p>
+        </div>
+        <div class="editorial-card highlight-amber">
+          <span class="card-label">Cognitive Demands</span>
+          <h4 class="card-heading">The Necessity of Memorization</h4>
+          <p class="card-text">
+            Because lexical pairings are arbitrary rather than mathematically deductive, learners cannot infer word meanings from sound alone. Vocabulary acquisition demands sustained exposure, contextual pairing, and repetition.
+          </p>
+        </div>
+      </div>
+
+      <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 28px 0 12px 0;">
+        Empirical Proof: Cross-Linguistic Comparison for "Water"
+      </h4>
+      <div class="lingual-grid">
+        <div class="lingual-item">
+          <div class="lang">English</div>
+          <div class="word">Water</div>
+        </div>
+        <div class="lingual-item">
+          <div class="lang">Spanish</div>
+          <div class="word">Agua</div>
+        </div>
+        <div class="lingual-item">
+          <div class="lang">French</div>
+          <div class="word">Eau</div>
+        </div>
+        <div class="lingual-item">
+          <div class="lang">Japanese</div>
+          <div class="word">Mizu</div>
+        </div>
+        <div class="lingual-item">
+          <div class="lang">Mandarin</div>
+          <div class="word">Shuǐ</div>
+        </div>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-light); text-align: center; margin-bottom: 28px;">
+        If sound and meaning held an innate connection, disparate cultures would not employ completely unrelated acoustic forms for the identical compound.
+      </p>
+
+      <h3 class="subsection-title">
+        The Exception: Sound Symbolism &amp; Onomatopoeia
+        <span class="tag">Iconicity</span>
+      </h3>
+      <p class="card-text" style="margin-bottom: 18px;">
+        While arbitrariness governs most vocabulary, <strong>sound symbolism</strong> occurs where phonetic articulation mimics sensory experience.
+      </p>
+
+      <div class="sensory-grid">
+        <div class="sensory-card">
+          <div class="word-title">
+            <span>Sizzle</span>
+            <code style="font-size: 0.75rem;">/ˈsɪzəl/</code>
+          </div>
+          <p class="card-text">The combination of alveolar fricative <span class="phonetic-badge">/s/</span> and voiced <span class="phonetic-badge">/z/</span> replicates the hiss and pop of frying fat.</p>
+          <div class="try-it-pill">"Sssss-izzzz-le" mimics frying thermal energy.</div>
+        </div>
+
+        <div class="sensory-card">
+          <div class="word-title">
+            <span>Buzz</span>
+            <code style="font-size: 0.75rem;">/bʌz/</code>
+          </div>
+          <p class="card-text">Sustained vocal-fold vibration <span class="phonetic-badge">/z/</span> echoes high-frequency insect wingbeats or electrical hums.</p>
+          <div class="try-it-pill">"Bzzzz" forces tactile lip and alveolar vibration.</div>
+        </div>
+
+        <div class="sensory-card">
+          <div class="word-title">
+            <span>Murmur</span>
+            <code style="font-size: 0.75rem;">/ˈmɜːmər/</code>
+          </div>
+          <p class="card-text">Continuous, low-frequency bilabial hums <span class="phonetic-badge">/m/</span> mimic muted voices or distant flowing water.</p>
+          <div class="try-it-pill">"Mmm-rmur" feels continuous, soft, and gentle.</div>
+        </div>
+      </div>
+
+      <!-- Case Study 3: The Arbitrariness Paradox -->
+      <div class="case-study">
+        <span class="case-study-badge">Analytical Case Study</span>
+        <h4 class="case-study-title">Does Onomatopoeia Refute Arbitrariness?</h4>
+        <div class="case-study-question">
+          "If the relationship between sound and meaning is arbitrary, why do languages have words like 'buzz' and 'sizzle'? Does this contradict the core principle?"
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Recognizing Iconicity:</strong> Onomatopoeic forms are genuinely iconic rather than arbitrary; their physical articulation mirrors real-world acoustic properties.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Statistical Scope:</strong> Iconic vocabulary constitutes only a tiny fraction of any lexicon. Abstract nouns, verbs, and relational terms (e.g., <em>justice</em>, <em>calculate</em>, <em>although</em>) exhibit zero acoustic correlation to their referents.
+            </div>
+          </li>
+        </ul>
+
+        <div class="verdict-box">
+          <span class="verdict-tag">Linguistic Verdict</span>
+          <div class="verdict-text">
+            Sound symbolism represents a <strong>specialized exception</strong>, not a contradiction. Arbitrariness remains the overarching organizational architecture of human language.
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist 3 -->
+      <div class="checklist-card">
+        <div class="checklist-title">Summary Checklist: Words &amp; Meanings</div>
+        <ul class="custom-checklist">
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Word Formula:</strong> Acoustic string coupled with mental conceptual meaning.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Arbitrary Connection:</strong> Absence of innate links between form and meaning.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Social Convention:</strong> Meaning is anchored through collective agreement across speakers.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Sound Symbolism:</strong> Iconic exceptions (e.g., sizzle, buzz, bang) that mirror sensory experience.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODULE 4 -->
+    <section class="chapter-section" id="module-4">
+      <div class="chapter-header">
+        <span class="chapter-num">04</span>
+        <h2 class="chapter-title">Knowledge of Sentences &amp; Rule-Governed Creativity</h2>
+      </div>
+      <p class="section-lead">
+        Language is not a fixed repertoire of rehearsed sentences. It is a <strong>generative syntactic engine</strong> capable of expressing an infinite array of novel ideas from a finite set of structural rules.
+      </p>
+
+      <h3 class="subsection-title">
+        The Architecture of Syntax
+        <span class="tag">Grammar</span>
+      </h3>
+
+      <div class="card-grid-3">
+        <div class="editorial-card highlight">
+          <span class="card-label">Structural Dimension I</span>
+          <h4 class="card-heading">Agreed Conventions</h4>
+          <p class="card-text">
+            Grammar functions as a tacit social contract. Native speakers intuitively recognize that <em>"The cat sat on the mat"</em> obeys structural rules, while <em>"Mat the on sat cat the"</em> violates them, even without formal grammatical training.
+          </p>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Structural Dimension II</span>
+          <h4 class="card-heading">Infinite Expressiveness</h4>
+          <p class="card-text">
+            Our vocabulary contains a finite number of words, yet our syntactic engine can produce an infinite number of sentences. We routinely decode sentences that have never before been uttered in human history.
+          </p>
+        </div>
+
+        <div class="editorial-card highlight-sage">
+          <span class="card-label">Structural Dimension III</span>
+          <h4 class="card-heading">Grammaticality Judgments</h4>
+          <p class="card-text">
+            Linguistic competence equips every speaker with an internal judge that immediately distinguishes well-formed sentences from ill-formed strings that break agreement or structural word order.
+          </p>
+        </div>
+      </div>
+
+      <div class="pedagogy-banner" style="margin: 24px 0;">
+        <div class="pedagogy-icon">🌌</div>
+        <div class="pedagogy-text">
+          <strong>The Miracle of Generative Syntax:</strong> Consider the sentence:<br>
+          <em style="color: var(--text-main); font-weight: 600;">"The purple elephant danced ballet on the moon while eating spaghetti."</em><br>
+          Though you have never encountered this exact formulation, your internalized grammar parses its structure and decodes its semantic meaning instantly.
+        </div>
+      </div>
+
+      <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 28px 0 12px 0;">
+        Syntactic Intuition: Grammaticality Judgments in Action
+      </h4>
+      <div class="judgment-grid">
+        <div class="judgment-item valid">
+          <span><code>She goes to school.</code></span>
+          <span class="judgment-status">Well-Formed (Grammatical)</span>
+        </div>
+        <div class="judgment-item invalid">
+          <span><code>She go to school.</code></span>
+          <span class="judgment-status">Ill-Formed (Agreement Violation)</span>
+        </div>
+        <div class="judgment-item invalid">
+          <span><code>School to goes she.</code></span>
+          <span class="judgment-status">Ill-Formed (Linear Word-Order Violation)</span>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">
+        The Structural Ladder of Language
+        <span class="tag">Hierarchy</span>
+      </h3>
+      <p class="card-text">
+        Language operates as a multi-tiered generative hierarchy. Each tier combines elements from the preceding level into increasingly complex structures:
+      </p>
+
+      <div class="hierarchy-ladder">
+        <div class="ladder-step">
+          <div class="ladder-num">1</div>
+          <div class="ladder-info">
+            <div class="ladder-title">Phonology (Sounds)</div>
+            <div class="ladder-desc">Basic acoustic building blocks without inherent meaning: <span class="phonetic-badge">/k/</span>, <span class="phonetic-badge">/æ/</span>, <span class="phonetic-badge">/t/</span>.</div>
+          </div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-num">2</div>
+          <div class="ladder-info">
+            <div class="ladder-title">Morphology &amp; Lexicon (Words)</div>
+            <div class="ladder-desc">Sounds organized into meaningful, distinct lexical units: <code>cat</code>.</div>
+          </div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-num">3</div>
+          <div class="ladder-info">
+            <div class="ladder-title">Phrases (Syntactic Clusters)</div>
+            <div class="ladder-desc">Words grouped around a central head: <code>the black cat</code>.</div>
+          </div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-num">4</div>
+          <div class="ladder-info">
+            <div class="ladder-title">Sentences (Propositions)</div>
+            <div class="ladder-desc">Phrases unified into complete, truth-evaluable thoughts: <code>The black cat sleeps on the sofa.</code></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">
+        Rule-Governed Creativity: Recursion
+        <span class="tag">The Secret Engine</span>
+      </h3>
+      <p class="card-text">
+        <strong>Recursion</strong> is the syntactic property that allows a phrase or clause to be embedded within a structure of the same type. This principle enables human language to extend descriptions and clauses indefinitely.
+      </p>
+
+      <div class="card-grid-3">
+        <div class="editorial-card highlight">
+          <span class="card-label">Type 1</span>
+          <h4 class="card-heading">Adjective Stacking</h4>
+          <p class="card-text">
+            Adjective phrases can contain additional adjectives without structural limit:
+          </p>
+          <div class="stack-container">
+            • The cat<br>
+            • The <span class="stack-highlight">big</span> cat<br>
+            • The <span class="stack-highlight">big, fluffy</span> cat<br>
+            • The <span class="stack-highlight">big, fluffy, orange</span> cat<br>
+            • The <span class="stack-highlight">big, fluffy, orange, sleepy</span> cat...
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Type 2</span>
+          <h4 class="card-heading">PP Embedding</h4>
+          <p class="card-text">
+            Noun Phrases can embed Prepositional Phrases containing further Noun Phrases:
+          </p>
+          <div class="stack-container">
+            • The house<br>
+            • The house <span class="stack-highlight">on the hill</span><br>
+            • ...on the hill <span class="stack-highlight">near the river</span><br>
+            • ...near the river <span class="stack-highlight">by the old bridge</span><br>
+            • ...by the bridge <span class="stack-highlight">under the stormy sky</span>
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-sage">
+          <span class="card-label">Type 3</span>
+          <h4 class="card-heading">Clause Embedding</h4>
+          <p class="card-text">
+            Sentences can nest additional relative clauses recursively:
+          </p>
+          <div class="stack-container">
+            • I know the man.<br>
+            • ...who <span class="stack-highlight">bought the car</span>.<br>
+            • ...that <span class="stack-highlight">hit the dog</span>.<br>
+            • ...which <span class="stack-highlight">chased the cat</span>.<br>
+            • ...that <span class="stack-highlight">caught the mouse</span>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Case Study 4: Recursion in Action -->
+      <div class="case-study">
+        <span class="case-study-badge">Analytical Case Study</span>
+        <h4 class="case-study-title">Deconstructing Recursive Stacking</h4>
+        <div class="case-study-question">
+          "Create a sentence using recursion to describe a specific object. Then, explain which grammatical rule allows you to keep adding details."
+        </div>
+
+        <div style="background: var(--bg-card); padding: 14px 18px; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.92rem; color: var(--accent-indigo); margin-bottom: 18px;">
+          "The book on the table in the library in the city in the country was old."
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>The Structural Rule:</strong> Prepositional Phrase Embedding (<code>NP ➔ NP + PP</code> where <code>PP ➔ P + NP</code>).
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>The Generative Loop:</strong> Because every Prepositional Phrase introduces a new Noun Phrase (e.g., <em>the library</em>), that newly introduced Noun Phrase can host another modifying Prepositional Phrase (<em>in the city</em>).
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Rule-Governed Creativity:</strong> You have not memorized this sentence as a canned phrase. You used shared grammatical rules to construct a completely original, fully comprehensible linguistic expression.
+            </div>
+          </li>
+        </ul>
+
+        <div class="verdict-box">
+          <span class="verdict-tag">Cognitive Significance</span>
+          <div class="verdict-text">
+            While animal communication systems are typically limited to fixed inventories of signals, <strong>recursion</strong> provides the structural mechanism for the unbounded expressive capacity of the human mind.
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist 4 -->
+      <div class="checklist-card">
+        <div class="checklist-title">Summary Checklist: Grammar &amp; Syntactic Creativity</div>
+        <ul class="custom-checklist">
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Conventional Rules:</strong> Shared grammatical conventions allow speakers to build and interpret meaning.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Infinite Potential:</strong> A finite vocabulary coupled with generative rules produces endless sentences.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Grammaticality Judgments:</strong> Intuitive recognition of well-formed versus ill-formed syntactic structures.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Structural Ladder:</strong> Systematic hierarchy advancing from Phonemes to Morphemes, Phrases, and Sentences.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Recursion:</strong> The syntactic rule allowing self-similar structures to nest infinitely.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Generative Engine:</strong> Language is an active system of construction, not a passive memorized script.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODULE 5 (NEW) -->
+    <section class="chapter-section" id="module-5">
+      <div class="chapter-header">
+        <span class="chapter-num">05</span>
+        <h2 class="chapter-title">Competence vs. Performance &amp; Grammatical Frameworks</h2>
+      </div>
+      <p class="section-lead">
+        Why is what we say not always what we know? We untangle Noam Chomsky's foundational distinction between internal knowledge and real-time execution, alongside the four major grammatical frameworks.
+      </p>
+
+      <h3 class="subsection-title">
+        The Dual Nature of Language Processing
+        <span class="tag">Chomsky's Dichotomy</span>
+      </h3>
+
+      <div class="card-grid-2">
+        <div class="editorial-card highlight">
+          <span class="card-label">Internal Architecture</span>
+          <h4 class="card-heading">Linguistic Competence 🧠</h4>
+          <p class="card-text">
+            The speaker-hearer's <strong>underlying, internalized knowledge</strong> of their language system. It encompasses the complete mental dictionary (lexicon) and generative rulebook (phonology, syntax, semantics).
+          </p>
+          <div style="margin-top: 14px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
+            <div>• <strong>Ideal &amp; Systematic:</strong> Pristine, stable, and coherent in the mind.</div>
+            <div>• <strong>Intuitive:</strong> Grasped without requiring conscious formal analysis.</div>
+            <div>• <strong>The Musical Analogy:</strong> Possessing absolute mastery of sheet music, chords, harmony, and composition theory.</div>
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Real-Time Execution</span>
+          <h4 class="card-heading">Linguistic Performance 🗣️</h4>
+          <p class="card-text">
+            The <strong>actual acoustic, written, or signed realization</strong> and real-time comprehension of language under authentic communicative conditions.
+          </p>
+          <div style="margin-top: 14px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
+            <div>• <strong>Imperfect &amp; Variable:</strong> Constantly buffeted by psychological noise.</div>
+            <div>• <strong>Influencing Factors:</strong> Memory lapses, distractions, performance anxiety, exhaustion, illness, or intoxication ("tipsy grammar").</div>
+            <div>• <strong>The Musical Analogy:</strong> Performing on stage where a finger slips on a key—you <em>know</em> the note, yet output failed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pedagogy-banner">
+        <div class="pedagogy-icon">👩‍🏫</div>
+        <div class="pedagogy-text">
+          <strong>Crucial Insight for Educators:</strong> Never conflate an imperfect <strong>Performance</strong> with a deficit in <strong>Competence</strong>. When a student falters during an oral presentation due to stress, their underlying internal competence remains intact; the performance filter simply suffered interference.
+        </div>
+      </div>
+
+      <h3 class="subsection-title">
+        Four Grammatical Frameworks
+        <span class="tag">Perspectives on Rules</span>
+      </h3>
+      <p class="card-text" style="margin-bottom: 20px;">
+        Linguists, educators, and cognitive scientists examine the rules of grammar through distinct conceptual lenses:
+      </p>
+
+      <div class="card-grid-4">
+        <div class="editorial-card highlight">
+          <span class="card-label">Framework 01</span>
+          <h4 class="card-heading">Descriptive</h4>
+          <p class="card-text">
+            <strong>Focus: Reality.</strong> Observes and models how native speakers <em>actually speak</em> in authentic contexts without moral or aesthetic judgment.
+          </p>
+          <div style="margin-top: 12px; font-size: 0.85rem; color: var(--accent-terracotta); font-weight: 600;">
+            "This is how people speak."
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Framework 02</span>
+          <h4 class="card-heading">Prescriptive</h4>
+          <p class="card-text">
+            <strong>Focus: Correctness.</strong> Enforces authoritative standards on what usage <em>ought</em> to be, often codifying social preferences as rigid mandates.
+          </p>
+          <div style="margin-top: 12px; font-size: 0.85rem; color: var(--accent-indigo); font-weight: 600;">
+            "This is how you SHOULD speak."
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-sage">
+          <span class="card-label">Framework 03</span>
+          <h4 class="card-heading">Teaching</h4>
+          <p class="card-text">
+            <strong>Focus: Acquisition.</strong> Curated pedagogical grammars for second-language learners that explicitly explain rules in accessible, practical formats.
+          </p>
+          <div style="margin-top: 12px; font-size: 0.85rem; color: var(--accent-sage); font-weight: 600;">
+            "This is how you LEARN to speak."
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-purple">
+          <span class="card-label">Framework 04</span>
+          <h4 class="card-heading">Universal (UG)</h4>
+          <p class="card-text">
+            <strong>Focus: Human Nature.</strong> The biological blueprint proposed by Chomsky that accounts for how every human child acquires any natural language.
+          </p>
+          <div style="margin-top: 12px; font-size: 0.85rem; color: var(--accent-purple); font-weight: 600;">
+            "What makes language possible."
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">
+        Universal Grammar: Principles &amp; Parameters
+        <span class="tag">The Biological Engine</span>
+      </h3>
+      <p class="card-text">
+        Chomsky's model reconciles the astonishing diversity of human speech with the universal speed of child language acquisition by partitioning UG into two mechanisms:
+      </p>
+
+      <div class="card-grid-2">
+        <div class="editorial-card highlight-purple">
+          <span class="card-label">Invariant Hardware</span>
+          <h4 class="card-heading">Universal Principles 🔒</h4>
+          <p class="card-text">
+            Invariable rules hardwired into human cognitive biology, shared across <strong>all</strong> natural languages.
+          </p>
+          <div style="margin-top: 12px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 6px;">
+            <div>• All languages possess distinct lexical classes: <strong>Nouns</strong> and <strong>Verbs</strong>.</div>
+            <div>• All languages operate via <strong>structure dependence</strong> (rules apply to hierarchical syntactic trees, never simple linear word counts).</div>
+          </div>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Configurable Switches</span>
+          <h4 class="card-heading">Language Parameters 🎛️</h4>
+          <p class="card-text">
+            Cognitive "switches" with a bounded set of binary settings that are calibrated as an infant absorbs linguistic input from their environment.
+          </p>
+          <div style="margin-top: 12px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 6px;">
+            <div>• Children do not learn grammar from scratch.</div>
+            <div>• Hearing native speech simply flips biological switches to match community settings.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parameter Switches Visualizer -->
+      <div class="param-switch-card">
+        <div class="param-title">
+          <span>Parameter 1: Head-Direction Parameter</span>
+          <span class="phonetic-badge">Syntactic Alignment</span>
+        </div>
+        <div class="param-options">
+          <div class="param-opt">
+            <strong>Head-Initial (English):</strong>
+            Verb precedes its complement Object:<br>
+            <code>[Eat] + [apples]</code>
+          </div>
+          <div class="param-opt">
+            <strong>Head-Final (Japanese):</strong>
+            Complement Object precedes its Verb:<br>
+            <code>[Ringo-o] + [taberu]</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="param-switch-card">
+        <div class="param-title">
+          <span>Parameter 2: Pro-Drop (Null-Subject) Parameter</span>
+          <span class="phonetic-badge">Pronoun Omission</span>
+        </div>
+        <div class="param-options">
+          <div class="param-opt">
+            <strong>Non-Pro-Drop (English):</strong>
+            Explicit subject pronoun is mandatory:<br>
+            <code>"I speak"</code> (<em>*"Speak"</em> is ungrammatical)
+          </div>
+          <div class="param-opt">
+            <strong>Pro-Drop (Spanish / Italian):</strong>
+            Subject pronoun can be omitted freely:<br>
+            <code>"Hablo"</code> (Subject inferred from inflection)
+          </div>
+        </div>
+      </div>
+
+      <!-- Case Study 5: Descriptive vs. Prescriptive -->
+      <div class="case-study">
+        <span class="case-study-badge">Analytical Case Study</span>
+        <h4 class="case-study-title">The Classroom Red Pen: Descriptive vs. Prescriptive</h4>
+        <div class="case-study-question">
+          "A student writes 'I ain't got no money' in an essay. The teacher marks it as incorrect. Is the teacher operating under a Descriptive or Prescriptive grammar framework, and why?"
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>The Descriptive Stance:</strong> A descriptive linguist recognizes that <em>"ain't"</em> and negative concord (double negatives) are rule-governed, systematic features of established varieties such as African American Vernacular English (AAVE) and British Cockney. Within those systems, the sentence is well-formed.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>The Prescriptive Stance:</strong> A prescriptivist enforces institutional norms of Standard Written English, decreeing double negatives "illogical" and classifying <em>"ain't"</em> as improper.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>The Evaluation:</strong> Because the instructor is penalizing the construction against an institutional ideal of "best usage" rather than analyzing natural dialectical regularity, they are applying <strong>Prescriptive Grammar</strong>.
+            </div>
+          </li>
+        </ul>
+
+        <div class="verdict-box">
+          <span class="verdict-tag">Pedagogical Synthesis</span>
+          <div class="verdict-text">
+            In an enlightened <strong>Teaching Grammar</strong> context, educators bridge both: validating the student's dialect as systematic while teaching the sociolinguistic conventions required for formal writing.
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist 5 -->
+      <div class="checklist-card">
+        <div class="checklist-title">Summary Checklist: Competence, Performance &amp; Frameworks</div>
+        <ul class="custom-checklist">
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Competence:</strong> Idealized, internalized knowledge of the language system.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Performance:</strong> Real-time production subject to memory slips, anxiety, and fatigue.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Descriptive Grammar:</strong> Documenting real-world speech without judgment.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Prescriptive Grammar:</strong> Enforcing rules of "correct" or prestigious usage.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Teaching Grammar:</strong> Structured pedagogical rules designed to facilitate language learning.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Universal Grammar:</strong> Innate biological faculty shared by all humans.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Principles &amp; Parameters:</strong> Invariant cognitive rules paired with environment-calibrated switches.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <!-- MODULE 6 (NEW) -->
+    <section class="chapter-section" id="module-6">
+      <div class="chapter-header">
+        <span class="chapter-num">06</span>
+        <h2 class="chapter-title">Structure Dependency &amp; The Sapir-Whorf Hypothesis</h2>
+      </div>
+      <p class="section-lead">
+        How do our minds navigate grammatical syntax, and does the language we speak dictate our perception of reality? We explore hierarchical cognitive processing and the classic debate on linguistic relativity.
+      </p>
+
+      <h3 class="subsection-title">
+        Structure Dependency: The Tree Over the String
+        <span class="tag">UG Invariant</span>
+      </h3>
+
+      <div class="card-grid-2">
+        <div class="editorial-card highlight">
+          <span class="card-label">Core Architectural Principle</span>
+          <h4 class="card-heading">Hierarchical Tree Structure 🌳</h4>
+          <p class="card-text">
+            Language processing does not treat sentences as linear "strings of beads." Syntactic operations depend on <strong>structural relationships</strong> and hierarchical grammatical roles (subject, main clause, auxiliary) rather than flat numerical word positions.
+          </p>
+        </div>
+
+        <div class="editorial-card highlight-indigo">
+          <span class="card-label">Empirical Evidence</span>
+          <h4 class="card-heading">The Innateness Proof 👶</h4>
+          <p class="card-text">
+            When acquiring language, children never commit structure-independent errors (e.g., mechanically fronting the 3rd word). Their cognitive grammar naturally parses nested constituents without explicit instruction.
+          </p>
+        </div>
+      </div>
+
+      <!-- Linear vs Structure Dependent Demonstration -->
+      <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 28px 0 12px 0;">
+        Transformational Proof: Question Formation
+      </h4>
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 22px; margin-bottom: 20px;">
+        <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-light); text-transform: uppercase;">Base Declarative Proposition:</span>
+        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-top: 4px;">
+          "The man [who is tall] is happy."
+        </div>
+      </div>
+
+      <div class="judgment-grid">
+        <div class="judgment-item invalid">
+          <span>❌ <strong>Flat Linear Error:</strong> Fronting the first auxiliary: <code>"Is the man who tall is happy?"</code></span>
+          <span class="judgment-status">Breaks Nested Clause</span>
+        </div>
+        <div class="judgment-item valid">
+          <span>✅ <strong>Structure-Dependent Move:</strong> Fronting the matrix verb: <code>"Is the man who is tall happy?"</code></span>
+          <span class="judgment-status">Preserves Structure</span>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">
+        Language and Thought: The Sapir-Whorf Hypothesis
+        <span class="tag">Cognitive Debate</span>
+      </h3>
+      <p class="card-text" style="margin-bottom: 20px;">
+        Formulated by Edward Sapir and Benjamin Lee Whorf, this hypothesis investigates whether the structural grammar and vocabulary of a language condition human cognitive perception:
+      </p>
+
+      <div class="card-grid-2">
+        <!-- Strong Form -->
+        <div class="editorial-card highlight-amber">
+          <span class="card-label">Strong Formulation</span>
+          <h4 class="card-heading">Linguistic Determinism 🔒</h4>
+          <p class="card-text">
+            <strong>Claim: Language DETERMINES thought.</strong> Cognition is strictly bounded by language; speakers can only conceptualize what their language encodes lexical or grammatical categories for.
+          </p>
+          <div style="margin-top: 14px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
+            <div>• <strong>The Hopi Time Example:</strong> Whorf suggested Hopi speakers perceive time as non-linear because Hopi grammar lacks European-style linear tenses.</div>
+            <div>• <strong>Academic Consensus:</strong> <em>Overwhelmingly rejected</em> by contemporary cognitive science. Cultural expression differs, but universal human cognition persists across grammars.</div>
+          </div>
+        </div>
+
+        <!-- Weak Form -->
+        <div class="editorial-card highlight-sage">
+          <span class="card-label">Weak Formulation</span>
+          <h4 class="card-heading">Linguistic Relativism 🌿</h4>
+          <p class="card-text">
+            <strong>Claim: Language INFLUENCES thought.</strong> Language acts as a perceptual lens, nudging habitual attention toward dimensions that the native grammar foregrounds.
+          </p>
+          <div style="margin-top: 14px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 8px;">
+            <div>• <strong>Spatial &amp; Prepositional Lenses:</strong> English classifies transit by surface vs. enclosure (<em>on a bicycle</em> vs. <em>in a car</em>), while Italian conceptualizes space containment (<em>in bicicletta</em>).</div>
+            <div>• <strong>Academic Consensus:</strong> <em>Widely supported</em>. Language shapes cognitive salience, speed of categorization, and focus without locking the mind.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case Study 6: Schadenfreude & Determinism -->
+      <div class="case-study">
+        <span class="case-study-badge">Analytical Case Study</span>
+        <h4 class="case-study-title">The Schadenfreude Test: Refuting Determinism</h4>
+        <div class="case-study-question">
+          "If Linguistic Determinism were true, could an English speaker conceptualize 'Schadenfreude' (taking pleasure in another's misfortune) without an exact single-word lexical equivalent? What does this demonstrate?"
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>The Deterministic Prediction:</strong> If words strictly dictate concepts, English speakers would be cognitively blind to this emotional state until the German loanword entered the vocabulary.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>The Empirical Reality:</strong> English speakers experienced and described the emotion long before borrowing the label (e.g., <em>"gloating over a rival's failure"</em>).
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>The Relativist Nuance:</strong> While determinism fails, acquiring the specific label <code>Schadenfreude</code> streamlines cognitive retrieval and social conversation, corroborating <strong>Linguistic Relativism</strong>.
+            </div>
+          </li>
+        </ul>
+
+        <div class="verdict-box">
+          <span class="verdict-tag">Cognitive Verdict</span>
+          <div class="verdict-text">
+            Linguistic Determinism is <strong>empirically false</strong>. Human conceptual ability surpasses surface lexical inventories; language influences habitual cognitive focus, but does not shackle thought.
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist 6 -->
+      <div class="checklist-card">
+        <div class="checklist-title">Summary Checklist: Structure Dependency &amp; Thought</div>
+        <ul class="custom-checklist">
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Structure Dependency:</strong> Syntactic operations apply to hierarchical trees, never raw linear counts.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Sapir-Whorf Hypothesis:</strong> The overarching investigation connecting language structure and thought.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Linguistic Determinism (Strong):</strong> Language dictates cognition (rejected by modern linguistics).</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Linguistic Relativism (Weak):</strong> Language acts as a lens shaping habitual salience (widely accepted).</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Hopi Temporal Debate:</strong> The classic tense-structure case study used in Whorfian determinism.</span>
+          </li>
+          <li>
+            <div class="checkbox-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="text"><strong>Prepositional Categorization:</strong> Cross-linguistic variation in spatial perception (English "on" vs. Italian "in").</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Grand Manifesto Section -->
+    <div class="grand-manifesto">
+      <span class="manifesto-badge">Pedagogical Manifesto</span>
+      <h2>Teaching the Generative Mind</h2>
+      <p>
+        Language acquisition transcends mechanical drill and rote memorization. Whether analyzing phonemic inventories, arbitrary word-meaning pairings, recursive syntactic structures, or parameter settings in Universal Grammar, educators do not simply hand down prefabricated lists. They help learners activate a <strong>generative cognitive engine</strong> capable of creating infinite meaning within human society.
+      </p>
+      
+      <div class="creator-signature">
+        <div class="credit-line">Curated &amp; Designed by Bunreth Nihrantz</div>
+        <div class="credit-sub">Editorial Publication • Linguistic Sciences Series</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="container" style="padding: 0; text-align: center;">
+      <p>© 2026 Linguistic Foundations • Designed for Academic &amp; Editorial Clarity</p>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript for Checklists & Scroll Progress -->
+  <script>
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    // Interactive checklist toggle
+    document.querySelectorAll('.custom-checklist li').forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('checked');
+      });
+    });
+  </script>
+</body>
+</html>
